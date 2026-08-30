@@ -3,7 +3,6 @@
  * Click nbfs://nbhost/SystemFileSystem/Templates/GUIForms/JFrame.java to edit this template
  */
 package vista;
-
 /**
  *
  * @author cesar
@@ -12,11 +11,32 @@ public class FrmPrincipal extends javax.swing.JFrame {
     
     private static final java.util.logging.Logger logger = java.util.logging.Logger.getLogger(FrmPrincipal.class.getName());
 
+    private java.awt.CardLayout vistaCards;
+    
     /**
      * Creates new form FrmPrincipal
      */
     public FrmPrincipal() {
         initComponents();
+        
+        vistaCards = (java.awt.CardLayout) panelContenido.getLayout();
+        
+        panelContenido.add(new PanelModuloInicio(), "MODULO_INICIO");
+        panelContenido.add(new PanelModuloViajes(), "MODULO_VIAJES");
+        panelContenido.add(new PanelModuloData(), "MODULO_DATA");
+        
+        vistaCards.show(panelContenido, "MODULO_INICIO");
+        
+        PanelUserSidebar sidebar = new PanelUserSidebar(this);
+        panelSidebarContenedor.setLayout(new java.awt.BorderLayout());
+        panelSidebarContenedor.add(sidebar, java.awt.BorderLayout.CENTER);
+        
+        this.setPreferredSize(new java.awt.Dimension(1100, 700));
+        this.setSize(1100, 700);
+        this.setLocationRelativeTo(null);
+        
+        panelSidebarContenedor.revalidate();
+        panelSidebarContenedor.repaint();
     }
 
     /**
@@ -28,19 +48,19 @@ public class FrmPrincipal extends javax.swing.JFrame {
     // <editor-fold defaultstate="collapsed" desc="Generated Code">//GEN-BEGIN:initComponents
     private void initComponents() {
 
+        panelSidebarContenedor = new java.awt.Panel();
+        panelContenido = new java.awt.Panel();
+
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
         setCursor(new java.awt.Cursor(java.awt.Cursor.DEFAULT_CURSOR));
 
-        javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
-        getContentPane().setLayout(layout);
-        layout.setHorizontalGroup(
-            layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGap(0, 1100, Short.MAX_VALUE)
-        );
-        layout.setVerticalGroup(
-            layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGap(0, 680, Short.MAX_VALUE)
-        );
+        panelSidebarContenedor.setBackground(new java.awt.Color(0, 153, 255));
+        panelSidebarContenedor.setPreferredSize(new java.awt.Dimension(220, 700));
+        panelSidebarContenedor.setLayout(new java.awt.CardLayout());
+        getContentPane().add(panelSidebarContenedor, java.awt.BorderLayout.LINE_START);
+
+        panelContenido.setLayout(new java.awt.CardLayout());
+        getContentPane().add(panelContenido, java.awt.BorderLayout.CENTER);
 
         pack();
     }// </editor-fold>//GEN-END:initComponents
@@ -69,7 +89,15 @@ public class FrmPrincipal extends javax.swing.JFrame {
         /* Create and display the form */
         java.awt.EventQueue.invokeLater(() -> new FrmPrincipal().setVisible(true));
     }
+    
+    public void navegar(String nombreCard){
+        if (vistaCards != null){
+            vistaCards.show(panelContenido, nombreCard);
+        }
+    }
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
+    private java.awt.Panel panelContenido;
+    private java.awt.Panel panelSidebarContenedor;
     // End of variables declaration//GEN-END:variables
 }
