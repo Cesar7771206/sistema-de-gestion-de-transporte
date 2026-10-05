@@ -3,7 +3,8 @@
  * Click nbfs://nbhost/SystemFileSystem/Templates/GUIForms/JPanel.java to edit this template
  */
 package vista;
-
+import java.awt.CardLayout;
+import javax.swing.table.DefaultTableModel;
 /**
  *
  * @author cesar
@@ -13,10 +14,22 @@ public class PanelModuloViajes extends javax.swing.JPanel {
     /**
      * Creates new form PanelControlViajes
      */
-    public PanelModuloViajes() {
-        initComponents();
-    }
+   public PanelModuloViajes() {
+    initComponents();
 
+    cardLayout = new CardLayout();
+    pnlContenido.setLayout(cardLayout);
+
+    pnlContenido.add(new PanelContenedor(), "contenedor");
+    pnlContenido.add(new PanelTractor(), "tractor");
+    pnlContenido.add(new PanelCarreta(), "carreta");
+    pnlContenido.add(new PanelPlanta(), "planta");
+    pnlContenido.add(new PanelTerminal(), "terminal");
+    pnlContenido.add(new PanelCliente(), "cliente");
+    pnlContenido.add(new PanelRuta(), "ruta");
+}
+    
+private CardLayout cardLayout;
     /**
      * This method is called from within the constructor to initialize the form.
      * WARNING: Do NOT modify this code. The content of this method is always
@@ -27,32 +40,107 @@ public class PanelModuloViajes extends javax.swing.JPanel {
     private void initComponents() {
 
         jLabel1 = new javax.swing.JLabel();
+        jLabel2 = new javax.swing.JLabel();
+        cboOpciones = new javax.swing.JComboBox<>();
+        pnlContenido = new javax.swing.JPanel();
+        jScrollPane1 = new javax.swing.JScrollPane();
+        tblViajes = new javax.swing.JTable();
 
-        setBackground(new java.awt.Color(255, 51, 204));
+        setBackground(new java.awt.Color(255, 255, 255));
         setPreferredSize(new java.awt.Dimension(880, 680));
+        setLayout(new org.netbeans.lib.awtextra.AbsoluteLayout());
 
-        jLabel1.setText("VISTA VIAJES");
+        jLabel1.setFont(new java.awt.Font("Javanese Text", 1, 36)); // NOI18N
+        jLabel1.setText("MODULO VIAJES");
+        jLabel1.setBorder(javax.swing.BorderFactory.createLineBorder(new java.awt.Color(0, 0, 0)));
+        add(jLabel1, new org.netbeans.lib.awtextra.AbsoluteConstraints(20, 30, 320, 60));
 
-        javax.swing.GroupLayout layout = new javax.swing.GroupLayout(this);
-        this.setLayout(layout);
-        layout.setHorizontalGroup(
-            layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(layout.createSequentialGroup()
-                .addGap(363, 363, 363)
-                .addComponent(jLabel1)
-                .addContainerGap(435, Short.MAX_VALUE))
+        jLabel2.setFont(new java.awt.Font("SimSun", 1, 14)); // NOI18N
+        jLabel2.setText("Selecciona un campo a editar:");
+        add(jLabel2, new org.netbeans.lib.awtextra.AbsoluteConstraints(390, 50, -1, -1));
+
+        cboOpciones.setModel(new javax.swing.DefaultComboBoxModel<>(new String[] { "Viaje", "Contenedor", "Tractor", "Carreta", "Planta", "Terminal", "Cliente", "Ruta" }));
+        cboOpciones.addActionListener(this::cboOpcionesActionPerformed);
+        add(cboOpciones, new org.netbeans.lib.awtextra.AbsoluteConstraints(620, 40, 140, 30));
+
+        pnlContenido.setBorder(javax.swing.BorderFactory.createLineBorder(new java.awt.Color(0, 0, 0)));
+
+        javax.swing.GroupLayout pnlContenidoLayout = new javax.swing.GroupLayout(pnlContenido);
+        pnlContenido.setLayout(pnlContenidoLayout);
+        pnlContenidoLayout.setHorizontalGroup(
+            pnlContenidoLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGap(0, 678, Short.MAX_VALUE)
         );
-        layout.setVerticalGroup(
-            layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(layout.createSequentialGroup()
-                .addGap(235, 235, 235)
-                .addComponent(jLabel1)
-                .addContainerGap(428, Short.MAX_VALUE))
+        pnlContenidoLayout.setVerticalGroup(
+            pnlContenidoLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGap(0, 288, Short.MAX_VALUE)
         );
+
+        add(pnlContenido, new org.netbeans.lib.awtextra.AbsoluteConstraints(50, 100, 680, 290));
+
+        tblViajes.setModel(new javax.swing.table.DefaultTableModel(
+            new Object [][] {
+                {null, null, null, null, null, null},
+                {null, null, null, null, null, null},
+                {null, null, null, null, null, null},
+                {null, null, null, null, null, null}
+            },
+            new String [] {
+                "ID", "Destino", "Fecha", "Origen", "Transporte", "Estado"
+            }
+        ));
+        jScrollPane1.setViewportView(tblViajes);
+
+        add(jScrollPane1, new org.netbeans.lib.awtextra.AbsoluteConstraints(60, 430, 660, 230));
     }// </editor-fold>//GEN-END:initComponents
+
+    private void cboOpcionesActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_cboOpcionesActionPerformed
+        String opcion = cboOpciones.getSelectedItem().toString();
+
+        if (opcion.equals("Contenedor")) {
+            cardLayout.show(pnlContenido, "contenedor");
+        }else if (opcion.equals("Tractor")) {
+
+            cardLayout.show(pnlContenido, "tractor");
+
+        }else if (opcion.equals("Carreta")) {
+
+            cardLayout.show(pnlContenido, "carreta");
+
+        }else if (opcion.equals("Planta")) {
+
+            cardLayout.show(pnlContenido, "planta");
+
+        }else if (opcion.equals("Terminal")) {
+
+            cardLayout.show(pnlContenido, "terminal");
+
+        }else if (opcion.equals("Terminal")) {
+
+            cardLayout.show(pnlContenido, "terminal");
+
+        }else if (opcion.equals("Cliente")) {
+
+            cardLayout.show(pnlContenido, "cliente");
+
+        }else if (opcion.equals("Ruta")) {
+
+            cardLayout.show(pnlContenido, "ruta");
+
+        }else if (opcion.equals("Viaje")) {
+
+            cardLayout.show(pnlContenido, "viaje");
+
+        }
+    }//GEN-LAST:event_cboOpcionesActionPerformed
 
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
+    private javax.swing.JComboBox<String> cboOpciones;
     private javax.swing.JLabel jLabel1;
+    private javax.swing.JLabel jLabel2;
+    private javax.swing.JScrollPane jScrollPane1;
+    private javax.swing.JPanel pnlContenido;
+    private javax.swing.JTable tblViajes;
     // End of variables declaration//GEN-END:variables
 }
