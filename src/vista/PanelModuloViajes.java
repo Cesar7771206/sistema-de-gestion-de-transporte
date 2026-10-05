@@ -20,7 +20,6 @@ public class PanelModuloViajes extends javax.swing.JPanel {
     cardLayout = new CardLayout();
     pnlContenido.setLayout(cardLayout);
 
-    pnlContenido.add(new PanelViaje(), "viaje");
     pnlContenido.add(new PanelContenedor(), "contenedor");
     pnlContenido.add(new PanelTractor(), "tractor");
     pnlContenido.add(new PanelCarreta(), "carreta");
@@ -96,43 +95,43 @@ private CardLayout cardLayout;
     }// </editor-fold>//GEN-END:initComponents
 
     private void cboOpcionesActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_cboOpcionesActionPerformed
-      String opcion = cboOpciones.getSelectedItem().toString();
+        String opcion = cboOpciones.getSelectedItem().toString();
 
-if (opcion.equals("Contenedor")) {
-    cardLayout.show(pnlContenido, "contenedor");
-}else if (opcion.equals("Tractor")) {
+        if (opcion.equals("Contenedor")) {
+            cardLayout.show(pnlContenido, "contenedor");
+        }else if (opcion.equals("Tractor")) {
 
-    cardLayout.show(pnlContenido, "tractor");
+            cardLayout.show(pnlContenido, "tractor");
 
-}else if (opcion.equals("Carreta")) {
+        }else if (opcion.equals("Carreta")) {
 
-    cardLayout.show(pnlContenido, "carreta");
+            cardLayout.show(pnlContenido, "carreta");
 
-}else if (opcion.equals("Planta")) {
+        }else if (opcion.equals("Planta")) {
 
-    cardLayout.show(pnlContenido, "planta");
+            cardLayout.show(pnlContenido, "planta");
 
-}else if (opcion.equals("Terminal")) {
+        }else if (opcion.equals("Terminal")) {
 
-    cardLayout.show(pnlContenido, "terminal");
+            cardLayout.show(pnlContenido, "terminal");
 
-}else if (opcion.equals("Terminal")) {
+        }else if (opcion.equals("Terminal")) {
 
-    cardLayout.show(pnlContenido, "terminal");
+            cardLayout.show(pnlContenido, "terminal");
 
-}else if (opcion.equals("Cliente")) {
+        }else if (opcion.equals("Cliente")) {
 
-    cardLayout.show(pnlContenido, "cliente");
+            cardLayout.show(pnlContenido, "cliente");
 
-}else if (opcion.equals("Ruta")) {
+        }else if (opcion.equals("Ruta")) {
 
-    cardLayout.show(pnlContenido, "ruta");
+            cardLayout.show(pnlContenido, "ruta");
 
-}else if (opcion.equals("Viaje")) {
+        }else if (opcion.equals("Viaje")) {
 
-    cardLayout.show(pnlContenido, "viaje");
+            cardLayout.show(pnlContenido, "viaje");
 
-}
+        }
     }//GEN-LAST:event_cboOpcionesActionPerformed
 
 
