@@ -15,9 +15,9 @@ public class Contenedor {
     private double payload;
     private double tara;
     
-    public static final Comparator<Contenedor> POR_CODIGO = Comparator.comparing(Contenedor :: getCodigo);
-    public static final Comparator<Contenedor> POR_PAYLOAD = Comparator.comparing(Contenedor :: getPayload);
-    public static final Comparator<Contenedor> POR_TARA = Comparator.comparing(Contenedor :: getTara);
+        public static final Comparator<Contenedor> POR_CODIGO = Comparator.comparing(Contenedor :: getCodigo);
+        public static final Comparator<Contenedor> POR_PAYLOAD = Comparator.comparing(Contenedor :: getPayload).reversed();
+        public static final Comparator<Contenedor> POR_TARA = Comparator.comparing(Contenedor :: getTara).reversed();
     
     public Contenedor(String codigo, double payload, double tara){
         setCodigo(codigo);

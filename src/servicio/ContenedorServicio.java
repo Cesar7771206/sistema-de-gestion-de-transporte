@@ -2,7 +2,7 @@
  * Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
  * Click nbfs://nbhost/SystemFileSystem/Templates/Classes/Class.java to edit this template
  */
-package controlador;
+package servicio;
 import java.util.ArrayList;
 import java.util.List; 
 import modelo.Contenedor; 
@@ -11,10 +11,10 @@ import modelo.Contenedor;
  *
  * @author cesar
  */
-public class ContenedorControlador {
+public class ContenedorServicio {
     private List<Contenedor> contenedores;
 
-    public ContenedorControlador() {
+    public ContenedorServicio() {
         contenedores = new ArrayList<>(); 
     }
 
@@ -36,12 +36,10 @@ public class ContenedorControlador {
         contenedor.setTara(tara);
     }
     
-    public boolean eliminarContenedor(String codigo){
+    public void eliminarContenedor(String codigo){
         boolean eliminado = contenedores.removeIf(c -> c.getCodigo().equals(codigo));
         if (!eliminado){
-            return false;
-        } else {
-            return true;
+            throw new IllegalArgumentException("El contenedor no existe");
         }
     }
     
