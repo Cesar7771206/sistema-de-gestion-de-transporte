@@ -35,6 +35,7 @@ public class PanelPlanta extends javax.swing.JPanel {
         jTextField3 = new javax.swing.JTextField();
         jButton1 = new javax.swing.JButton();
 
+        setBackground(new java.awt.Color(255, 255, 255));
         setMaximumSize(new java.awt.Dimension(810, 540));
         setMinimumSize(new java.awt.Dimension(810, 540));
         setPreferredSize(new java.awt.Dimension(810, 540));
@@ -75,7 +76,7 @@ public class PanelPlanta extends javax.swing.JPanel {
                     .addComponent(jTextField3)
                     .addComponent(jTextField2)
                     .addComponent(jTextField1))
-                .addContainerGap(533, Short.MAX_VALUE))
+                .addContainerGap(530, Short.MAX_VALUE))
             .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
                 .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                 .addComponent(jButton1, javax.swing.GroupLayout.PREFERRED_SIZE, 150, javax.swing.GroupLayout.PREFERRED_SIZE)
