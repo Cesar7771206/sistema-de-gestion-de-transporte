@@ -46,14 +46,14 @@ public class Planta {
     }
 
     public void setNombre(String nombre) {
-        if (nombre != null) {
-            String n = nombre.trim().toUpperCase();
-                if (n.isEmpty()) {
-                    this.nombre = n;
-                    } else {
-                       throw new IllegalArgumentException("El nombre no puede estar vacio") ;
-            }
-       }
+        if (nombre == null) {
+            throw new IllegalArgumentException("El nombre no puede ser nulo");
+        }
+        String n = nombre.trim().toUpperCase();
+        if (n.isEmpty()) {
+            throw new IllegalArgumentException("El nombre no puede estar vacio");
+        }
+        this.nombre = n;
     }
     public String getDireccion() {
         return direccion;
