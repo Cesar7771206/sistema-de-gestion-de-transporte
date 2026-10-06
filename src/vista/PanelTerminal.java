@@ -4,17 +4,38 @@
  */
 package vista;
 
+import javax.swing.table.DefaultTableModel;
+import servicio.TerminalServicio;
+import modelo.Terminal;
+
 /**
  *
  * @author GIANCARLO REA
  */
 public class PanelTerminal extends javax.swing.JPanel {
-
+    TerminalServicio terminalServicio;
+    DefaultTableModel modeloTabla;
     /**
      * Creates new form PanelTerminal
      */
     public PanelTerminal() {
         initComponents();
+        this.terminalServicio = new TerminalServicio();
+        this.modeloTabla = (DefaultTableModel) tblTerminales.getModel();
+        actualizarTabla();
+    }
+    
+    public void actualizarTabla(){
+        modeloTabla.setRowCount(0);
+        
+        for(Terminal t: terminalServicio.getTerminales()){
+            Object[] fila = new Object[]{
+                t.getRuc(),
+                t.getNombre(),
+                t.getDireccion()
+            };
+            modeloTabla.addRow(fila);
+        }
     }
 
     /**
@@ -30,96 +51,107 @@ public class PanelTerminal extends javax.swing.JPanel {
         jLabel2 = new javax.swing.JLabel();
         jLabel3 = new javax.swing.JLabel();
         jLabel4 = new javax.swing.JLabel();
-        jTextField1 = new javax.swing.JTextField();
-        jTextField2 = new javax.swing.JTextField();
-        jTextField3 = new javax.swing.JTextField();
-        jButton1 = new javax.swing.JButton();
+        txtInputDireccion = new javax.swing.JTextField();
+        btnGuardarTerminal = new javax.swing.JButton();
+        txtInputRuc = new javax.swing.JTextField();
+        txtInputNombre = new javax.swing.JTextField();
+        jScrollPane1 = new javax.swing.JScrollPane();
+        tblTerminales = new javax.swing.JTable();
 
+        setBackground(new java.awt.Color(255, 255, 255));
         setMaximumSize(new java.awt.Dimension(810, 540));
         setMinimumSize(new java.awt.Dimension(810, 540));
+        setLayout(new org.netbeans.lib.awtextra.AbsoluteLayout());
 
         jLabel1.setFont(new java.awt.Font("Sans Serif Collection", 1, 14)); // NOI18N
+        jLabel1.setForeground(new java.awt.Color(0, 0, 0));
         jLabel1.setText("REGISTRAR TERMINAL");
+        add(jLabel1, new org.netbeans.lib.awtextra.AbsoluteConstraints(20, 20, -1, 30));
 
         jLabel2.setFont(new java.awt.Font("Sans Serif Collection", 1, 14)); // NOI18N
+        jLabel2.setForeground(new java.awt.Color(0, 0, 0));
         jLabel2.setText("Ruc:");
+        add(jLabel2, new org.netbeans.lib.awtextra.AbsoluteConstraints(60, 80, -1, -1));
 
         jLabel3.setFont(new java.awt.Font("Sans Serif Collection", 1, 14)); // NOI18N
+        jLabel3.setForeground(new java.awt.Color(0, 0, 0));
         jLabel3.setText("Nombre:");
+        add(jLabel3, new org.netbeans.lib.awtextra.AbsoluteConstraints(270, 80, -1, -1));
 
+        jLabel4.setBackground(new java.awt.Color(0, 0, 0));
         jLabel4.setFont(new java.awt.Font("Sans Serif Collection", 1, 14)); // NOI18N
+        jLabel4.setForeground(new java.awt.Color(0, 0, 0));
         jLabel4.setText("Dirección: ");
+        add(jLabel4, new org.netbeans.lib.awtextra.AbsoluteConstraints(70, 130, -1, -1));
 
-        jTextField1.setBorder(javax.swing.BorderFactory.createLineBorder(new java.awt.Color(0, 0, 0)));
+        txtInputDireccion.setBackground(new java.awt.Color(255, 255, 255));
+        txtInputDireccion.setBorder(javax.swing.BorderFactory.createLineBorder(new java.awt.Color(0, 0, 0)));
+        add(txtInputDireccion, new org.netbeans.lib.awtextra.AbsoluteConstraints(150, 120, 420, 30));
 
-        jTextField2.setBorder(javax.swing.BorderFactory.createLineBorder(new java.awt.Color(0, 0, 0)));
+        btnGuardarTerminal.setBackground(new java.awt.Color(0, 153, 255));
+        btnGuardarTerminal.setForeground(new java.awt.Color(255, 255, 255));
+        btnGuardarTerminal.setText("Guardar");
+        btnGuardarTerminal.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                btnGuardarTerminalActionPerformed(evt);
+            }
+        });
+        add(btnGuardarTerminal, new org.netbeans.lib.awtextra.AbsoluteConstraints(600, 90, 131, -1));
 
-        jTextField3.setBorder(javax.swing.BorderFactory.createLineBorder(new java.awt.Color(0, 0, 0)));
+        txtInputRuc.setBackground(new java.awt.Color(255, 255, 255));
+        txtInputRuc.setBorder(javax.swing.BorderFactory.createLineBorder(new java.awt.Color(0, 0, 0)));
+        add(txtInputRuc, new org.netbeans.lib.awtextra.AbsoluteConstraints(100, 70, 150, 30));
 
-        jButton1.setText("Guardar");
+        txtInputNombre.setBackground(new java.awt.Color(255, 255, 255));
+        txtInputNombre.setBorder(javax.swing.BorderFactory.createLineBorder(new java.awt.Color(0, 0, 0)));
+        add(txtInputNombre, new org.netbeans.lib.awtextra.AbsoluteConstraints(340, 70, 230, 30));
 
-        javax.swing.GroupLayout layout = new javax.swing.GroupLayout(this);
-        this.setLayout(layout);
-        layout.setHorizontalGroup(
-            layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(layout.createSequentialGroup()
-                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addGroup(layout.createSequentialGroup()
-                        .addGap(26, 26, 26)
-                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
-                            .addGroup(layout.createSequentialGroup()
-                                .addComponent(jLabel3)
-                                .addGap(31, 31, 31)
-                                .addComponent(jTextField2, javax.swing.GroupLayout.PREFERRED_SIZE, 120, javax.swing.GroupLayout.PREFERRED_SIZE))
-                            .addGroup(layout.createSequentialGroup()
-                                .addComponent(jLabel4)
-                                .addGap(18, 18, 18)
-                                .addComponent(jTextField3))
-                            .addGroup(layout.createSequentialGroup()
-                                .addComponent(jLabel2)
-                                .addGap(62, 62, 62)
-                                .addComponent(jTextField1, javax.swing.GroupLayout.PREFERRED_SIZE, 120, javax.swing.GroupLayout.PREFERRED_SIZE))))
-                    .addGroup(layout.createSequentialGroup()
-                        .addGap(41, 41, 41)
-                        .addComponent(jLabel1)))
-                .addContainerGap(572, Short.MAX_VALUE))
-            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
-                .addGap(0, 0, Short.MAX_VALUE)
-                .addComponent(jButton1, javax.swing.GroupLayout.PREFERRED_SIZE, 131, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addGap(250, 250, 250))
-        );
-        layout.setVerticalGroup(
-            layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(layout.createSequentialGroup()
-                .addGap(16, 16, 16)
-                .addComponent(jLabel1)
-                .addGap(18, 18, 18)
-                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                    .addComponent(jLabel2)
-                    .addComponent(jTextField1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
-                .addGap(18, 18, 18)
-                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                    .addComponent(jTextField2, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addComponent(jLabel3))
-                .addGap(18, 18, 18)
-                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                    .addComponent(jLabel4)
-                    .addComponent(jTextField3, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
-                .addGap(98, 98, 98)
-                .addComponent(jButton1)
-                .addContainerGap(264, Short.MAX_VALUE))
-        );
+        jScrollPane1.setBackground(new java.awt.Color(255, 255, 255));
+
+        tblTerminales.setBackground(new java.awt.Color(255, 255, 255));
+        tblTerminales.setModel(new javax.swing.table.DefaultTableModel(
+            new Object [][] {
+                {null, null, null},
+                {null, null, null},
+                {null, null, null},
+                {null, null, null}
+            },
+            new String [] {
+                "RUC", "Nombre", "Direccion"
+            }
+        ) {
+            Class[] types = new Class [] {
+                java.lang.String.class, java.lang.String.class, java.lang.String.class
+            };
+
+            public Class getColumnClass(int columnIndex) {
+                return types [columnIndex];
+            }
+        });
+        jScrollPane1.setViewportView(tblTerminales);
+
+        add(jScrollPane1, new org.netbeans.lib.awtextra.AbsoluteConstraints(50, 180, 680, 210));
     }// </editor-fold>//GEN-END:initComponents
+
+    private void btnGuardarTerminalActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnGuardarTerminalActionPerformed
+        String ruc = txtInputRuc.getText();
+        String nombre = txtInputNombre.getText();
+        String direccion = txtInputDireccion.getText();
+        terminalServicio.guardarTerminal(ruc, nombre, direccion);
+        actualizarTabla();
+    }//GEN-LAST:event_btnGuardarTerminalActionPerformed
 
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
-    private javax.swing.JButton jButton1;
+    private javax.swing.JButton btnGuardarTerminal;
     private javax.swing.JLabel jLabel1;
     private javax.swing.JLabel jLabel2;
     private javax.swing.JLabel jLabel3;
     private javax.swing.JLabel jLabel4;
-    private javax.swing.JTextField jTextField1;
-    private javax.swing.JTextField jTextField2;
-    private javax.swing.JTextField jTextField3;
+    private javax.swing.JScrollPane jScrollPane1;
+    private javax.swing.JTable tblTerminales;
+    private javax.swing.JTextField txtInputDireccion;
+    private javax.swing.JTextField txtInputNombre;
+    private javax.swing.JTextField txtInputRuc;
     // End of variables declaration//GEN-END:variables
 }
