@@ -4,17 +4,42 @@
  */
 package vista;
 
+import java.awt.Dimension;
+import javax.swing.SwingUtilities;
+
 /**
  *
  * @author GIANCARLO REA
  */
 public class PanelTractor extends javax.swing.JPanel {
 
+    private boolean formularioVisible = false;
+
     /**
      * Creates new form PanelTractor
      */
     public PanelTractor() {
         initComponents();
+        jSplitPane.setResizeWeight(0);
+        panelFormulario.setMinimumSize(new Dimension(0, 0));
+        panelTabla.setMinimumSize(new Dimension(0, 0));
+        ocultarFormulario();
+    }
+
+    private void mostrarFormulario() {
+        jSplitPane.setDividerSize(8);
+        SwingUtilities.invokeLater(() -> {
+            jSplitPane.setDividerLocation(jSplitPane.getHeight() / 3);
+        });
+        formularioVisible = true;
+        btnAgregar.setText("Cerrar formulario");
+    }
+
+    private void ocultarFormulario() {
+        jSplitPane.setDividerSize(0);
+        SwingUtilities.invokeLater(() -> jSplitPane.setDividerLocation(0));
+        formularioVisible = false;
+        btnAgregar.setText("Agregar");
     }
 
     /**
@@ -26,198 +51,120 @@ public class PanelTractor extends javax.swing.JPanel {
     // <editor-fold defaultstate="collapsed" desc="Generated Code">//GEN-BEGIN:initComponents
     private void initComponents() {
 
+        jSplitPane = new javax.swing.JSplitPane();
+        panelFormulario = new javax.swing.JPanel();
         jLabel1 = new javax.swing.JLabel();
-        jLabel2 = new javax.swing.JLabel();
-        jLabel3 = new javax.swing.JLabel();
-        jLabel4 = new javax.swing.JLabel();
-        jTextField1 = new javax.swing.JTextField();
-        jButton1 = new javax.swing.JButton();
-        jTextField2 = new javax.swing.JTextField();
-        jTextField3 = new javax.swing.JTextField();
-        jLabel6 = new javax.swing.JLabel();
-        jTextField4 = new javax.swing.JTextField();
-        jLabel7 = new javax.swing.JLabel();
-        jTextField5 = new javax.swing.JTextField();
-        jLabel8 = new javax.swing.JLabel();
-        jTextField6 = new javax.swing.JTextField();
-        jTextField7 = new javax.swing.JTextField();
-        jLabel9 = new javax.swing.JLabel();
-        jScrollPane1 = new javax.swing.JScrollPane();
+        panelTabla = new javax.swing.JPanel();
+        jScrollPane = new javax.swing.JScrollPane();
         jTable1 = new javax.swing.JTable();
-        jLabel5 = new javax.swing.JLabel();
-        jTextField8 = new javax.swing.JTextField();
-        jButton2 = new javax.swing.JButton();
-        jButton3 = new javax.swing.JButton();
-        jButton4 = new javax.swing.JButton();
+        panelBarra = new javax.swing.JPanel();
+        lblTitutlo = new javax.swing.JLabel();
+        panelBotones = new javax.swing.JPanel();
+        btnAgregar = new javax.swing.JButton();
 
         setBackground(new java.awt.Color(255, 255, 255));
         setMaximumSize(new java.awt.Dimension(810, 540));
         setMinimumSize(new java.awt.Dimension(810, 540));
         setPreferredSize(new java.awt.Dimension(810, 540));
-        setLayout(new org.netbeans.lib.awtextra.AbsoluteLayout());
+        setLayout(new java.awt.BorderLayout());
 
-        jLabel1.setFont(new java.awt.Font("Sans Serif Collection", 1, 14)); // NOI18N
-        jLabel1.setForeground(new java.awt.Color(0, 0, 0));
-        jLabel1.setText("REGISTRAR TRACTOR");
-        add(jLabel1, new org.netbeans.lib.awtextra.AbsoluteConstraints(20, 30, -1, -1));
+        jSplitPane.setBackground(new java.awt.Color(255, 255, 255));
+        jSplitPane.setDividerLocation(200);
+        jSplitPane.setOrientation(javax.swing.JSplitPane.VERTICAL_SPLIT);
 
-        jLabel2.setFont(new java.awt.Font("Sans Serif Collection", 1, 14)); // NOI18N
-        jLabel2.setForeground(new java.awt.Color(0, 0, 0));
-        jLabel2.setText("Placa:");
-        add(jLabel2, new org.netbeans.lib.awtextra.AbsoluteConstraints(20, 60, -1, -1));
+        panelFormulario.setBackground(new java.awt.Color(255, 255, 255));
+        panelFormulario.setMinimumSize(new java.awt.Dimension(100, 100));
 
-        jLabel3.setFont(new java.awt.Font("Sans Serif Collection", 1, 14)); // NOI18N
-        jLabel3.setForeground(new java.awt.Color(0, 0, 0));
-        jLabel3.setText("Marca:");
-        add(jLabel3, new org.netbeans.lib.awtextra.AbsoluteConstraints(190, 60, -1, -1));
+        jLabel1.setText("jLabel1");
 
-        jLabel4.setFont(new java.awt.Font("Segoe UI", 1, 14)); // NOI18N
-        jLabel4.setForeground(new java.awt.Color(0, 0, 0));
-        jLabel4.setText("Modelo:");
-        add(jLabel4, new org.netbeans.lib.awtextra.AbsoluteConstraints(360, 60, -1, -1));
+        javax.swing.GroupLayout panelFormularioLayout = new javax.swing.GroupLayout(panelFormulario);
+        panelFormulario.setLayout(panelFormularioLayout);
+        panelFormularioLayout.setHorizontalGroup(
+            panelFormularioLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(panelFormularioLayout.createSequentialGroup()
+                .addGap(48, 48, 48)
+                .addComponent(jLabel1)
+                .addContainerGap(720, Short.MAX_VALUE))
+        );
+        panelFormularioLayout.setVerticalGroup(
+            panelFormularioLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(panelFormularioLayout.createSequentialGroup()
+                .addGap(33, 33, 33)
+                .addComponent(jLabel1)
+                .addContainerGap(149, Short.MAX_VALUE))
+        );
 
-        jTextField1.setBackground(new java.awt.Color(255, 255, 255));
-        jTextField1.setForeground(new java.awt.Color(0, 0, 0));
-        jTextField1.setHorizontalAlignment(javax.swing.JTextField.CENTER);
-        jTextField1.setBorder(javax.swing.BorderFactory.createLineBorder(new java.awt.Color(0, 0, 0)));
-        add(jTextField1, new org.netbeans.lib.awtextra.AbsoluteConstraints(360, 80, 160, 30));
+        jSplitPane.setTopComponent(panelFormulario);
 
-        jButton1.setBackground(new java.awt.Color(0, 153, 255));
-        jButton1.setForeground(new java.awt.Color(255, 255, 255));
-        jButton1.setText("Guardar");
-        add(jButton1, new org.netbeans.lib.awtextra.AbsoluteConstraints(460, 30, 132, -1));
+        panelTabla.setBackground(new java.awt.Color(255, 255, 255));
+        panelTabla.setLayout(new java.awt.BorderLayout());
 
-        jTextField2.setBackground(new java.awt.Color(255, 255, 255));
-        jTextField2.setForeground(new java.awt.Color(0, 0, 0));
-        jTextField2.setHorizontalAlignment(javax.swing.JTextField.CENTER);
-        jTextField2.setBorder(javax.swing.BorderFactory.createLineBorder(new java.awt.Color(0, 0, 0)));
-        add(jTextField2, new org.netbeans.lib.awtextra.AbsoluteConstraints(20, 80, 160, 30));
-
-        jTextField3.setBackground(new java.awt.Color(255, 255, 255));
-        jTextField3.setForeground(new java.awt.Color(0, 0, 0));
-        jTextField3.setHorizontalAlignment(javax.swing.JTextField.CENTER);
-        jTextField3.setBorder(javax.swing.BorderFactory.createLineBorder(new java.awt.Color(0, 0, 0)));
-        add(jTextField3, new org.netbeans.lib.awtextra.AbsoluteConstraints(190, 80, 160, 30));
-
-        jLabel6.setFont(new java.awt.Font("Segoe UI", 1, 14)); // NOI18N
-        jLabel6.setForeground(new java.awt.Color(0, 0, 0));
-        jLabel6.setText("Carrorería");
-        add(jLabel6, new org.netbeans.lib.awtextra.AbsoluteConstraints(530, 60, -1, -1));
-
-        jTextField4.setBackground(new java.awt.Color(255, 255, 255));
-        jTextField4.setForeground(new java.awt.Color(0, 0, 0));
-        jTextField4.setHorizontalAlignment(javax.swing.JTextField.CENTER);
-        jTextField4.setBorder(javax.swing.BorderFactory.createLineBorder(new java.awt.Color(0, 0, 0)));
-        add(jTextField4, new org.netbeans.lib.awtextra.AbsoluteConstraints(530, 80, 160, 30));
-
-        jLabel7.setFont(new java.awt.Font("Segoe UI", 1, 14)); // NOI18N
-        jLabel7.setForeground(new java.awt.Color(0, 0, 0));
-        jLabel7.setText("MTC");
-        add(jLabel7, new org.netbeans.lib.awtextra.AbsoluteConstraints(20, 120, -1, -1));
-
-        jTextField5.setBackground(new java.awt.Color(255, 255, 255));
-        jTextField5.setForeground(new java.awt.Color(0, 0, 0));
-        jTextField5.setHorizontalAlignment(javax.swing.JTextField.CENTER);
-        jTextField5.setBorder(javax.swing.BorderFactory.createLineBorder(new java.awt.Color(0, 0, 0)));
-        add(jTextField5, new org.netbeans.lib.awtextra.AbsoluteConstraints(20, 140, 160, 30));
-
-        jLabel8.setFont(new java.awt.Font("Segoe UI", 1, 14)); // NOI18N
-        jLabel8.setForeground(new java.awt.Color(0, 0, 0));
-        jLabel8.setText("Año");
-        add(jLabel8, new org.netbeans.lib.awtextra.AbsoluteConstraints(190, 120, -1, -1));
-
-        jTextField6.setBackground(new java.awt.Color(255, 255, 255));
-        jTextField6.setForeground(new java.awt.Color(0, 0, 0));
-        jTextField6.setHorizontalAlignment(javax.swing.JTextField.CENTER);
-        jTextField6.setBorder(javax.swing.BorderFactory.createLineBorder(new java.awt.Color(0, 0, 0)));
-        add(jTextField6, new org.netbeans.lib.awtextra.AbsoluteConstraints(20, 210, 160, 30));
-
-        jTextField7.setBackground(new java.awt.Color(255, 255, 255));
-        jTextField7.setForeground(new java.awt.Color(0, 0, 0));
-        jTextField7.setHorizontalAlignment(javax.swing.JTextField.CENTER);
-        jTextField7.setBorder(javax.swing.BorderFactory.createLineBorder(new java.awt.Color(0, 0, 0)));
-        add(jTextField7, new org.netbeans.lib.awtextra.AbsoluteConstraints(700, 80, 90, 30));
-
-        jLabel9.setFont(new java.awt.Font("Segoe UI", 1, 14)); // NOI18N
-        jLabel9.setForeground(new java.awt.Color(0, 0, 0));
-        jLabel9.setText("Ejes");
-        add(jLabel9, new org.netbeans.lib.awtextra.AbsoluteConstraints(700, 60, -1, -1));
-
-        jScrollPane1.setBackground(new java.awt.Color(255, 255, 255));
+        jScrollPane.setBackground(new java.awt.Color(255, 255, 255));
 
         jTable1.setBackground(new java.awt.Color(255, 255, 255));
         jTable1.setModel(new javax.swing.table.DefaultTableModel(
             new Object [][] {
-                {null, null, null, null, null, null, null},
-                {null, null, null, null, null, null, null},
-                {null, null, null, null, null, null, null},
-                {null, null, null, null, null, null, null}
+                {null, null, null, null},
+                {null, null, null, null},
+                {null, null, null, null},
+                {null, null, null, null}
             },
             new String [] {
-                "Placa", "Marca", "Modelo", "Carrocería", "MTC", "Ejes", "Año"
+                "Title 1", "Title 2", "Title 3", "Title 4"
             }
-        ) {
-            Class[] types = new Class [] {
-                java.lang.String.class, java.lang.String.class, java.lang.String.class, java.lang.String.class, java.lang.String.class, java.lang.String.class, java.lang.String.class
-            };
+        ));
+        jScrollPane.setViewportView(jTable1);
 
-            public Class getColumnClass(int columnIndex) {
-                return types [columnIndex];
+        panelTabla.add(jScrollPane, java.awt.BorderLayout.CENTER);
+
+        panelBarra.setBackground(new java.awt.Color(255, 255, 255));
+        panelBarra.setLayout(new java.awt.BorderLayout());
+
+        lblTitutlo.setFont(new java.awt.Font("sansserif", 1, 13)); // NOI18N
+        lblTitutlo.setForeground(new java.awt.Color(0, 0, 0));
+        lblTitutlo.setText("      TRACTORS");
+        panelBarra.add(lblTitutlo, java.awt.BorderLayout.CENTER);
+
+        panelBotones.setBackground(new java.awt.Color(255, 255, 255));
+
+        btnAgregar.setBackground(new java.awt.Color(51, 153, 255));
+        btnAgregar.setForeground(new java.awt.Color(255, 255, 255));
+        btnAgregar.setText("Agregar");
+        btnAgregar.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                btnAgregarActionPerformed(evt);
             }
         });
-        jScrollPane1.setViewportView(jTable1);
+        panelBotones.add(btnAgregar);
 
-        add(jScrollPane1, new org.netbeans.lib.awtextra.AbsoluteConstraints(20, 290, 770, 210));
+        panelBarra.add(panelBotones, java.awt.BorderLayout.LINE_END);
 
-        jLabel5.setText("Ingrese la placa del tractor que desea seleccionar");
-        add(jLabel5, new org.netbeans.lib.awtextra.AbsoluteConstraints(20, 180, -1, -1));
+        panelTabla.add(panelBarra, java.awt.BorderLayout.PAGE_START);
 
-        jTextField8.setBackground(new java.awt.Color(255, 255, 255));
-        jTextField8.setForeground(new java.awt.Color(0, 0, 0));
-        jTextField8.setHorizontalAlignment(javax.swing.JTextField.CENTER);
-        jTextField8.setBorder(javax.swing.BorderFactory.createLineBorder(new java.awt.Color(0, 0, 0)));
-        add(jTextField8, new org.netbeans.lib.awtextra.AbsoluteConstraints(190, 140, 90, 30));
+        jSplitPane.setRightComponent(panelTabla);
 
-        jButton2.setBackground(new java.awt.Color(0, 153, 255));
-        jButton2.setForeground(new java.awt.Color(255, 255, 255));
-        jButton2.setText("Guardar");
-        add(jButton2, new org.netbeans.lib.awtextra.AbsoluteConstraints(290, 140, 132, -1));
-
-        jButton3.setBackground(new java.awt.Color(0, 153, 255));
-        jButton3.setForeground(new java.awt.Color(255, 255, 255));
-        jButton3.setText("Guardar");
-        add(jButton3, new org.netbeans.lib.awtextra.AbsoluteConstraints(180, 30, 132, -1));
-
-        jButton4.setBackground(new java.awt.Color(0, 153, 255));
-        jButton4.setForeground(new java.awt.Color(255, 255, 255));
-        jButton4.setText("Guardar");
-        add(jButton4, new org.netbeans.lib.awtextra.AbsoluteConstraints(320, 30, 132, -1));
+        add(jSplitPane, java.awt.BorderLayout.CENTER);
     }// </editor-fold>//GEN-END:initComponents
+
+    private void btnAgregarActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnAgregarActionPerformed
+        if (formularioVisible) {
+            ocultarFormulario();
+        } else {
+            mostrarFormulario();
+        }
+    }//GEN-LAST:event_btnAgregarActionPerformed
 
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
-    private javax.swing.JButton jButton1;
-    private javax.swing.JButton jButton2;
-    private javax.swing.JButton jButton3;
-    private javax.swing.JButton jButton4;
+    private javax.swing.JButton btnAgregar;
     private javax.swing.JLabel jLabel1;
-    private javax.swing.JLabel jLabel2;
-    private javax.swing.JLabel jLabel3;
-    private javax.swing.JLabel jLabel4;
-    private javax.swing.JLabel jLabel5;
-    private javax.swing.JLabel jLabel6;
-    private javax.swing.JLabel jLabel7;
-    private javax.swing.JLabel jLabel8;
-    private javax.swing.JLabel jLabel9;
-    private javax.swing.JScrollPane jScrollPane1;
+    private javax.swing.JScrollPane jScrollPane;
+    private javax.swing.JSplitPane jSplitPane;
     private javax.swing.JTable jTable1;
-    private javax.swing.JTextField jTextField1;
-    private javax.swing.JTextField jTextField2;
-    private javax.swing.JTextField jTextField3;
-    private javax.swing.JTextField jTextField4;
-    private javax.swing.JTextField jTextField5;
-    private javax.swing.JTextField jTextField6;
-    private javax.swing.JTextField jTextField7;
-    private javax.swing.JTextField jTextField8;
+    private javax.swing.JLabel lblTitutlo;
+    private javax.swing.JPanel panelBarra;
+    private javax.swing.JPanel panelBotones;
+    private javax.swing.JPanel panelFormulario;
+    private javax.swing.JPanel panelTabla;
     // End of variables declaration//GEN-END:variables
 }
