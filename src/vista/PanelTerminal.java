@@ -4,18 +4,72 @@
  */
 package vista;
 
+import javax.swing.table.DefaultTableModel;
+import servicio.TerminalServicio;
+import modelo.Terminal;
+
 /**
  *
  * @author GIANCARLO REA
  */
 public class PanelTerminal extends javax.swing.JPanel {
-
+    TerminalServicio terminalServicio;
+    DefaultTableModel modeloTabla;
     /**
      * Creates new form PanelTerminal
      */
     public PanelTerminal() {
         initComponents();
+        this.terminalServicio = new TerminalServicio();
+        this.modeloTabla = (DefaultTableModel) tblTerminales.getModel();
+        actualizarTabla();
     }
+    
+    public void actualizarTabla(){
+        modeloTabla.setRowCount(0);
+        
+        for(Terminal t: terminalServicio.getTerminales()){
+            Object[] fila = new Object[]{
+                t.getRuc(),
+                t.getNombre(),
+                t.getDireccion()
+            };
+            modeloTabla.addRow(fila);
+        }
+    }
+    private boolean modoModificar = false;
+
+private Terminal terminalSeleccionada() {
+    int fila = tblTerminales.getSelectedRow();
+    if (fila < 0) {
+        javax.swing.JOptionPane.showMessageDialog(this, "Selecciona una terminal de la tabla");
+        return null; 
+    }
+    return terminalServicio.obtenerPorRuc(modeloTabla.getValueAt(fila, 0).toString());
+}
+
+private void cargarEnFormulario(Terminal t) {
+    txtInputRuc.setText(t.getRuc());
+    txtInputNombre.setText(t.getNombre());
+    txtInputDireccion.setText(t.getDireccion());
+}
+
+private void mostrarEnTabla(java.util.List<Terminal> lista) {
+    modeloTabla.setRowCount(0);
+    for (Terminal t : lista) {
+        modeloTabla.addRow(new Object[]{t.getRuc(), t.getNombre(), t.getDireccion()});
+    }
+}
+
+private void limpiarFormulario() {
+    txtInputRuc.setText("");
+    txtInputNombre.setText("");
+    txtInputDireccion.setText("");
+    txtInputRuc.setEditable(true);
+    txtInputNombre.setEditable(true);
+    txtInputDireccion.setEditable(true);
+    modoModificar = false;
+}
 
     /**
      * This method is called from within the constructor to initialize the form.
@@ -30,96 +84,258 @@ public class PanelTerminal extends javax.swing.JPanel {
         jLabel2 = new javax.swing.JLabel();
         jLabel3 = new javax.swing.JLabel();
         jLabel4 = new javax.swing.JLabel();
-        jTextField1 = new javax.swing.JTextField();
-        jTextField2 = new javax.swing.JTextField();
-        jTextField3 = new javax.swing.JTextField();
-        jButton1 = new javax.swing.JButton();
+        txtInputDireccion = new javax.swing.JTextField();
+        btnGuardarTerminal = new javax.swing.JButton();
+        txtInputRuc = new javax.swing.JTextField();
+        txtInputNombre = new javax.swing.JTextField();
+        jScrollPane1 = new javax.swing.JScrollPane();
+        tblTerminales = new javax.swing.JTable();
+        btnNuevoTerminal = new javax.swing.JButton();
+        btnCancelar = new javax.swing.JButton();
+        btnModificar = new javax.swing.JButton();
+        btnConsultar = new javax.swing.JButton();
+        btnEliminar = new javax.swing.JButton();
+        jLabel5 = new javax.swing.JLabel();
+        txtBuscar = new javax.swing.JTextField();
+        btnBuscar = new javax.swing.JButton();
 
+        setBackground(new java.awt.Color(255, 255, 255));
         setMaximumSize(new java.awt.Dimension(810, 540));
         setMinimumSize(new java.awt.Dimension(810, 540));
+        setLayout(new org.netbeans.lib.awtextra.AbsoluteLayout());
 
         jLabel1.setFont(new java.awt.Font("Sans Serif Collection", 1, 14)); // NOI18N
         jLabel1.setText("REGISTRAR TERMINAL");
+        add(jLabel1, new org.netbeans.lib.awtextra.AbsoluteConstraints(20, 20, -1, 30));
 
         jLabel2.setFont(new java.awt.Font("Sans Serif Collection", 1, 14)); // NOI18N
         jLabel2.setText("Ruc:");
+        add(jLabel2, new org.netbeans.lib.awtextra.AbsoluteConstraints(60, 70, -1, -1));
 
         jLabel3.setFont(new java.awt.Font("Sans Serif Collection", 1, 14)); // NOI18N
         jLabel3.setText("Nombre:");
+        add(jLabel3, new org.netbeans.lib.awtextra.AbsoluteConstraints(270, 70, -1, -1));
 
+        jLabel4.setBackground(new java.awt.Color(0, 0, 0));
         jLabel4.setFont(new java.awt.Font("Sans Serif Collection", 1, 14)); // NOI18N
         jLabel4.setText("Dirección: ");
+        add(jLabel4, new org.netbeans.lib.awtextra.AbsoluteConstraints(60, 120, -1, 40));
 
-        jTextField1.setBorder(javax.swing.BorderFactory.createLineBorder(new java.awt.Color(0, 0, 0)));
+        txtInputDireccion.setBorder(javax.swing.BorderFactory.createLineBorder(new java.awt.Color(0, 0, 0)));
+        add(txtInputDireccion, new org.netbeans.lib.awtextra.AbsoluteConstraints(150, 120, 420, 30));
 
-        jTextField2.setBorder(javax.swing.BorderFactory.createLineBorder(new java.awt.Color(0, 0, 0)));
+        btnGuardarTerminal.setBackground(new java.awt.Color(51, 153, 255));
+        btnGuardarTerminal.setForeground(new java.awt.Color(255, 255, 255));
+        btnGuardarTerminal.setText("Guardar");
+        btnGuardarTerminal.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                btnGuardarTerminalActionPerformed(evt);
+            }
+        });
+        add(btnGuardarTerminal, new org.netbeans.lib.awtextra.AbsoluteConstraints(600, 90, 131, -1));
 
-        jTextField3.setBorder(javax.swing.BorderFactory.createLineBorder(new java.awt.Color(0, 0, 0)));
+        txtInputRuc.setBorder(javax.swing.BorderFactory.createLineBorder(new java.awt.Color(0, 0, 0)));
+        add(txtInputRuc, new org.netbeans.lib.awtextra.AbsoluteConstraints(100, 70, 150, 30));
 
-        jButton1.setText("Guardar");
+        txtInputNombre.setBorder(javax.swing.BorderFactory.createLineBorder(new java.awt.Color(0, 0, 0)));
+        add(txtInputNombre, new org.netbeans.lib.awtextra.AbsoluteConstraints(340, 70, 230, 30));
 
-        javax.swing.GroupLayout layout = new javax.swing.GroupLayout(this);
-        this.setLayout(layout);
-        layout.setHorizontalGroup(
-            layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(layout.createSequentialGroup()
-                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addGroup(layout.createSequentialGroup()
-                        .addGap(26, 26, 26)
-                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
-                            .addGroup(layout.createSequentialGroup()
-                                .addComponent(jLabel3)
-                                .addGap(31, 31, 31)
-                                .addComponent(jTextField2, javax.swing.GroupLayout.PREFERRED_SIZE, 120, javax.swing.GroupLayout.PREFERRED_SIZE))
-                            .addGroup(layout.createSequentialGroup()
-                                .addComponent(jLabel4)
-                                .addGap(18, 18, 18)
-                                .addComponent(jTextField3))
-                            .addGroup(layout.createSequentialGroup()
-                                .addComponent(jLabel2)
-                                .addGap(62, 62, 62)
-                                .addComponent(jTextField1, javax.swing.GroupLayout.PREFERRED_SIZE, 120, javax.swing.GroupLayout.PREFERRED_SIZE))))
-                    .addGroup(layout.createSequentialGroup()
-                        .addGap(41, 41, 41)
-                        .addComponent(jLabel1)))
-                .addContainerGap(572, Short.MAX_VALUE))
-            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
-                .addGap(0, 0, Short.MAX_VALUE)
-                .addComponent(jButton1, javax.swing.GroupLayout.PREFERRED_SIZE, 131, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addGap(250, 250, 250))
-        );
-        layout.setVerticalGroup(
-            layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(layout.createSequentialGroup()
-                .addGap(16, 16, 16)
-                .addComponent(jLabel1)
-                .addGap(18, 18, 18)
-                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                    .addComponent(jLabel2)
-                    .addComponent(jTextField1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
-                .addGap(18, 18, 18)
-                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                    .addComponent(jTextField2, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addComponent(jLabel3))
-                .addGap(18, 18, 18)
-                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                    .addComponent(jLabel4)
-                    .addComponent(jTextField3, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
-                .addGap(98, 98, 98)
-                .addComponent(jButton1)
-                .addContainerGap(264, Short.MAX_VALUE))
-        );
+        jScrollPane1.setBackground(new java.awt.Color(255, 255, 255));
+
+        tblTerminales.setModel(new javax.swing.table.DefaultTableModel(
+            new Object [][] {
+                {null, null, null},
+                {null, null, null},
+                {null, null, null},
+                {null, null, null}
+            },
+            new String [] {
+                "RUC", "Nombre", "Direccion"
+            }
+        ) {
+            Class[] types = new Class [] {
+                java.lang.String.class, java.lang.String.class, java.lang.String.class
+            };
+
+            public Class getColumnClass(int columnIndex) {
+                return types [columnIndex];
+            }
+        });
+        jScrollPane1.setViewportView(tblTerminales);
+
+        add(jScrollPane1, new org.netbeans.lib.awtextra.AbsoluteConstraints(50, 230, 680, 210));
+
+        btnNuevoTerminal.setBackground(new java.awt.Color(153, 204, 255));
+        btnNuevoTerminal.setText("Nuevo");
+        btnNuevoTerminal.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                btnNuevoTerminalActionPerformed(evt);
+            }
+        });
+        add(btnNuevoTerminal, new org.netbeans.lib.awtextra.AbsoluteConstraints(600, 60, 130, -1));
+
+        btnCancelar.setBackground(new java.awt.Color(220, 220, 220));
+        btnCancelar.setText("Cancelar");
+        btnCancelar.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                btnCancelarActionPerformed(evt);
+            }
+        });
+        add(btnCancelar, new org.netbeans.lib.awtextra.AbsoluteConstraints(600, 120, 130, -1));
+
+        btnModificar.setBackground(new java.awt.Color(255, 153, 0));
+        btnModificar.setForeground(new java.awt.Color(255, 255, 255));
+        btnModificar.setText("Modificar");
+        btnModificar.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                btnModificarActionPerformed(evt);
+            }
+        });
+        add(btnModificar, new org.netbeans.lib.awtextra.AbsoluteConstraints(350, 460, 110, -1));
+
+        btnConsultar.setBackground(new java.awt.Color(51, 153, 51));
+        btnConsultar.setForeground(new java.awt.Color(255, 255, 255));
+        btnConsultar.setText("Consultar");
+        btnConsultar.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                btnConsultarActionPerformed(evt);
+            }
+        });
+        add(btnConsultar, new org.netbeans.lib.awtextra.AbsoluteConstraints(230, 460, 110, -1));
+
+        btnEliminar.setBackground(new java.awt.Color(204, 0, 0));
+        btnEliminar.setForeground(new java.awt.Color(255, 255, 255));
+        btnEliminar.setText("Eliminar");
+        btnEliminar.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                btnEliminarActionPerformed(evt);
+            }
+        });
+        add(btnEliminar, new org.netbeans.lib.awtextra.AbsoluteConstraints(470, 460, 110, -1));
+
+        jLabel5.setFont(new java.awt.Font("Sans Serif Collection", 1, 14)); // NOI18N
+        jLabel5.setText("Buscar por Nombre o Ruc:");
+        add(jLabel5, new org.netbeans.lib.awtextra.AbsoluteConstraints(60, 170, -1, 40));
+
+        txtBuscar.setBorder(javax.swing.BorderFactory.createLineBorder(new java.awt.Color(0, 0, 0)));
+        add(txtBuscar, new org.netbeans.lib.awtextra.AbsoluteConstraints(260, 170, 310, 30));
+
+        btnBuscar.setText("Buscar");
+        btnBuscar.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                btnBuscarActionPerformed(evt);
+            }
+        });
+        add(btnBuscar, new org.netbeans.lib.awtextra.AbsoluteConstraints(600, 170, 130, -1));
     }// </editor-fold>//GEN-END:initComponents
+
+    private void btnGuardarTerminalActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnGuardarTerminalActionPerformed
+        String ruc = txtInputRuc.getText();
+        String nombre = txtInputNombre.getText();
+        String direccion = txtInputDireccion.getText();
+
+        try {
+            if (modoModificar) {
+                terminalServicio.modificarTerminal(ruc, nombre, direccion);
+                javax.swing.JOptionPane.showMessageDialog(this, "Terminal modificada correctamente");
+            } else {
+                boolean guardado = terminalServicio.guardarTerminal(ruc, nombre, direccion);
+                if (!guardado) {
+                    javax.swing.JOptionPane.showMessageDialog(this,
+                            "Ya existe una terminal con ese RUC",
+                            "Error", javax.swing.JOptionPane.WARNING_MESSAGE);
+                    return;
+                }
+                javax.swing.JOptionPane.showMessageDialog(this, "Terminal registrada correctamente");
+            }
+            limpiarFormulario();
+            actualizarTabla();
+        } catch (IllegalArgumentException ex) {
+            javax.swing.JOptionPane.showMessageDialog(this, ex.getMessage(),
+                "Error", javax.swing.JOptionPane.WARNING_MESSAGE);
+        }
+    }//GEN-LAST:event_btnGuardarTerminalActionPerformed
+
+    private void btnNuevoTerminalActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnNuevoTerminalActionPerformed
+        
+        limpiarFormulario();
+        txtInputRuc.requestFocus();
+    }//GEN-LAST:event_btnNuevoTerminalActionPerformed
+
+    private void btnCancelarActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnCancelarActionPerformed
+        
+        limpiarFormulario();
+        txtBuscar.setText("");
+        mostrarEnTabla(terminalServicio.getTerminales());
+    }//GEN-LAST:event_btnCancelarActionPerformed
+
+    private void btnBuscarActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnBuscarActionPerformed
+        // TODO add your handling code here:
+        java.util.List<Terminal> resultado = terminalServicio.filtrar(txtBuscar.getText());
+        mostrarEnTabla(resultado);
+        if (resultado.isEmpty()) {
+            javax.swing.JOptionPane.showMessageDialog(this, "No se encontraron terminales");
+}
+    }//GEN-LAST:event_btnBuscarActionPerformed
+
+    private void btnConsultarActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnConsultarActionPerformed
+        
+        Terminal t = terminalSeleccionada();
+        if (t == null) {
+            return;
+        }
+        cargarEnFormulario(t);
+        txtInputRuc.setEditable(false);
+        txtInputNombre.setEditable(false);
+        txtInputDireccion.setEditable(false);
+    }//GEN-LAST:event_btnConsultarActionPerformed
+
+    private void btnModificarActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnModificarActionPerformed
+        
+        Terminal t = terminalSeleccionada();
+        if (t == null) {
+            return;
+        }
+        cargarEnFormulario(t);
+        txtInputRuc.setEditable(false);   // el RUC es la clave y no se cambia
+        modoModificar = true;
+    }//GEN-LAST:event_btnModificarActionPerformed
+
+    private void btnEliminarActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnEliminarActionPerformed
+        // TODO add your handling code here:
+        Terminal t = terminalSeleccionada();
+        if (t == null) {
+            return;
+        }
+        int r = javax.swing.JOptionPane.showConfirmDialog(this,
+                "¿Eliminar la terminal " + t.getNombre() + "?",
+                "Confirmar", javax.swing.JOptionPane.YES_NO_OPTION);
+        if (r == javax.swing.JOptionPane.YES_OPTION) {
+            terminalServicio.eliminarPorRuc(t.getRuc());
+            mostrarEnTabla(terminalServicio.getTerminales());
+            limpiarFormulario();
+}
+    }//GEN-LAST:event_btnEliminarActionPerformed
 
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
-    private javax.swing.JButton jButton1;
+    private javax.swing.JButton btnBuscar;
+    private javax.swing.JButton btnCancelar;
+    private javax.swing.JButton btnConsultar;
+    private javax.swing.JButton btnEliminar;
+    private javax.swing.JButton btnGuardarTerminal;
+    private javax.swing.JButton btnModificar;
+    private javax.swing.JButton btnNuevoTerminal;
     private javax.swing.JLabel jLabel1;
     private javax.swing.JLabel jLabel2;
     private javax.swing.JLabel jLabel3;
     private javax.swing.JLabel jLabel4;
-    private javax.swing.JTextField jTextField1;
-    private javax.swing.JTextField jTextField2;
-    private javax.swing.JTextField jTextField3;
+    private javax.swing.JLabel jLabel5;
+    private javax.swing.JScrollPane jScrollPane1;
+    private javax.swing.JTable tblTerminales;
+    private javax.swing.JTextField txtBuscar;
+    private javax.swing.JTextField txtInputDireccion;
+    private javax.swing.JTextField txtInputNombre;
+    private javax.swing.JTextField txtInputRuc;
     // End of variables declaration//GEN-END:variables
 }
