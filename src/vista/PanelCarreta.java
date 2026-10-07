@@ -35,6 +35,9 @@ public class PanelCarreta extends javax.swing.JPanel {
         jTextField2 = new javax.swing.JTextField();
         jTextField3 = new javax.swing.JTextField();
 
+        setMaximumSize(new java.awt.Dimension(810, 540));
+        setMinimumSize(new java.awt.Dimension(810, 540));
+        setPreferredSize(new java.awt.Dimension(810, 540));
         setLayout(new org.netbeans.lib.awtextra.AbsoluteLayout());
 
         jLabel1.setFont(new java.awt.Font("Sans Serif Collection", 1, 14)); // NOI18N

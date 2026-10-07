@@ -35,6 +35,9 @@ public class PanelTractor extends javax.swing.JPanel {
         jTextField3 = new javax.swing.JTextField();
         jButton1 = new javax.swing.JButton();
 
+        setMaximumSize(new java.awt.Dimension(810, 540));
+        setMinimumSize(new java.awt.Dimension(810, 540));
+
         jLabel1.setFont(new java.awt.Font("Sans Serif Collection", 1, 14)); // NOI18N
         jLabel1.setText("REGISTRAR TRACTOR");
 
@@ -77,7 +80,7 @@ public class PanelTractor extends javax.swing.JPanel {
                             .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
                                 .addComponent(jTextField1, javax.swing.GroupLayout.DEFAULT_SIZE, 131, Short.MAX_VALUE)
                                 .addComponent(jTextField2)))))
-                .addContainerGap(131, Short.MAX_VALUE))
+                .addContainerGap(541, Short.MAX_VALUE))
             .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
                 .addGap(0, 0, Short.MAX_VALUE)
                 .addComponent(jButton1, javax.swing.GroupLayout.PREFERRED_SIZE, 132, javax.swing.GroupLayout.PREFERRED_SIZE)
@@ -102,7 +105,7 @@ public class PanelTractor extends javax.swing.JPanel {
                     .addComponent(jTextField3, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
                 .addGap(18, 18, 18)
                 .addComponent(jButton1)
-                .addContainerGap(41, Short.MAX_VALUE))
+                .addContainerGap(336, Short.MAX_VALUE))
         );
     }// </editor-fold>//GEN-END:initComponents
 

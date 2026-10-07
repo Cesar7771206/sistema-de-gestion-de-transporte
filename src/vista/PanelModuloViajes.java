@@ -29,44 +29,16 @@ public class PanelModuloViajes extends javax.swing.JPanel {
 }
   private void cargarCombos() {
 
-    
-    cboContenedor.removeAllItems();
-    cboTractor.removeAllItems();
-    cboCarreta.removeAllItems();
-    cboPlanta.removeAllItems();
-    cboTerminal.removeAllItems();
-    cboCliente.removeAllItems();
-    cboRuta.removeAllItems();
+    cardLayout = new CardLayout();
+    pnlContenido.setLayout(cardLayout);
 
-    // EQUIPOS
-    for (Contenedor contenedor : GestorEquipos.getContenedores()) {
-        cboContenedor.addItem(contenedor.getCodigo());
-    }
-
-    for (Tractor tractor : GestorEquipos.getTractores()) {
-        cboTractor.addItem(tractor.getPlaca());
-    }
-
-    for (Carreta carreta : GestorEquipos.getCarretas()) {
-        cboCarreta.addItem(carreta.getPlaca());
-    }
-
-    // LOGÍSTICA
-    for (Planta planta : GestorLogistica.getPlantas()) {
-        cboPlanta.addItem(planta.getNombre());
-    }
-
-    for (Terminal terminal : GestorLogistica.getTerminales()) {
-        cboTerminal.addItem(terminal.getNombre());
-    }
-
-    for (Cliente cliente : GestorLogistica.getClientes()) {
-        cboCliente.addItem(cliente.getNombre());
-    }
-
-    for (Ruta ruta : GestorLogistica.getRutas()) {
-        cboRuta.addItem("Ruta " + ruta.getId());
-    }
+    pnlContenido.add(new PanelContenedor(), "contenedor");
+    pnlContenido.add(new PanelTractor(), "tractor");
+    pnlContenido.add(new PanelCarreta(), "carreta");
+    pnlContenido.add(new PanelPlanta(), "planta");
+    pnlContenido.add(new PanelTerminal(), "terminal");
+    pnlContenido.add(new PanelCliente(), "cliente");
+    pnlContenido.add(new PanelRuta(), "ruta");
 }
     
 

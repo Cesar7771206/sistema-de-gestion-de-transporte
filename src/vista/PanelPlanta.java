@@ -35,6 +35,10 @@ public class PanelPlanta extends javax.swing.JPanel {
         jTextField3 = new javax.swing.JTextField();
         jButton1 = new javax.swing.JButton();
 
+        setMaximumSize(new java.awt.Dimension(810, 540));
+        setMinimumSize(new java.awt.Dimension(810, 540));
+        setPreferredSize(new java.awt.Dimension(810, 540));
+
         jLabel1.setFont(new java.awt.Font("Sans Serif Collection", 1, 14)); // NOI18N
         jLabel1.setText("REGISTRAR PLANTA");
 
@@ -71,7 +75,7 @@ public class PanelPlanta extends javax.swing.JPanel {
                     .addComponent(jTextField3)
                     .addComponent(jTextField2)
                     .addComponent(jTextField1))
-                .addContainerGap(118, Short.MAX_VALUE))
+                .addContainerGap(533, Short.MAX_VALUE))
             .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
                 .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                 .addComponent(jButton1, javax.swing.GroupLayout.PREFERRED_SIZE, 150, javax.swing.GroupLayout.PREFERRED_SIZE)

@@ -4,17 +4,31 @@
  */
 package vista;
 
+import java.awt.CardLayout;
+
 /**
  *
  * @author cesar
  */
 public class PanelModuloData extends javax.swing.JPanel {
+    private CardLayout cardLayout;
 
     /**
      * Creates new form PanelModuloData
      */
     public PanelModuloData() {
         initComponents();
+        
+        cardLayout = new CardLayout(); 
+        pnlContenidoData.setLayout(cardLayout);
+        
+        pnlContenidoData.add(new PanelContenedor(), "contenedor");
+        pnlContenidoData.add(new PanelTractor(), "tractor");
+        pnlContenidoData.add(new PanelCarreta(), "carreta");
+        pnlContenidoData.add(new PanelPlanta(), "planta");
+        pnlContenidoData.add(new PanelTerminal(), "terminal");
+        pnlContenidoData.add(new PanelCliente(), "cliente");
+        pnlContenidoData.add(new PanelRuta(), "ruta");
     }
 
     /**
@@ -27,10 +41,9 @@ public class PanelModuloData extends javax.swing.JPanel {
     private void initComponents() {
 
         jLabel1 = new javax.swing.JLabel();
-        jComboBox1 = new javax.swing.JComboBox<>();
+        cboOpciones = new javax.swing.JComboBox<>();
         jLabel2 = new javax.swing.JLabel();
-        jPanel1 = new javax.swing.JPanel();
-        jPanel2 = new javax.swing.JPanel();
+        pnlContenidoData = new javax.swing.JPanel();
 
         setBackground(new java.awt.Color(255, 255, 255));
         setLayout(new org.netbeans.lib.awtextra.AbsoluteLayout());
@@ -40,55 +53,68 @@ public class PanelModuloData extends javax.swing.JPanel {
         jLabel1.setText("MODULO DATA");
         add(jLabel1, new org.netbeans.lib.awtextra.AbsoluteConstraints(30, 20, -1, -1));
 
-        jComboBox1.setBackground(new java.awt.Color(51, 153, 255));
-        jComboBox1.setForeground(new java.awt.Color(255, 255, 255));
-        jComboBox1.setModel(new javax.swing.DefaultComboBoxModel<>(new String[] { "Item 1", "Item 2", "Item 3", "Item 4" }));
-        add(jComboBox1, new org.netbeans.lib.awtextra.AbsoluteConstraints(560, 20, 270, 40));
+        cboOpciones.setBackground(new java.awt.Color(51, 153, 255));
+        cboOpciones.setForeground(new java.awt.Color(255, 255, 255));
+        cboOpciones.setModel(new javax.swing.DefaultComboBoxModel<>(new String[] { "Contenedor", "Tractor", "Carreta", "Planta", "Terminal", "Cliente", "Ruta" }));
+        cboOpciones.addActionListener(this::cboOpcionesActionPerformed);
+        add(cboOpciones, new org.netbeans.lib.awtextra.AbsoluteConstraints(560, 20, 270, 40));
 
         jLabel2.setForeground(new java.awt.Color(0, 0, 0));
         jLabel2.setText("Selecciona el campo a editar: ");
-        add(jLabel2, new org.netbeans.lib.awtextra.AbsoluteConstraints(320, 30, -1, -1));
+        add(jLabel2, new org.netbeans.lib.awtextra.AbsoluteConstraints(380, 30, -1, -1));
 
-        jPanel1.setBackground(new java.awt.Color(255, 255, 255));
-        jPanel1.setBorder(javax.swing.BorderFactory.createLineBorder(new java.awt.Color(0, 0, 0)));
+        pnlContenidoData.setBackground(new java.awt.Color(255, 255, 255));
+        pnlContenidoData.setBorder(javax.swing.BorderFactory.createLineBorder(new java.awt.Color(0, 0, 0)));
 
-        javax.swing.GroupLayout jPanel1Layout = new javax.swing.GroupLayout(jPanel1);
-        jPanel1.setLayout(jPanel1Layout);
-        jPanel1Layout.setHorizontalGroup(
-            jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+        javax.swing.GroupLayout pnlContenidoDataLayout = new javax.swing.GroupLayout(pnlContenidoData);
+        pnlContenidoData.setLayout(pnlContenidoDataLayout);
+        pnlContenidoDataLayout.setHorizontalGroup(
+            pnlContenidoDataLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGap(0, 808, Short.MAX_VALUE)
         );
-        jPanel1Layout.setVerticalGroup(
-            jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGap(0, 218, Short.MAX_VALUE)
+        pnlContenidoDataLayout.setVerticalGroup(
+            pnlContenidoDataLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGap(0, 538, Short.MAX_VALUE)
         );
 
-        add(jPanel1, new org.netbeans.lib.awtextra.AbsoluteConstraints(30, 90, 810, 220));
-
-        jPanel2.setBackground(new java.awt.Color(255, 255, 255));
-        jPanel2.setBorder(javax.swing.BorderFactory.createLineBorder(new java.awt.Color(0, 0, 0)));
-        jPanel2.setForeground(new java.awt.Color(0, 0, 0));
-
-        javax.swing.GroupLayout jPanel2Layout = new javax.swing.GroupLayout(jPanel2);
-        jPanel2.setLayout(jPanel2Layout);
-        jPanel2Layout.setHorizontalGroup(
-            jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGap(0, 808, Short.MAX_VALUE)
-        );
-        jPanel2Layout.setVerticalGroup(
-            jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGap(0, 298, Short.MAX_VALUE)
-        );
-
-        add(jPanel2, new org.netbeans.lib.awtextra.AbsoluteConstraints(30, 330, 810, 300));
+        add(pnlContenidoData, new org.netbeans.lib.awtextra.AbsoluteConstraints(30, 90, 810, 540));
     }// </editor-fold>//GEN-END:initComponents
+
+    private void cboOpcionesActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_cboOpcionesActionPerformed
+        String opcion = cboOpciones.getSelectedItem().toString();
+        
+        switch (opcion) {
+            case "Contenedor":
+                cardLayout.show(pnlContenidoData, "contenedor");
+                break;
+            case "Tractor":
+                cardLayout.show(pnlContenidoData, "tractor");
+                break;
+            case "Carreta":
+                cardLayout.show(pnlContenidoData, "carreta");
+                break;
+            case "Planta":
+                cardLayout.show(pnlContenidoData, "planta");
+                break;
+            case "Terminal":
+                cardLayout.show(pnlContenidoData, "terminal");
+                break;
+            case "Cliente":
+                cardLayout.show(pnlContenidoData, "cliente");
+                break;
+            case "Ruta":
+                cardLayout.show(pnlContenidoData, "ruta");
+                break;
+            default:
+                throw new AssertionError();
+        }
+    }//GEN-LAST:event_cboOpcionesActionPerformed
 
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
-    private javax.swing.JComboBox<String> jComboBox1;
+    private javax.swing.JComboBox<String> cboOpciones;
     private javax.swing.JLabel jLabel1;
     private javax.swing.JLabel jLabel2;
-    private javax.swing.JPanel jPanel1;
-    private javax.swing.JPanel jPanel2;
+    private javax.swing.JPanel pnlContenidoData;
     // End of variables declaration//GEN-END:variables
 }

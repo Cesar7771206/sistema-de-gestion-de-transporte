@@ -35,6 +35,9 @@ public class PanelTerminal extends javax.swing.JPanel {
         jTextField3 = new javax.swing.JTextField();
         jButton1 = new javax.swing.JButton();
 
+        setMaximumSize(new java.awt.Dimension(810, 540));
+        setMinimumSize(new java.awt.Dimension(810, 540));
+
         jLabel1.setFont(new java.awt.Font("Sans Serif Collection", 1, 14)); // NOI18N
         jLabel1.setText("REGISTRAR TERMINAL");
 
@@ -59,10 +62,6 @@ public class PanelTerminal extends javax.swing.JPanel {
         this.setLayout(layout);
         layout.setHorizontalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
-                .addContainerGap(217, Short.MAX_VALUE)
-                .addComponent(jButton1, javax.swing.GroupLayout.PREFERRED_SIZE, 131, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addGap(21, 21, 21))
             .addGroup(layout.createSequentialGroup()
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addGroup(layout.createSequentialGroup()
@@ -83,7 +82,11 @@ public class PanelTerminal extends javax.swing.JPanel {
                     .addGroup(layout.createSequentialGroup()
                         .addGap(41, 41, 41)
                         .addComponent(jLabel1)))
-                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                .addContainerGap(572, Short.MAX_VALUE))
+            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
+                .addGap(0, 0, Short.MAX_VALUE)
+                .addComponent(jButton1, javax.swing.GroupLayout.PREFERRED_SIZE, 131, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addGap(250, 250, 250))
         );
         layout.setVerticalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -102,9 +105,9 @@ public class PanelTerminal extends javax.swing.JPanel {
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(jLabel4)
                     .addComponent(jTextField3, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
-                .addGap(18, 18, 18)
+                .addGap(98, 98, 98)
                 .addComponent(jButton1)
-                .addContainerGap(41, Short.MAX_VALUE))
+                .addContainerGap(264, Short.MAX_VALUE))
         );
     }// </editor-fold>//GEN-END:initComponents
 
