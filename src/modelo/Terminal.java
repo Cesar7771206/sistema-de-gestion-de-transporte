@@ -24,7 +24,7 @@ public class Terminal {
     }
 
     public void setRuc(String ruc) {
-        if (ruc.matches("\\d+")){
+        if (ruc != null && ruc.matches("\\d+")) {
             this.ruc = ruc;
         } else {
             throw new IllegalArgumentException("El RUC solo puede estar conformado por números");
@@ -46,6 +46,4 @@ public class Terminal {
     public void setDireccion(String direccion) {
         this.direccion = direccion;
     }
-    
-    
 }
