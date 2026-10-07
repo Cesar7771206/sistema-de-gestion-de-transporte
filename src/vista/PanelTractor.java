@@ -10,7 +10,7 @@ import java.util.List;
 import javax.swing.JOptionPane;
 import javax.swing.SwingUtilities;
 import javax.swing.table.DefaultTableModel;
-
+import servicio.GestorEquipos;
 import servicio.TractorServicio;
 import modelo.Tractor;
 
@@ -373,6 +373,10 @@ public class PanelTractor extends javax.swing.JPanel {
                     tractorServicio.registrarTractor(placa, ejes, marca, modelo, carroceria, anio, MTC);
 
                     limpiarCampos();
+                    Tractor tractorRegistrado
+                            = tractorServicio.getTractorByPlaca(placa);
+
+                    GestorEquipos.agregarTractor(tractorRegistrado);
 
                     btnOpcion.setVisible(false);
                     actualizarTabla(tractorServicio.getTractors());

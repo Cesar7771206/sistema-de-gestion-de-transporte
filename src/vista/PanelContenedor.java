@@ -9,6 +9,7 @@ import javax.swing.BorderFactory;
 import servicio.ContenedorServicio;
 import javax.swing.table.DefaultTableModel;
 import modelo.Contenedor;
+import servicio.GestorEquipos;
 /**
  *
  * @author GIANCARLO REA
@@ -327,14 +328,25 @@ public class PanelContenedor extends javax.swing.JPanel {
     }// </editor-fold>//GEN-END:initComponents
 
     private void btnGuardarContenedorActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnGuardarContenedorActionPerformed
-        contenedorServicio.guardarContenedor(txtCodigo.getText(), Double.parseDouble(txtPayload.getText()), Double.parseDouble(txtTara.getText()));
-        
-        actualizarTabla();
-        
-        txtCodigo.setText("");
-        txtPayload.setText("");
-        txtTara.setText("");
-        txtCodigo.requestFocus();
+
+        contenedorServicio.guardarContenedor(
+        txtCodigo.getText(),
+        Double.parseDouble(txtPayload.getText()),
+        Double.parseDouble(txtTara.getText())
+    );
+
+    Contenedor contenedorRegistrado =
+            contenedorServicio.obtenerContenedorPörCodigo(txtCodigo.getText());
+
+    GestorEquipos.agregarContenedor(contenedorRegistrado);
+
+    actualizarTabla();
+
+    txtCodigo.setText("");
+    txtPayload.setText("");
+    txtTara.setText("");
+    txtCodigo.requestFocus();
+
     }//GEN-LAST:event_btnGuardarContenedorActionPerformed
 
     private void btnSeleccionarContenedorActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnSeleccionarContenedorActionPerformed
