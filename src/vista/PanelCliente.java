@@ -4,6 +4,11 @@
  */
 package vista;
 
+import modelo.Cliente;
+import modelo.Ubicacion;
+import servicio.GestorLogistica;
+import javax.swing.JOptionPane;
+
 /**
  *
  * @author GIANCARLO REA
@@ -57,6 +62,11 @@ public class PanelCliente extends javax.swing.JPanel {
         jTextField3.setBorder(javax.swing.BorderFactory.createLineBorder(new java.awt.Color(0, 0, 0)));
 
         jButton1.setText("Guardar");
+        jButton1.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jButton1ActionPerformed(evt);
+            }
+        });
 
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(this);
         this.setLayout(layout);
@@ -119,6 +129,46 @@ public class PanelCliente extends javax.swing.JPanel {
                         .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))))
         );
     }// </editor-fold>//GEN-END:initComponents
+
+    private void jButton1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton1ActionPerformed
+        String ruc = jTextField1.getText().trim();
+        String nombre = jTextField2.getText().trim();
+        String direccion = jTextField3.getText().trim();
+
+        if (ruc.isEmpty() || nombre.isEmpty() || direccion.isEmpty()) {
+            JOptionPane.showMessageDialog(
+                    this,
+                    "Complete todos los campos."
+            );
+            return;
+        }
+
+        Ubicacion direccionFiscal = new Ubicacion(
+                1,
+                "",
+                "",
+                "",
+                direccion
+        );
+
+        Cliente nuevoCliente = new Cliente(
+                ruc,
+                nombre,
+                direccionFiscal
+        );
+
+        GestorLogistica.agregarCliente(nuevoCliente);
+
+        JOptionPane.showMessageDialog(
+                this,
+                "Cliente registrado correctamente."
+        );
+
+        jTextField1.setText("");
+        jTextField2.setText("");
+        jTextField3.setText("");
+        jTextField1.requestFocus();
+    }//GEN-LAST:event_jButton1ActionPerformed
 
 
     // Variables declaration - do not modify//GEN-BEGIN:variables

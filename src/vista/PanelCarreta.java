@@ -3,7 +3,9 @@
  * Click nbfs://nbhost/SystemFileSystem/Templates/GUIForms/JPanel.java to edit this template
  */
 package vista;
-
+import modelo.Carreta;
+import servicio.GestorEquipos;
+import javax.swing.JOptionPane;
 /**
  *
  * @author GIANCARLO REA
@@ -57,6 +59,11 @@ public class PanelCarreta extends javax.swing.JPanel {
         add(jLabel4, new org.netbeans.lib.awtextra.AbsoluteConstraints(40, 170, -1, -1));
 
         jButton1.setText("Guardar");
+        jButton1.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jButton1ActionPerformed(evt);
+            }
+        });
         add(jButton1, new org.netbeans.lib.awtextra.AbsoluteConstraints(510, 220, 130, -1));
 
         jTextField1.setBorder(javax.swing.BorderFactory.createLineBorder(new java.awt.Color(0, 0, 0)));
@@ -68,6 +75,37 @@ public class PanelCarreta extends javax.swing.JPanel {
         jTextField3.setBorder(javax.swing.BorderFactory.createLineBorder(new java.awt.Color(0, 0, 0)));
         add(jTextField3, new org.netbeans.lib.awtextra.AbsoluteConstraints(110, 180, 150, -1));
     }// </editor-fold>//GEN-END:initComponents
+
+    private void jButton1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton1ActionPerformed
+String placa = jTextField1.getText().trim();
+String marca = jTextField2.getText().trim();
+String modelo = jTextField3.getText().trim();
+
+if (placa.isEmpty() || marca.isEmpty() || modelo.isEmpty()) {
+    JOptionPane.showMessageDialog(
+            this,
+            "Complete todos los campos."
+    );
+    return;
+}
+
+Carreta nuevaCarreta = new Carreta(
+        placa,
+        marca,
+        modelo
+);
+
+GestorEquipos.agregarCarreta(nuevaCarreta);
+
+JOptionPane.showMessageDialog(
+        this,
+        "Carreta registrada correctamente."
+);
+
+jTextField1.setText("");
+jTextField2.setText("");
+jTextField3.setText("");        
+    }//GEN-LAST:event_jButton1ActionPerformed
 
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
