@@ -12,7 +12,7 @@ import java.util.Comparator;
  * @author cesar
  */
 public class Carreta {
-    
+
     private static final int ANIO_MINIMO = 2000;
     private static final int ANIO_ACTUAL = Year.now().getValue();
 
@@ -23,12 +23,11 @@ public class Carreta {
     private String carroceria;
     private int anio;
     private String MTC;
-    
+
     // Comparadores para los botones "Ordenar por"
     public static final Comparator<Carreta> POR_PLACA = Comparator.comparing(Carreta::getPlaca);
     public static final Comparator<Carreta> POR_MARCA = Comparator.comparing(Carreta::getMarca);
-    public static final Comparator<Carreta> POR_ANIO =  Comparator.comparingInt(Carreta::getAnio);
-    
+
     //Constructor que usa setters para validacion
     public Carreta(String placa, int ejes, String marca, String modelo, String carroceria, int anio, String MTC) {
         setPlaca(placa);
@@ -39,24 +38,24 @@ public class Carreta {
         setAnio(anio);
         setMTC(MTC);
     }
-    
+
     //Getters y Setters
     public String getPlaca() {
         return placa;
-    } 
-    
+    }
+
     // 
     public void setPlaca(String placa) {
         if (placa == null || placa.trim().isEmpty()) {
             throw new IllegalArgumentException("La placa no puede ser nula ni vacía.");
-        }    
+        }
         String placaFinal = placa.trim().toUpperCase();
         if (!placaFinal.matches("[A-Z0-9]{6}")) {
             throw new IllegalArgumentException("La placa debe tener 6 letras o números");
         }
         this.placa = placaFinal;
-    
-    }   
+
+    }
 
     public int getEjes() {
         return ejes;
@@ -68,7 +67,7 @@ public class Carreta {
             throw new IllegalArgumentException("Los ejes deben estar entre 1 y 6");
         }
         this.ejes = ejes;
-        
+
     }
 
     public String getMarca() {
@@ -76,50 +75,53 @@ public class Carreta {
     }
 
     public void setMarca(String marca) {
-        if (marca != null){
-        String marcaLimpia = marca.trim().toUpperCase();
-        if (!marcaLimpia.isEmpty()){
+        if (marca != null) {
+            String marcaLimpia = marca.trim().toUpperCase();
+            if (!marcaLimpia.isEmpty()) {
                 this.marca = marcaLimpia;
-            }else {
-                    throw new IllegalArgumentException("La marca no puede estar vacía.");
+            } else {
+                throw new IllegalArgumentException("La marca no puede estar vacía.");
             }
         } else {
-                throw new IllegalArgumentException("La marca no puede ser nula.");
-               }
+            throw new IllegalArgumentException("La marca no puede ser nula.");
+        }
+        this.marca = marca;
     }
+
     public String getModelo() {
         return modelo;
     }
 
     public void setModelo(String modelo) {
-        if (modelo != null){
+        if (modelo != null) {
             String modeloLimpio = modelo.trim();
-            if(!modeloLimpio.isEmpty()){
+            if (!modeloLimpio.isEmpty()) {
                 this.modelo = modeloLimpio;
-            }else {
-                    throw new IllegalArgumentException("El modelo no puede estar vacío.");
+            } else {
+                throw new IllegalArgumentException("El modelo no puede estar vacío.");
             }
         } else {
-                throw new IllegalArgumentException("El modelo no puede ser nulo.");
-               }
+            throw new IllegalArgumentException("El modelo no puede ser nulo.");
+        }
     }
+
     public String getCarroceria() {
         return carroceria;
     }
 
     public void setCarroceria(String carroceria) {
-        if (carroceria != null){
+        if (carroceria != null) {
             String carroceriaLimpio = carroceria.trim();
-            if (!carroceriaLimpio.isEmpty()){
+            if (!carroceriaLimpio.isEmpty()) {
                 this.carroceria = carroceriaLimpio;
-            }else {
-                    throw new IllegalArgumentException("La carrocería no puede estar vacía.");
+            } else {
+                throw new IllegalArgumentException("La carrocería no puede estar vacía.");
             }
         } else {
-                throw new IllegalArgumentException("La carrocería no puede ser nula.");
-               }
+            throw new IllegalArgumentException("La carrocería no puede ser nula.");
+        }
     }
-    
+
     public int getAnio() {
         return anio;
     }
@@ -137,24 +139,17 @@ public class Carreta {
     }
 
     public void setMTC(String MTC) {
-         if (MTC != null){
+        if (MTC != null) {
             String MTCLimpio = MTC.trim();
-            if (!MTCLimpio.isEmpty()){
+            if (!MTCLimpio.isEmpty()) {
                 this.MTC = MTCLimpio;
-                }else {
-                    throw new IllegalArgumentException("El MTC no puede estar vacío.");
+            } else {
+                throw new IllegalArgumentException("El MTC no puede estar vacío.");
             }
         } else {
-                throw new IllegalArgumentException("El MTC no puede ser nulo.");
-               }
-    
-    }
+            throw new IllegalArgumentException("El MTC no puede ser nulo.");
+        }
+        this.modelo = modelo;
 
-    @Override
-    public String toString() {
-        return "Carreta{" + "placa=" + placa + ", ejes=" + ejes + ", marca=" + marca + ", modelo=" + modelo + ", carroceria=" + carroceria + ", anio=" + anio + ", MTC=" + MTC + '}';
     }
-    
-    
-    
 }

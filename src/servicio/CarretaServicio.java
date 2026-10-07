@@ -87,12 +87,6 @@ public class CarretaServicio {
     // Devuelve la lista ordenada por marca
     public List<Carreta> ordenarCarretaPorMarca() {
         return carretas.stream().sorted(Carreta.POR_MARCA).toList();
-    }
-
-    // Devuelve la lista ordenada por año
-    public List<Carreta> ordenarCarretaPorAnio() {
-        return carretas.stream().sorted(Carreta.POR_ANIO).toList();
-    }
-    
+    }    
     
 }
