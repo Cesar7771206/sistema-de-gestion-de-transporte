@@ -4,6 +4,8 @@
  */
 package modelo;
 
+import java.util.Comparator;
+
 /**
  *
  * @author cesar
@@ -12,12 +14,18 @@ public class Cliente {
 
     private String ruc;
     private String nombre;
-    private Ubicacion direccionFiscal;
+    private String direccion;
 
-    public Cliente(String ruc, String nombre, Ubicacion direccionFiscal) {
-        this.ruc = ruc;
-        this.nombre = nombre;
-        this.direccionFiscal = direccionFiscal;
+    // Comparadores para los botones "Ordenar por"
+    public static final Comparator<Cliente> POR_RUC = Comparator.comparing(Cliente::getRuc);
+    public static final Comparator<Cliente> POR_NOMBRE = Comparator.comparing(Cliente::getNombre);
+
+    // Constructor 
+    public Cliente(String ruc, String nombre, String direccion) {
+        setRuc(ruc);
+        setNombre(nombre);
+        setDireccion(direccion);
+
     }
 
     public String getRuc() {
@@ -25,7 +33,20 @@ public class Cliente {
     }
 
     public void setRuc(String ruc) {
-        this.ruc = ruc;
+        if (ruc == null) {
+            throw new IllegalArgumentException("El Ruc no puede ser nulo");
+        }
+
+        String n = ruc.trim().toUpperCase();
+        if (ruc == null) {
+            throw new IllegalArgumentException("El RUC no puede ser nulo");
+        }
+        String r = ruc.trim();
+        if (ruc.matches("\\d{11}")) {
+            this.ruc = ruc;
+        } else {
+            throw new IllegalArgumentException("El ruc debe tener solo 11 digitos");
+        }
     }
 
     public String getNombre() {
@@ -33,19 +54,37 @@ public class Cliente {
     }
 
     public void setNombre(String nombre) {
-        this.nombre = nombre;
+        if (nombre == null) {
+            throw new IllegalArgumentException("El nombre no puede ser nulo");
+        }
+        String n = nombre.trim().toUpperCase();
+        if (n.isEmpty()) {
+            throw new IllegalArgumentException("El nombre no puede estar vacio");
+        }
+        this.nombre = n;
+
     }
 
-    public Ubicacion getDireccionFiscal() {
-        return direccionFiscal;
+    public String getDireccion() {
+        return direccion;
     }
 
-    public void setDireccionFiscal(Ubicacion direccionFiscal) {
-        this.direccionFiscal = direccionFiscal;
+    public void setDireccion(String direccion) {
+
+        if (direccion == null) {
+            throw new IllegalArgumentException("La dirección no puede ser nula");
+        }
+        String d = direccion.trim().toUpperCase();
+        if (d.isEmpty()) {
+            throw new IllegalArgumentException("La dirección no puede estar vacía");
+        }
+        this.direccion = d;
+
     }
 
     @Override
     public String toString() {
-        return nombre;
+        return "Cliente{" + "ruc=" + ruc + ", nombre=" + nombre + ", direccion=" + direccion + '}';
     }
+
 }

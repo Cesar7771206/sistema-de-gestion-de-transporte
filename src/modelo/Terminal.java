@@ -10,15 +10,14 @@ import java.util.ArrayList;
  * @author cesar
  */
 public class Terminal {
-  
     private String ruc;
     private String nombre;
-    private ArrayList<Ubicacion> ubicaciones;
+    private String direccion;
 
-    public Terminal(String ruc, String nombre) {
-        this.ruc = ruc;
+    public Terminal(String ruc, String nombre, String direccion) {
+        setRuc(ruc);
         this.nombre = nombre;
-        this.ubicaciones = new ArrayList<>();
+        this.direccion = direccion;
     }
 
     public String getRuc() {
@@ -26,7 +25,11 @@ public class Terminal {
     }
 
     public void setRuc(String ruc) {
-        this.ruc = ruc;
+        if (ruc != null && ruc.matches("\\d+")) {
+            this.ruc = ruc;
+        } else {
+            throw new IllegalArgumentException("El RUC solo puede estar conformado por números");
+        }
     }
 
     public String getNombre() {
@@ -37,20 +40,11 @@ public class Terminal {
         this.nombre = nombre;
     }
 
-    public ArrayList<Ubicacion> getUbicaciones() {
-        return ubicaciones;
+    public String getDireccion() {
+        return direccion;
     }
 
-    public void setUbicaciones(ArrayList<Ubicacion> ubicaciones) {
-        this.ubicaciones = ubicaciones;
-    }
-
-    public void agregarUbicacion(Ubicacion ubicacion) {
-        ubicaciones.add(ubicacion);
-    }
-
-    @Override
-    public String toString() {
-        return nombre;
+    public void setDireccion(String direccion) {
+        this.direccion = direccion;
     }
 }
