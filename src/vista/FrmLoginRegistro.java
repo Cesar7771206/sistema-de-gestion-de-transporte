@@ -4,19 +4,37 @@
  */
 package vista;
 
+import java.awt.CardLayout;
+import servicio.UsuarioServicio;
+import modelo.Usuario;
+import modelo.Direccion;
+
 /**
  *
  * @author cesar
  */
 public class FrmLoginRegistro extends javax.swing.JFrame {
-    
+
     private static final java.util.logging.Logger logger = java.util.logging.Logger.getLogger(FrmLoginRegistro.class.getName());
+    private UsuarioServicio usuarioServicio = new UsuarioServicio();
 
     /**
      * Creates new form FrmLoginRegistro
      */
     public FrmLoginRegistro() {
         initComponents();
+    }
+
+    private void limpiarRegistro() {
+        txtDni.setText("");
+        txtNombres.setText("");
+        txtApellidos.setText("");
+        txtCorreoRegistro.setText("");
+        txtContraseñaRegistro.setText("");
+        txtDistrito.setText("");
+        txtProvincia.setText("");
+        txtDepartamento.setText("");
+        txtDirección.setText("");
     }
 
     /**
@@ -28,21 +46,352 @@ public class FrmLoginRegistro extends javax.swing.JFrame {
     // <editor-fold defaultstate="collapsed" desc="Generated Code">//GEN-BEGIN:initComponents
     private void initComponents() {
 
+        fondoPanel = new javax.swing.JPanel();
+        cardPanel = new javax.swing.JPanel();
+        panelRegistro = new javax.swing.JPanel();
+        lblDni = new javax.swing.JLabel();
+        txtDni = new javax.swing.JTextField();
+        lblApellidos = new javax.swing.JLabel();
+        txtApellidos = new javax.swing.JTextField();
+        lblNombres = new javax.swing.JLabel();
+        txtNombres = new javax.swing.JTextField();
+        lblCorreoRegistro = new javax.swing.JLabel();
+        txtCorreoRegistro = new javax.swing.JTextField();
+        lblContraseñaRegistro = new javax.swing.JLabel();
+        txtContraseñaRegistro = new javax.swing.JPasswordField();
+        lblTituloRegistro = new javax.swing.JLabel();
+        btnRegistrar = new javax.swing.JButton();
+        lblIrLogin = new javax.swing.JLabel();
+        lblDireccionCochera = new javax.swing.JLabel();
+        lblDistrito = new javax.swing.JLabel();
+        lblProvincia = new javax.swing.JLabel();
+        lblDepartamento = new javax.swing.JLabel();
+        lblDirección = new javax.swing.JLabel();
+        txtDepartamento = new javax.swing.JTextField();
+        txtDistrito = new javax.swing.JTextField();
+        txtProvincia = new javax.swing.JTextField();
+        txtDirección = new javax.swing.JTextField();
+        panelLogin = new javax.swing.JPanel();
+        txtCorreo = new javax.swing.JTextField();
+        txtContraseña = new javax.swing.JPasswordField();
+        btbIngresar = new javax.swing.JButton();
+        lblCorreo = new javax.swing.JLabel();
+        lblContraseña = new javax.swing.JLabel();
+        lblRegistro = new javax.swing.JLabel();
+        lblTituloLogin = new javax.swing.JLabel();
+        lblFondo = new javax.swing.JLabel();
+
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
+
+        fondoPanel.setBackground(new java.awt.Color(204, 204, 204));
+        fondoPanel.setLayout(new org.netbeans.lib.awtextra.AbsoluteLayout());
+
+        cardPanel.setBackground(new java.awt.Color(204, 204, 204));
+        cardPanel.setLayout(new java.awt.CardLayout());
+
+        panelRegistro.setBackground(new java.awt.Color(255, 255, 255));
+
+        lblDni.setText("DNI");
+
+        txtDni.setBorder(javax.swing.BorderFactory.createLineBorder(new java.awt.Color(0, 0, 0)));
+
+        lblApellidos.setText("Apellidos");
+
+        txtApellidos.setBorder(javax.swing.BorderFactory.createLineBorder(new java.awt.Color(0, 0, 0)));
+
+        lblNombres.setText("Nombres");
+
+        txtNombres.setBorder(javax.swing.BorderFactory.createLineBorder(new java.awt.Color(0, 0, 0)));
+
+        lblCorreoRegistro.setText("Correo");
+
+        txtCorreoRegistro.setBorder(javax.swing.BorderFactory.createLineBorder(new java.awt.Color(0, 0, 0)));
+
+        lblContraseñaRegistro.setText("Contraseña");
+
+        txtContraseñaRegistro.setBorder(javax.swing.BorderFactory.createLineBorder(new java.awt.Color(0, 0, 0)));
+
+        lblTituloRegistro.setFont(new java.awt.Font("Segoe UI", 1, 18)); // NOI18N
+        lblTituloRegistro.setText("Registro de Operadores ");
+
+        btnRegistrar.setBackground(new java.awt.Color(25, 55, 109));
+        btnRegistrar.setText("Registrarse");
+        btnRegistrar.addActionListener(this::btnRegistrarActionPerformed);
+
+        lblIrLogin.setFont(new java.awt.Font("Segoe UI", 1, 12)); // NOI18N
+        lblIrLogin.setForeground(new java.awt.Color(41, 98, 255));
+        lblIrLogin.setText("¿Ya tienes cuenta? Inicia sesión");
+        lblIrLogin.addMouseListener(new java.awt.event.MouseAdapter() {
+            public void mouseClicked(java.awt.event.MouseEvent evt) {
+                lblIrLoginMouseClicked(evt);
+            }
+        });
+
+        lblDireccionCochera.setFont(new java.awt.Font("Segoe UI", 1, 12)); // NOI18N
+        lblDireccionCochera.setText("Direccion de Cochera");
+
+        lblDistrito.setText("Distrito");
+
+        lblProvincia.setText("Provincia");
+
+        lblDepartamento.setText("Departamento");
+
+        lblDirección.setText("Dirección");
+
+        txtDepartamento.setBorder(javax.swing.BorderFactory.createLineBorder(new java.awt.Color(0, 0, 0)));
+
+        txtDistrito.setBorder(javax.swing.BorderFactory.createLineBorder(new java.awt.Color(0, 0, 0)));
+
+        txtProvincia.setBorder(javax.swing.BorderFactory.createLineBorder(new java.awt.Color(0, 0, 0)));
+
+        txtDirección.setBorder(javax.swing.BorderFactory.createLineBorder(new java.awt.Color(0, 0, 0)));
+
+        javax.swing.GroupLayout panelRegistroLayout = new javax.swing.GroupLayout(panelRegistro);
+        panelRegistro.setLayout(panelRegistroLayout);
+        panelRegistroLayout.setHorizontalGroup(
+            panelRegistroLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, panelRegistroLayout.createSequentialGroup()
+                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                .addGroup(panelRegistroLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, panelRegistroLayout.createSequentialGroup()
+                        .addComponent(lblTituloRegistro)
+                        .addGap(42, 42, 42))
+                    .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, panelRegistroLayout.createSequentialGroup()
+                        .addComponent(lblIrLogin, javax.swing.GroupLayout.PREFERRED_SIZE, 172, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addGap(59, 59, 59))
+                    .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, panelRegistroLayout.createSequentialGroup()
+                        .addComponent(btnRegistrar)
+                        .addGap(103, 103, 103))))
+            .addGroup(panelRegistroLayout.createSequentialGroup()
+                .addGap(35, 35, 35)
+                .addGroup(panelRegistroLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addGroup(panelRegistroLayout.createSequentialGroup()
+                        .addGroup(panelRegistroLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
+                            .addComponent(lblContraseñaRegistro, javax.swing.GroupLayout.PREFERRED_SIZE, 61, Short.MAX_VALUE)
+                            .addComponent(lblDni, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                            .addComponent(lblApellidos, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                            .addComponent(lblNombres, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                            .addComponent(lblCorreoRegistro, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                        .addGroup(panelRegistroLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                            .addGroup(panelRegistroLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
+                                .addComponent(txtDni)
+                                .addComponent(txtApellidos)
+                                .addComponent(txtNombres, javax.swing.GroupLayout.DEFAULT_SIZE, 127, Short.MAX_VALUE))
+                            .addComponent(txtContraseñaRegistro, javax.swing.GroupLayout.PREFERRED_SIZE, 128, javax.swing.GroupLayout.PREFERRED_SIZE)
+                            .addComponent(lblDireccionCochera)
+                            .addComponent(txtCorreoRegistro, javax.swing.GroupLayout.PREFERRED_SIZE, 166, javax.swing.GroupLayout.PREFERRED_SIZE)))
+                    .addGroup(panelRegistroLayout.createSequentialGroup()
+                        .addGroup(panelRegistroLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                            .addComponent(lblDepartamento)
+                            .addComponent(lblDistrito)
+                            .addComponent(lblProvincia)
+                            .addComponent(lblDirección))
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                        .addGroup(panelRegistroLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
+                            .addComponent(txtDistrito, javax.swing.GroupLayout.DEFAULT_SIZE, 151, Short.MAX_VALUE)
+                            .addComponent(txtProvincia)
+                            .addComponent(txtDepartamento)
+                            .addComponent(txtDirección))))
+                .addContainerGap(32, Short.MAX_VALUE))
+        );
+        panelRegistroLayout.setVerticalGroup(
+            panelRegistroLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(panelRegistroLayout.createSequentialGroup()
+                .addGap(31, 31, 31)
+                .addComponent(lblTituloRegistro)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addGroup(panelRegistroLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addComponent(lblDni, javax.swing.GroupLayout.PREFERRED_SIZE, 16, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(txtDni, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addGroup(panelRegistroLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                    .addComponent(lblApellidos)
+                    .addComponent(txtApellidos, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                .addGap(7, 7, 7)
+                .addGroup(panelRegistroLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addComponent(lblNombres)
+                    .addComponent(txtNombres, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addGroup(panelRegistroLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addComponent(lblCorreoRegistro)
+                    .addComponent(txtCorreoRegistro, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addGroup(panelRegistroLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addComponent(lblContraseñaRegistro)
+                    .addComponent(txtContraseñaRegistro, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                .addGap(1, 1, 1)
+                .addComponent(lblDireccionCochera)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addGroup(panelRegistroLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                    .addComponent(lblDistrito)
+                    .addComponent(txtDistrito, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addGroup(panelRegistroLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                    .addComponent(lblProvincia)
+                    .addComponent(txtProvincia, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addGroup(panelRegistroLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
+                    .addComponent(lblDepartamento)
+                    .addComponent(txtDepartamento, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addGroup(panelRegistroLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                    .addComponent(lblDirección)
+                    .addComponent(txtDirección, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 66, Short.MAX_VALUE)
+                .addComponent(btnRegistrar)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addComponent(lblIrLogin)
+                .addGap(14, 14, 14))
+        );
+
+        cardPanel.add(panelRegistro, "panelRegistro");
+
+        panelLogin.setBackground(new java.awt.Color(255, 255, 255));
+
+        txtCorreo.setBorder(javax.swing.BorderFactory.createLineBorder(new java.awt.Color(0, 0, 0)));
+
+        txtContraseña.setBorder(javax.swing.BorderFactory.createLineBorder(new java.awt.Color(0, 0, 0)));
+
+        btbIngresar.setBackground(new java.awt.Color(25, 55, 105));
+        btbIngresar.setText("Ingresar");
+        btbIngresar.addActionListener(this::btbIngresarActionPerformed);
+
+        lblCorreo.setText("Correo  Electrónico");
+
+        lblContraseña.setText("Contraseña");
+
+        lblRegistro.setFont(new java.awt.Font("Segoe UI", 1, 12)); // NOI18N
+        lblRegistro.setForeground(new java.awt.Color(41, 98, 255));
+        lblRegistro.setText("¿No tienes cuenta? Registrate");
+        lblRegistro.addMouseListener(new java.awt.event.MouseAdapter() {
+            public void mouseClicked(java.awt.event.MouseEvent evt) {
+                lblRegistroMouseClicked(evt);
+            }
+        });
+
+        lblTituloLogin.setFont(new java.awt.Font("Segoe UI", 1, 14)); // NOI18N
+        lblTituloLogin.setText("Iniciar sesión");
+
+        javax.swing.GroupLayout panelLoginLayout = new javax.swing.GroupLayout(panelLogin);
+        panelLogin.setLayout(panelLoginLayout);
+        panelLoginLayout.setHorizontalGroup(
+            panelLoginLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, panelLoginLayout.createSequentialGroup()
+                .addContainerGap(68, Short.MAX_VALUE)
+                .addGroup(panelLoginLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
+                    .addComponent(lblRegistro)
+                    .addGroup(panelLoginLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING, false)
+                        .addComponent(txtContraseña, javax.swing.GroupLayout.DEFAULT_SIZE, 113, Short.MAX_VALUE)
+                        .addComponent(txtCorreo)))
+                .addGap(67, 67, 67))
+            .addGroup(panelLoginLayout.createSequentialGroup()
+                .addGroup(panelLoginLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addGroup(panelLoginLayout.createSequentialGroup()
+                        .addGap(52, 52, 52)
+                        .addGroup(panelLoginLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                            .addComponent(lblCorreo)
+                            .addComponent(lblContraseña, javax.swing.GroupLayout.PREFERRED_SIZE, 70, javax.swing.GroupLayout.PREFERRED_SIZE)))
+                    .addGroup(panelLoginLayout.createSequentialGroup()
+                        .addGap(100, 100, 100)
+                        .addComponent(btbIngresar, javax.swing.GroupLayout.PREFERRED_SIZE, 98, javax.swing.GroupLayout.PREFERRED_SIZE))
+                    .addGroup(panelLoginLayout.createSequentialGroup()
+                        .addGap(105, 105, 105)
+                        .addComponent(lblTituloLogin)))
+                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+        );
+        panelLoginLayout.setVerticalGroup(
+            panelLoginLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(panelLoginLayout.createSequentialGroup()
+                .addContainerGap(87, Short.MAX_VALUE)
+                .addComponent(lblTituloLogin, javax.swing.GroupLayout.PREFERRED_SIZE, 26, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addGap(32, 32, 32)
+                .addComponent(lblCorreo, javax.swing.GroupLayout.PREFERRED_SIZE, 26, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addComponent(txtCorreo, javax.swing.GroupLayout.PREFERRED_SIZE, 18, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addGap(18, 18, 18)
+                .addComponent(lblContraseña, javax.swing.GroupLayout.PREFERRED_SIZE, 24, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addGap(4, 4, 4)
+                .addComponent(txtContraseña, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addGap(45, 45, 45)
+                .addComponent(btbIngresar)
+                .addGap(18, 18, 18)
+                .addComponent(lblRegistro, javax.swing.GroupLayout.PREFERRED_SIZE, 28, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addGap(42, 42, 42))
+        );
+
+        cardPanel.add(panelLogin, "panelLogin");
+
+        fondoPanel.add(cardPanel, new org.netbeans.lib.awtextra.AbsoluteConstraints(490, 176, -1, -1));
+
+        lblFondo.setIcon(new javax.swing.ImageIcon(getClass().getResource("/imagenes/FondoLogin.png"))); // NOI18N
+        fondoPanel.add(lblFondo, new org.netbeans.lib.awtextra.AbsoluteConstraints(0, 0, 1280, 768));
 
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
         getContentPane().setLayout(layout);
         layout.setHorizontalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGap(0, 1100, Short.MAX_VALUE)
+            .addComponent(fondoPanel, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
         );
         layout.setVerticalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGap(0, 680, Short.MAX_VALUE)
+            .addComponent(fondoPanel, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
         );
 
         pack();
     }// </editor-fold>//GEN-END:initComponents
+
+    private void lblRegistroMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_lblRegistroMouseClicked
+        CardLayout cl = (CardLayout) cardPanel.getLayout();
+        cl.show(cardPanel, "panelRegistro");
+    }//GEN-LAST:event_lblRegistroMouseClicked
+
+    private void lblIrLoginMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_lblIrLoginMouseClicked
+        CardLayout cl = (CardLayout) cardPanel.getLayout();
+        cl.show(cardPanel, "panelLogin");
+    }//GEN-LAST:event_lblIrLoginMouseClicked
+
+    private void btnRegistrarActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnRegistrarActionPerformed
+
+        try {
+            String nombreCompleto = txtNombres.getText().trim() + " " + txtApellidos.getText().trim();
+
+            Direccion cochera = new Direccion(
+                    1,
+                    txtDistrito.getText().trim(),
+                    txtProvincia.getText().trim(),
+                    txtDepartamento.getText().trim(),
+                    txtDirección.getText().trim());
+
+            usuarioServicio.guardarUsuario(
+                    txtDni.getText(),
+                    nombreCompleto,
+                    cochera,
+                    txtCorreoRegistro.getText(),
+                    new String(txtContraseñaRegistro.getPassword()));
+
+            javax.swing.JOptionPane.showMessageDialog(this, "Usuario registrado correctamente");
+            limpiarRegistro();
+            ((CardLayout) cardPanel.getLayout()).show(cardPanel, "card2");
+        } catch (IllegalArgumentException ex) {
+            javax.swing.JOptionPane.showMessageDialog(this, ex.getMessage(),
+                    "Error", javax.swing.JOptionPane.WARNING_MESSAGE);
+        }
+    }//GEN-LAST:event_btnRegistrarActionPerformed
+
+    private void btbIngresarActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btbIngresarActionPerformed
+
+        Usuario u = usuarioServicio.autenticar(
+                txtCorreo.getText(),
+                new String(txtContraseña.getPassword()));
+
+        if (u == null) {
+            javax.swing.JOptionPane.showMessageDialog(this, "Correo o contraseña incorrectos",
+                    "Error", javax.swing.JOptionPane.ERROR_MESSAGE);
+            return;
+        }
+        javax.swing.JOptionPane.showMessageDialog(this, "Bienvenido, " + u.getNombre());
+    }//GEN-LAST:event_btbIngresarActionPerformed
 
     /**
      * @param args the command line arguments
@@ -70,5 +419,40 @@ public class FrmLoginRegistro extends javax.swing.JFrame {
     }
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
+    private javax.swing.JButton btbIngresar;
+    private javax.swing.JButton btnRegistrar;
+    private javax.swing.JPanel cardPanel;
+    private javax.swing.JPanel fondoPanel;
+    private javax.swing.JLabel lblApellidos;
+    private javax.swing.JLabel lblContraseña;
+    private javax.swing.JLabel lblContraseñaRegistro;
+    private javax.swing.JLabel lblCorreo;
+    private javax.swing.JLabel lblCorreoRegistro;
+    private javax.swing.JLabel lblDepartamento;
+    private javax.swing.JLabel lblDireccionCochera;
+    private javax.swing.JLabel lblDirección;
+    private javax.swing.JLabel lblDistrito;
+    private javax.swing.JLabel lblDni;
+    private javax.swing.JLabel lblFondo;
+    private javax.swing.JLabel lblIrLogin;
+    private javax.swing.JLabel lblNombres;
+    private javax.swing.JLabel lblProvincia;
+    private javax.swing.JLabel lblRegistro;
+    private javax.swing.JLabel lblTituloLogin;
+    private javax.swing.JLabel lblTituloRegistro;
+    private javax.swing.JPanel panelLogin;
+    private javax.swing.JPanel panelRegistro;
+    private javax.swing.JTextField txtApellidos;
+    private javax.swing.JPasswordField txtContraseña;
+    private javax.swing.JPasswordField txtContraseñaRegistro;
+    private javax.swing.JTextField txtCorreo;
+    private javax.swing.JTextField txtCorreoRegistro;
+    private javax.swing.JTextField txtDepartamento;
+    private javax.swing.JTextField txtDirección;
+    private javax.swing.JTextField txtDistrito;
+    private javax.swing.JTextField txtDni;
+    private javax.swing.JTextField txtNombres;
+    private javax.swing.JTextField txtProvincia;
     // End of variables declaration//GEN-END:variables
+
 }
