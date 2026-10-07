@@ -43,9 +43,6 @@ public class PanelCarreta extends javax.swing.JPanel {
             case "marca":
                 lista = carretaServicio.ordenarCarretaPorMarca();
                 break;
-            case "anio":
-                lista = carretaServicio.ordenarCarretaPorAnio();
-                break;
             default:
                 lista = carretaServicio.getCarretas();
                 break;
@@ -147,7 +144,7 @@ public class PanelCarreta extends javax.swing.JPanel {
         jLabel3.setFont(new java.awt.Font("Sans Serif Collection", 1, 14)); // NOI18N
         jLabel3.setForeground(new java.awt.Color(0, 0, 0));
         jLabel3.setText("Marca:");
-        add(jLabel3, new org.netbeans.lib.awtextra.AbsoluteConstraints(200, 60, -1, -1));
+        add(jLabel3, new org.netbeans.lib.awtextra.AbsoluteConstraints(180, 60, -1, -1));
 
         jLabel4.setFont(new java.awt.Font("Sans Serif Collection", 1, 14)); // NOI18N
         jLabel4.setForeground(new java.awt.Color(0, 0, 0));
@@ -167,12 +164,12 @@ public class PanelCarreta extends javax.swing.JPanel {
         jLabel5.setFont(new java.awt.Font("Sans Serif Collection", 1, 14)); // NOI18N
         jLabel5.setForeground(new java.awt.Color(0, 0, 0));
         jLabel5.setText("Modelo:");
-        add(jLabel5, new org.netbeans.lib.awtextra.AbsoluteConstraints(430, 60, -1, -1));
+        add(jLabel5, new org.netbeans.lib.awtextra.AbsoluteConstraints(400, 60, -1, -1));
 
         jLabel6.setFont(new java.awt.Font("Sans Serif Collection", 1, 14)); // NOI18N
         jLabel6.setForeground(new java.awt.Color(0, 0, 0));
         jLabel6.setText("Ejes:");
-        add(jLabel6, new org.netbeans.lib.awtextra.AbsoluteConstraints(660, 60, 40, -1));
+        add(jLabel6, new org.netbeans.lib.awtextra.AbsoluteConstraints(640, 60, 40, -1));
 
         jLabel7.setFont(new java.awt.Font("Sans Serif Collection", 1, 14)); // NOI18N
         jLabel7.setForeground(new java.awt.Color(0, 0, 0));
@@ -185,32 +182,39 @@ public class PanelCarreta extends javax.swing.JPanel {
         add(jLabel8, new org.netbeans.lib.awtextra.AbsoluteConstraints(290, 110, -1, -1));
 
         txtInputPlaca.setBackground(new java.awt.Color(255, 255, 255));
+        txtInputPlaca.setHorizontalAlignment(javax.swing.JTextField.CENTER);
         txtInputPlaca.setBorder(javax.swing.BorderFactory.createLineBorder(new java.awt.Color(0, 0, 0)));
         add(txtInputPlaca, new org.netbeans.lib.awtextra.AbsoluteConstraints(90, 50, 80, 30));
 
         txtInputMTC.setBackground(new java.awt.Color(255, 255, 255));
+        txtInputMTC.setHorizontalAlignment(javax.swing.JTextField.CENTER);
         txtInputMTC.setBorder(javax.swing.BorderFactory.createLineBorder(new java.awt.Color(0, 0, 0)));
-        add(txtInputMTC, new org.netbeans.lib.awtextra.AbsoluteConstraints(450, 100, 60, 30));
+        add(txtInputMTC, new org.netbeans.lib.awtextra.AbsoluteConstraints(460, 100, 150, 30));
 
         txtInputModelo.setBackground(new java.awt.Color(255, 255, 255));
+        txtInputModelo.setHorizontalAlignment(javax.swing.JTextField.CENTER);
         txtInputModelo.setBorder(javax.swing.BorderFactory.createLineBorder(new java.awt.Color(0, 0, 0)));
-        add(txtInputModelo, new org.netbeans.lib.awtextra.AbsoluteConstraints(490, 50, 150, 30));
+        add(txtInputModelo, new org.netbeans.lib.awtextra.AbsoluteConstraints(470, 50, 150, 30));
 
         txtInputCarroceria.setBackground(new java.awt.Color(255, 255, 255));
+        txtInputCarroceria.setHorizontalAlignment(javax.swing.JTextField.CENTER);
         txtInputCarroceria.setBorder(javax.swing.BorderFactory.createLineBorder(new java.awt.Color(0, 0, 0)));
         add(txtInputCarroceria, new org.netbeans.lib.awtextra.AbsoluteConstraints(120, 100, 150, 30));
 
         txtInputEjes.setBackground(new java.awt.Color(255, 255, 255));
+        txtInputEjes.setHorizontalAlignment(javax.swing.JTextField.CENTER);
         txtInputEjes.setBorder(javax.swing.BorderFactory.createLineBorder(new java.awt.Color(0, 0, 0)));
-        add(txtInputEjes, new org.netbeans.lib.awtextra.AbsoluteConstraints(700, 50, 60, 30));
+        add(txtInputEjes, new org.netbeans.lib.awtextra.AbsoluteConstraints(680, 50, 60, 30));
 
         txtInputAnio.setBackground(new java.awt.Color(255, 255, 255));
+        txtInputAnio.setHorizontalAlignment(javax.swing.JTextField.CENTER);
         txtInputAnio.setBorder(javax.swing.BorderFactory.createLineBorder(new java.awt.Color(0, 0, 0)));
         add(txtInputAnio, new org.netbeans.lib.awtextra.AbsoluteConstraints(330, 100, 60, 30));
 
         txtInputMarca.setBackground(new java.awt.Color(255, 255, 255));
+        txtInputMarca.setHorizontalAlignment(javax.swing.JTextField.CENTER);
         txtInputMarca.setBorder(javax.swing.BorderFactory.createLineBorder(new java.awt.Color(0, 0, 0)));
-        add(txtInputMarca, new org.netbeans.lib.awtextra.AbsoluteConstraints(260, 50, 150, 30));
+        add(txtInputMarca, new org.netbeans.lib.awtextra.AbsoluteConstraints(240, 50, 150, 30));
 
         jLabel9.setForeground(new java.awt.Color(0, 0, 0));
         jLabel9.setText("Ordenar por:");
@@ -281,14 +285,15 @@ public class PanelCarreta extends javax.swing.JPanel {
         });
         jScrollPane1.setViewportView(tblCarretas);
 
-        add(jScrollPane1, new org.netbeans.lib.awtextra.AbsoluteConstraints(40, 200, 720, 180));
+        add(jScrollPane1, new org.netbeans.lib.awtextra.AbsoluteConstraints(40, 200, 720, 160));
 
         jLabel10.setForeground(new java.awt.Color(0, 0, 0));
         jLabel10.setText("Ingresar la placa de la Carreta:");
-        add(jLabel10, new org.netbeans.lib.awtextra.AbsoluteConstraints(40, 400, 170, 20));
+        add(jLabel10, new org.netbeans.lib.awtextra.AbsoluteConstraints(40, 380, 200, 20));
 
         txtCarretaBuscada.setBackground(new java.awt.Color(255, 255, 255));
-        add(txtCarretaBuscada, new org.netbeans.lib.awtextra.AbsoluteConstraints(200, 400, 200, -1));
+        txtCarretaBuscada.setHorizontalAlignment(javax.swing.JTextField.CENTER);
+        add(txtCarretaBuscada, new org.netbeans.lib.awtextra.AbsoluteConstraints(250, 380, 200, -1));
 
         btnSeleccionarCarreta.setBackground(new java.awt.Color(0, 153, 204));
         btnSeleccionarCarreta.setForeground(new java.awt.Color(255, 255, 255));
@@ -298,56 +303,63 @@ public class PanelCarreta extends javax.swing.JPanel {
                 btnSeleccionarCarretaActionPerformed(evt);
             }
         });
-        add(btnSeleccionarCarreta, new org.netbeans.lib.awtextra.AbsoluteConstraints(410, 400, 130, -1));
+        add(btnSeleccionarCarreta, new org.netbeans.lib.awtextra.AbsoluteConstraints(460, 380, 130, -1));
 
         jLabel11.setForeground(new java.awt.Color(0, 0, 0));
         jLabel11.setText("MTC");
-        add(jLabel11, new org.netbeans.lib.awtextra.AbsoluteConstraints(470, 440, -1, -1));
+        add(jLabel11, new org.netbeans.lib.awtextra.AbsoluteConstraints(360, 470, -1, -1));
 
         txtPlacaBuscada.setBackground(new java.awt.Color(255, 255, 255));
-        add(txtPlacaBuscada, new org.netbeans.lib.awtextra.AbsoluteConstraints(40, 460, -1, -1));
+        txtPlacaBuscada.setHorizontalAlignment(javax.swing.JTextField.CENTER);
+        add(txtPlacaBuscada, new org.netbeans.lib.awtextra.AbsoluteConstraints(40, 440, 140, -1));
 
         txtMarcaBuscada.setBackground(new java.awt.Color(255, 255, 255));
-        add(txtMarcaBuscada, new org.netbeans.lib.awtextra.AbsoluteConstraints(120, 460, -1, -1));
+        txtMarcaBuscada.setHorizontalAlignment(javax.swing.JTextField.CENTER);
+        add(txtMarcaBuscada, new org.netbeans.lib.awtextra.AbsoluteConstraints(40, 490, 140, -1));
 
         txtModeloBuscado.setBackground(new java.awt.Color(255, 255, 255));
-        add(txtModeloBuscado, new org.netbeans.lib.awtextra.AbsoluteConstraints(200, 460, -1, -1));
+        txtModeloBuscado.setHorizontalAlignment(javax.swing.JTextField.CENTER);
+        add(txtModeloBuscado, new org.netbeans.lib.awtextra.AbsoluteConstraints(200, 440, 120, -1));
 
         txtEjesBuscado.setBackground(new java.awt.Color(255, 255, 255));
-        add(txtEjesBuscado, new org.netbeans.lib.awtextra.AbsoluteConstraints(280, 460, 40, -1));
+        txtEjesBuscado.setHorizontalAlignment(javax.swing.JTextField.CENTER);
+        add(txtEjesBuscado, new org.netbeans.lib.awtextra.AbsoluteConstraints(330, 440, 70, -1));
 
         txtCarroceriaBuscada.setBackground(new java.awt.Color(255, 255, 255));
-        add(txtCarroceriaBuscada, new org.netbeans.lib.awtextra.AbsoluteConstraints(330, 460, -1, -1));
+        txtCarroceriaBuscada.setHorizontalAlignment(javax.swing.JTextField.CENTER);
+        add(txtCarroceriaBuscada, new org.netbeans.lib.awtextra.AbsoluteConstraints(200, 490, 150, -1));
 
         txtMTCBuscado.setBackground(new java.awt.Color(255, 255, 255));
-        add(txtMTCBuscado, new org.netbeans.lib.awtextra.AbsoluteConstraints(470, 460, 50, -1));
+        txtMTCBuscado.setHorizontalAlignment(javax.swing.JTextField.CENTER);
+        add(txtMTCBuscado, new org.netbeans.lib.awtextra.AbsoluteConstraints(360, 490, 140, -1));
 
         txtAnioBuscado.setBackground(new java.awt.Color(255, 255, 255));
-        add(txtAnioBuscado, new org.netbeans.lib.awtextra.AbsoluteConstraints(410, 460, 50, -1));
+        txtAnioBuscado.setHorizontalAlignment(javax.swing.JTextField.CENTER);
+        add(txtAnioBuscado, new org.netbeans.lib.awtextra.AbsoluteConstraints(410, 440, 90, -1));
 
         jLabel12.setForeground(new java.awt.Color(0, 0, 0));
         jLabel12.setText("Placa");
-        add(jLabel12, new org.netbeans.lib.awtextra.AbsoluteConstraints(40, 440, -1, -1));
+        add(jLabel12, new org.netbeans.lib.awtextra.AbsoluteConstraints(40, 420, -1, -1));
 
         jLabel13.setForeground(new java.awt.Color(0, 0, 0));
         jLabel13.setText("Marca");
-        add(jLabel13, new org.netbeans.lib.awtextra.AbsoluteConstraints(120, 440, -1, -1));
+        add(jLabel13, new org.netbeans.lib.awtextra.AbsoluteConstraints(40, 470, -1, -1));
 
         jLabel14.setForeground(new java.awt.Color(0, 0, 0));
         jLabel14.setText("Modelo");
-        add(jLabel14, new org.netbeans.lib.awtextra.AbsoluteConstraints(200, 440, -1, -1));
+        add(jLabel14, new org.netbeans.lib.awtextra.AbsoluteConstraints(200, 420, -1, -1));
 
         jLabel15.setForeground(new java.awt.Color(0, 0, 0));
         jLabel15.setText("Ejes");
-        add(jLabel15, new org.netbeans.lib.awtextra.AbsoluteConstraints(280, 440, -1, -1));
+        add(jLabel15, new org.netbeans.lib.awtextra.AbsoluteConstraints(330, 420, -1, -1));
 
         jLabel16.setForeground(new java.awt.Color(0, 0, 0));
         jLabel16.setText("Carroceria");
-        add(jLabel16, new org.netbeans.lib.awtextra.AbsoluteConstraints(330, 440, -1, -1));
+        add(jLabel16, new org.netbeans.lib.awtextra.AbsoluteConstraints(200, 470, -1, -1));
 
         jLabel17.setForeground(new java.awt.Color(0, 0, 0));
         jLabel17.setText("Año");
-        add(jLabel17, new org.netbeans.lib.awtextra.AbsoluteConstraints(410, 440, -1, -1));
+        add(jLabel17, new org.netbeans.lib.awtextra.AbsoluteConstraints(410, 420, -1, -1));
 
         btnLimpiarCarreta.setBackground(new java.awt.Color(0, 153, 204));
         btnLimpiarCarreta.setForeground(new java.awt.Color(255, 255, 255));
@@ -357,7 +369,7 @@ public class PanelCarreta extends javax.swing.JPanel {
                 btnLimpiarCarretaActionPerformed(evt);
             }
         });
-        add(btnLimpiarCarreta, new org.netbeans.lib.awtextra.AbsoluteConstraints(500, 500, -1, -1));
+        add(btnLimpiarCarreta, new org.netbeans.lib.awtextra.AbsoluteConstraints(600, 460, -1, -1));
 
         btnEditarCarreta.setBackground(new java.awt.Color(255, 153, 0));
         btnEditarCarreta.setForeground(new java.awt.Color(255, 255, 255));
@@ -368,7 +380,7 @@ public class PanelCarreta extends javax.swing.JPanel {
                 btnEditarCarretaActionPerformed(evt);
             }
         });
-        add(btnEditarCarreta, new org.netbeans.lib.awtextra.AbsoluteConstraints(590, 500, -1, -1));
+        add(btnEditarCarreta, new org.netbeans.lib.awtextra.AbsoluteConstraints(520, 460, -1, -1));
 
         btnEliminarCarreta.setBackground(new java.awt.Color(255, 51, 51));
         btnEliminarCarreta.setForeground(new java.awt.Color(255, 255, 255));
@@ -378,7 +390,7 @@ public class PanelCarreta extends javax.swing.JPanel {
                 btnEliminarCarretaActionPerformed(evt);
             }
         });
-        add(btnEliminarCarreta, new org.netbeans.lib.awtextra.AbsoluteConstraints(680, 500, -1, -1));
+        add(btnEliminarCarreta, new org.netbeans.lib.awtextra.AbsoluteConstraints(680, 460, -1, -1));
     }// </editor-fold>//GEN-END:initComponents
 
     private void btnGuardarActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnGuardarActionPerformed
