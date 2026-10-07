@@ -126,6 +126,9 @@ public class PanelModuloViajes extends javax.swing.JPanel {
         cboPlanta = new javax.swing.JComboBox<>();
         jScrollPane1 = new javax.swing.JScrollPane();
         tblViajes = new javax.swing.JTable();
+        jButton2 = new javax.swing.JButton();
+        jButton3 = new javax.swing.JButton();
+        jButton4 = new javax.swing.JButton();
 
         setBackground(new java.awt.Color(255, 255, 255));
         setPreferredSize(new java.awt.Dimension(880, 680));
@@ -144,18 +147,21 @@ public class PanelModuloViajes extends javax.swing.JPanel {
 
         cboTerminal.setBackground(new java.awt.Color(0, 153, 153));
         cboTerminal.setModel(new javax.swing.DefaultComboBoxModel<>(new String[] { "Item 1", "Item 2", "Item 3", "Item 4" }));
+        cboTerminal.setBorder(javax.swing.BorderFactory.createBevelBorder(javax.swing.border.BevelBorder.RAISED));
 
         jLabel3.setFont(new java.awt.Font("Sans Serif Collection", 1, 12)); // NOI18N
         jLabel3.setText("Tractor:");
 
         cboCliente.setBackground(new java.awt.Color(0, 153, 153));
         cboCliente.setModel(new javax.swing.DefaultComboBoxModel<>(new String[] { "Item 1", "Item 2", "Item 3", "Item 4" }));
+        cboCliente.setBorder(javax.swing.BorderFactory.createBevelBorder(javax.swing.border.BevelBorder.RAISED));
 
         jLabel4.setFont(new java.awt.Font("Sans Serif Collection", 1, 12)); // NOI18N
         jLabel4.setText("Carreta:");
 
         cboRuta.setBackground(new java.awt.Color(0, 153, 153));
         cboRuta.setModel(new javax.swing.DefaultComboBoxModel<>(new String[] { "Item 1", "Item 2", "Item 3", "Item 4" }));
+        cboRuta.setBorder(javax.swing.BorderFactory.createBevelBorder(javax.swing.border.BevelBorder.RAISED));
 
         jLabel5.setFont(new java.awt.Font("Sans Serif Collection", 1, 12)); // NOI18N
         jLabel5.setText("Terminal:");
@@ -177,18 +183,22 @@ public class PanelModuloViajes extends javax.swing.JPanel {
 
         cboContenedor.setBackground(new java.awt.Color(0, 153, 153));
         cboContenedor.setModel(new javax.swing.DefaultComboBoxModel<>(new String[] { "Item 1", "Item 2", "Item 3", "Item 4" }));
+        cboContenedor.setBorder(javax.swing.BorderFactory.createBevelBorder(javax.swing.border.BevelBorder.RAISED));
 
         cboTractor.setBackground(new java.awt.Color(0, 153, 153));
         cboTractor.setModel(new javax.swing.DefaultComboBoxModel<>(new String[] { "Item 1", "Item 2", "Item 3", "Item 4" }));
+        cboTractor.setBorder(javax.swing.BorderFactory.createBevelBorder(javax.swing.border.BevelBorder.RAISED));
 
         cboCarreta.setBackground(new java.awt.Color(0, 153, 153));
         cboCarreta.setModel(new javax.swing.DefaultComboBoxModel<>(new String[] { "Item 1", "Item 2", "Item 3", "Item 4" }));
+        cboCarreta.setBorder(javax.swing.BorderFactory.createBevelBorder(javax.swing.border.BevelBorder.RAISED));
 
         jLabel9.setFont(new java.awt.Font("Sans Serif Collection", 1, 14)); // NOI18N
         jLabel9.setText("REGISTRAR / EDITAR VIAJE");
 
         cboPlanta.setBackground(new java.awt.Color(0, 153, 153));
         cboPlanta.setModel(new javax.swing.DefaultComboBoxModel<>(new String[] { "Item 1", "Item 2", "Item 3", "Item 4" }));
+        cboPlanta.setBorder(javax.swing.BorderFactory.createBevelBorder(javax.swing.border.BevelBorder.RAISED));
 
         javax.swing.GroupLayout pnlContenidoLayout = new javax.swing.GroupLayout(pnlContenido);
         pnlContenido.setLayout(pnlContenidoLayout);
@@ -197,7 +207,7 @@ public class PanelModuloViajes extends javax.swing.JPanel {
             .addGroup(pnlContenidoLayout.createSequentialGroup()
                 .addGap(199, 199, 199)
                 .addComponent(jLabel9)
-                .addContainerGap(293, Short.MAX_VALUE))
+                .addContainerGap(413, Short.MAX_VALUE))
             .addGroup(pnlContenidoLayout.createSequentialGroup()
                 .addGap(24, 24, 24)
                 .addGroup(pnlContenidoLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
@@ -263,7 +273,7 @@ public class PanelModuloViajes extends javax.swing.JPanel {
                 .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
         );
 
-        add(pnlContenido, new org.netbeans.lib.awtextra.AbsoluteConstraints(50, 100, 680, 290));
+        add(pnlContenido, new org.netbeans.lib.awtextra.AbsoluteConstraints(50, 100, 800, 290));
         pnlContenido.getAccessibleContext().setAccessibleName("");
 
         tblViajes.setModel(new javax.swing.table.DefaultTableModel(
@@ -279,7 +289,26 @@ public class PanelModuloViajes extends javax.swing.JPanel {
         ));
         jScrollPane1.setViewportView(tblViajes);
 
-        add(jScrollPane1, new org.netbeans.lib.awtextra.AbsoluteConstraints(50, 400, 680, 260));
+        add(jScrollPane1, new org.netbeans.lib.awtextra.AbsoluteConstraints(50, 400, 640, 260));
+
+        jButton2.setBackground(new java.awt.Color(255, 51, 51));
+        jButton2.setFont(new java.awt.Font("Sans Serif Collection", 0, 12)); // NOI18N
+        jButton2.setText("ELIMINAR");
+        jButton2.setBorder(javax.swing.BorderFactory.createBevelBorder(javax.swing.border.BevelBorder.RAISED));
+        add(jButton2, new org.netbeans.lib.awtextra.AbsoluteConstraints(740, 440, 110, -1));
+
+        jButton3.setBackground(new java.awt.Color(153, 153, 153));
+        jButton3.setFont(new java.awt.Font("Sans Serif Collection", 0, 12)); // NOI18N
+        jButton3.setText("ACTUALIZAR");
+        jButton3.setBorder(javax.swing.BorderFactory.createBevelBorder(javax.swing.border.BevelBorder.RAISED));
+        jButton3.addActionListener(this::jButton3ActionPerformed);
+        add(jButton3, new org.netbeans.lib.awtextra.AbsoluteConstraints(740, 500, 110, 40));
+
+        jButton4.setBackground(new java.awt.Color(0, 153, 153));
+        jButton4.setFont(new java.awt.Font("Sans Serif Collection", 0, 12)); // NOI18N
+        jButton4.setText("EDITAR");
+        jButton4.setBorder(javax.swing.BorderFactory.createBevelBorder(javax.swing.border.BevelBorder.RAISED));
+        add(jButton4, new org.netbeans.lib.awtextra.AbsoluteConstraints(740, 560, 110, -1));
     }// </editor-fold>//GEN-END:initComponents
 
     private void jButton1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton1ActionPerformed
@@ -349,6 +378,10 @@ public class PanelModuloViajes extends javax.swing.JPanel {
         );
     }//GEN-LAST:event_jButton1ActionPerformed
 
+    private void jButton3ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton3ActionPerformed
+        // TODO add your handling code here:
+    }//GEN-LAST:event_jButton3ActionPerformed
+
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JComboBox<String> cboCarreta;
@@ -359,6 +392,9 @@ public class PanelModuloViajes extends javax.swing.JPanel {
     private javax.swing.JComboBox<String> cboTerminal;
     private javax.swing.JComboBox<String> cboTractor;
     private javax.swing.JButton jButton1;
+    private javax.swing.JButton jButton2;
+    private javax.swing.JButton jButton3;
+    private javax.swing.JButton jButton4;
     private javax.swing.JLabel jLabel1;
     private javax.swing.JLabel jLabel2;
     private javax.swing.JLabel jLabel3;
