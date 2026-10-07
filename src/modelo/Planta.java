@@ -5,6 +5,8 @@
 package modelo;
 
 import java.util.ArrayList;
+import java.util.Comparator;
+
 /**
  *
  * @author cesar
@@ -13,12 +15,15 @@ public class Planta {
     
     private String ruc;
     private String nombre;
-    private ArrayList<Ubicacion> ubicaciones;
+    private String direccion;
+    
+    public static final Comparator<Planta> POR_RUC = Comparator.comparing(Planta::getRuc);
+    public static final Comparator<Planta> POR_NOMBRE = Comparator.comparing(Planta::getNombre);
 
-    public Planta(String ruc, String nombre) {
-        this.ruc = ruc;
-        this.nombre = nombre;
-        this.ubicaciones = new ArrayList<>();
+    public Planta(String ruc, String nombre, String direccion) {
+        setRuc(ruc);
+        setNombre(nombre);
+        setDireccion(direccion);
     }
 
     public String getRuc() {
@@ -26,7 +31,15 @@ public class Planta {
     }
 
     public void setRuc(String ruc) {
-        this.ruc = ruc;
+        if (ruc == null){
+        throw new IllegalArgumentException("El RUC no puede ser nulo");
+            }
+        String r =ruc.trim();
+        if(ruc.matches("\\d{11}")){
+            this.ruc=ruc;
+            }else {
+                     throw new IllegalArgumentException("El ruc debe tener solo 11 digitos");
+                  }
     }
 
     public String getNombre() {
@@ -34,23 +47,35 @@ public class Planta {
     }
 
     public void setNombre(String nombre) {
-        this.nombre = nombre;
+        if (nombre == null) {
+            throw new IllegalArgumentException("El nombre no puede ser nulo");
+        }
+        String n = nombre.trim().toUpperCase();
+        if (n.isEmpty()) {
+            throw new IllegalArgumentException("El nombre no puede estar vacio");
+        }
+        this.nombre = n;
+    }
+    public String getDireccion() {
+        return direccion;
     }
 
-    public ArrayList<Ubicacion> getUbicaciones() {
-        return ubicaciones;
-    }
-
-    public void setUbicaciones(ArrayList<Ubicacion> ubicaciones) {
-        this.ubicaciones = ubicaciones;
-    }
-
-    public void agregarUbicacion(Ubicacion ubicacion) {
-        ubicaciones.add(ubicacion);
+    public void setDireccion(String direccion) {
+        if (direccion == null) {
+            throw new IllegalArgumentException("La dirección no puede ser nula");
+        }
+        String d = direccion.trim().toUpperCase();
+        if (d.isEmpty()) {
+            throw new IllegalArgumentException("La dirección no puede estar vacía");
+        }
+        this.direccion = d;
     }
 
     @Override
     public String toString() {
-        return nombre;
+        return "Planta{" + "ruc=" + ruc + ", nombre=" + nombre + ", direccion=" + direccion + '}';
     }
+    
+    
+    
 }
