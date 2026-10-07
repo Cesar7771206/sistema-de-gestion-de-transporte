@@ -28,7 +28,7 @@ public class Tractor {
     public static final Comparator<Tractor> POR_EJES = Comparator.comparing(Tractor :: getEjes).reversed();
 
     public Tractor(String placa, int ejes, String marca, String modelo, String carroceria, int anio, String MTC) {
-        this.placa = validarTexto(marca, "La marca").toUpperCase();
+        this.placa = validarTexto(placa, "La placa").toUpperCase();
         setEjes(ejes);
         setMarca(marca);
         setModelo(modelo);
