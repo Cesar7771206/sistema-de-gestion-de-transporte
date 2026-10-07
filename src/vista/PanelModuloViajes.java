@@ -4,6 +4,22 @@
  */
 package vista;
 
+
+import javax.swing.table.DefaultTableModel;
+import servicio.GestorEquipos;
+import servicio.GestorLogistica;
+
+import modelo.Contenedor;
+import modelo.Tractor;
+import modelo.Carreta;
+import modelo.Planta;
+import modelo.Terminal;
+import modelo.Cliente;
+import modelo.Ruta;
+import servicio.GestorViajes;
+import modelo.Viaje;
+import javax.swing.JOptionPane;
+
 /**
  *
  * @author cesar
@@ -16,6 +32,72 @@ public class PanelModuloViajes extends javax.swing.JPanel {
     public PanelModuloViajes() {
         initComponents();
     }
+    initComponents();
+    cargarCombos();
+    cargarTablaViajes();
+}
+    
+    private void cargarCombos() {
+
+        cboContenedor.removeAllItems();
+        cboTractor.removeAllItems();
+        cboCarreta.removeAllItems();
+        cboPlanta.removeAllItems();
+        cboTerminal.removeAllItems();
+        cboCliente.removeAllItems();
+        cboRuta.removeAllItems();
+
+        for (Contenedor contenedor : GestorEquipos.getContenedores()) {
+            cboContenedor.addItem(contenedor.getCodigo());
+        }
+
+        for (Tractor tractor : GestorEquipos.getTractores()) {
+            cboTractor.addItem(tractor.getPlaca());
+        }
+
+        for (Carreta carreta : GestorEquipos.getCarretas()) {
+            cboCarreta.addItem(carreta.getPlaca());
+        }
+
+        for (Planta planta : GestorLogistica.getPlantas()) {
+            cboPlanta.addItem(planta.getNombre());
+        }
+
+        for (Terminal terminal : GestorLogistica.getTerminales()) {
+            cboTerminal.addItem(terminal.getNombre());
+        }
+
+        for (Cliente cliente : GestorLogistica.getClientes()) {
+            cboCliente.addItem(cliente.getNombre());
+        }
+
+        for (Ruta ruta : GestorLogistica.getRutas()) {
+            cboRuta.addItem("Ruta " + ruta.getId());
+        }
+    }
+    private void cargarTablaViajes() {
+
+    DefaultTableModel modelo =
+            (DefaultTableModel) tblViajes.getModel();
+
+    
+    modelo.setRowCount(0);
+
+    for (Viaje viaje : GestorViajes.getViajes()) {
+
+        Object[] fila = {
+            viaje.getId(),
+            viaje.getContenedor().getCodigo(),
+            viaje.getTractor().getPlaca(),
+            viaje.getCarreta().getPlaca(),
+            viaje.getCliente().getNombre(),
+            "Ruta " + viaje.getRuta().getId()
+        };
+
+        modelo.addRow(fila);
+    }
+}
+
 
     /**
      * This method is called from within the constructor to initialize the form.
@@ -36,7 +118,251 @@ public class PanelModuloViajes extends javax.swing.JPanel {
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGap(0, 300, Short.MAX_VALUE)
         );
+        jLabel1 = new javax.swing.JLabel();
+        pnlContenido = new javax.swing.JPanel();
+        jLabel2 = new javax.swing.JLabel();
+        cboTerminal = new javax.swing.JComboBox<>();
+        jLabel3 = new javax.swing.JLabel();
+        cboCliente = new javax.swing.JComboBox<>();
+        jLabel4 = new javax.swing.JLabel();
+        cboRuta = new javax.swing.JComboBox<>();
+        jLabel5 = new javax.swing.JLabel();
+        jButton1 = new javax.swing.JButton();
+        jLabel6 = new javax.swing.JLabel();
+        jLabel7 = new javax.swing.JLabel();
+        jLabel8 = new javax.swing.JLabel();
+        cboContenedor = new javax.swing.JComboBox<>();
+        cboTractor = new javax.swing.JComboBox<>();
+        cboCarreta = new javax.swing.JComboBox<>();
+        jLabel9 = new javax.swing.JLabel();
+        cboPlanta = new javax.swing.JComboBox<>();
+        jScrollPane1 = new javax.swing.JScrollPane();
+        tblViajes = new javax.swing.JTable();
+
+        setBackground(new java.awt.Color(255, 255, 255));
+        setPreferredSize(new java.awt.Dimension(880, 680));
+        setLayout(new org.netbeans.lib.awtextra.AbsoluteLayout());
+
+        jLabel1.setBackground(new java.awt.Color(255, 255, 255));
+        jLabel1.setFont(new java.awt.Font("Javanese Text", 1, 36)); // NOI18N
+        jLabel1.setText("MODULO VIAJES");
+        add(jLabel1, new org.netbeans.lib.awtextra.AbsoluteConstraints(50, 40, 320, 60));
+
+        pnlContenido.setBackground(new java.awt.Color(204, 204, 204));
+        pnlContenido.setBorder(javax.swing.BorderFactory.createEtchedBorder());
+
+        jLabel2.setFont(new java.awt.Font("Sans Serif Collection", 1, 12)); // NOI18N
+        jLabel2.setText("Contenedor:");
+
+        cboTerminal.setBackground(new java.awt.Color(0, 153, 153));
+        cboTerminal.setModel(new javax.swing.DefaultComboBoxModel<>(new String[] { "Item 1", "Item 2", "Item 3", "Item 4" }));
+
+        jLabel3.setFont(new java.awt.Font("Sans Serif Collection", 1, 12)); // NOI18N
+        jLabel3.setText("Tractor:");
+
+        cboCliente.setBackground(new java.awt.Color(0, 153, 153));
+        cboCliente.setModel(new javax.swing.DefaultComboBoxModel<>(new String[] { "Item 1", "Item 2", "Item 3", "Item 4" }));
+
+        jLabel4.setFont(new java.awt.Font("Sans Serif Collection", 1, 12)); // NOI18N
+        jLabel4.setText("Carreta:");
+
+        cboRuta.setBackground(new java.awt.Color(0, 153, 153));
+        cboRuta.setModel(new javax.swing.DefaultComboBoxModel<>(new String[] { "Item 1", "Item 2", "Item 3", "Item 4" }));
+
+        jLabel5.setFont(new java.awt.Font("Sans Serif Collection", 1, 12)); // NOI18N
+        jLabel5.setText("Terminal:");
+
+        jButton1.setBackground(new java.awt.Color(0, 153, 153));
+        jButton1.setText("REGISTRAR VIAJE");
+        jButton1.setToolTipText("");
+        jButton1.setBorder(javax.swing.BorderFactory.createBevelBorder(javax.swing.border.BevelBorder.RAISED));
+        jButton1.addActionListener(this::jButton1ActionPerformed);
+
+        jLabel6.setFont(new java.awt.Font("Sans Serif Collection", 1, 12)); // NOI18N
+        jLabel6.setText("Cliente:");
+
+        jLabel7.setFont(new java.awt.Font("Sans Serif Collection", 1, 12)); // NOI18N
+        jLabel7.setText("Ruta:");
+
+        jLabel8.setFont(new java.awt.Font("Sans Serif Collection", 1, 12)); // NOI18N
+        jLabel8.setText("Planta:");
+
+        cboContenedor.setBackground(new java.awt.Color(0, 153, 153));
+        cboContenedor.setModel(new javax.swing.DefaultComboBoxModel<>(new String[] { "Item 1", "Item 2", "Item 3", "Item 4" }));
+
+        cboTractor.setBackground(new java.awt.Color(0, 153, 153));
+        cboTractor.setModel(new javax.swing.DefaultComboBoxModel<>(new String[] { "Item 1", "Item 2", "Item 3", "Item 4" }));
+
+        cboCarreta.setBackground(new java.awt.Color(0, 153, 153));
+        cboCarreta.setModel(new javax.swing.DefaultComboBoxModel<>(new String[] { "Item 1", "Item 2", "Item 3", "Item 4" }));
+
+        jLabel9.setFont(new java.awt.Font("Sans Serif Collection", 1, 14)); // NOI18N
+        jLabel9.setText("REGISTRAR / EDITAR VIAJE");
+
+        cboPlanta.setBackground(new java.awt.Color(0, 153, 153));
+        cboPlanta.setModel(new javax.swing.DefaultComboBoxModel<>(new String[] { "Item 1", "Item 2", "Item 3", "Item 4" }));
+
+        javax.swing.GroupLayout pnlContenidoLayout = new javax.swing.GroupLayout(pnlContenido);
+        pnlContenido.setLayout(pnlContenidoLayout);
+        pnlContenidoLayout.setHorizontalGroup(
+            pnlContenidoLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(pnlContenidoLayout.createSequentialGroup()
+                .addGap(199, 199, 199)
+                .addComponent(jLabel9)
+                .addContainerGap(293, Short.MAX_VALUE))
+            .addGroup(pnlContenidoLayout.createSequentialGroup()
+                .addGap(24, 24, 24)
+                .addGroup(pnlContenidoLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
+                    .addComponent(jLabel2)
+                    .addComponent(jLabel3, javax.swing.GroupLayout.Alignment.LEADING)
+                    .addComponent(jLabel4, javax.swing.GroupLayout.Alignment.LEADING)
+                    .addComponent(jLabel8, javax.swing.GroupLayout.Alignment.LEADING))
+                .addGroup(pnlContenidoLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addGroup(pnlContenidoLayout.createSequentialGroup()
+                        .addGap(18, 18, 18)
+                        .addGroup(pnlContenidoLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
+                            .addComponent(cboTractor, 0, 150, Short.MAX_VALUE)
+                            .addComponent(cboCarreta, 0, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                            .addComponent(cboPlanta, 0, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                            .addComponent(cboContenedor, 0, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                        .addGap(54, 54, 54)
+                        .addGroup(pnlContenidoLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
+                            .addComponent(jLabel5)
+                            .addComponent(jLabel6, javax.swing.GroupLayout.Alignment.LEADING)
+                            .addComponent(jLabel7, javax.swing.GroupLayout.Alignment.LEADING))
+                        .addGap(18, 18, 18)
+                        .addGroup(pnlContenidoLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
+                            .addComponent(cboTerminal, 0, 150, Short.MAX_VALUE)
+                            .addComponent(cboCliente, 0, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                            .addComponent(cboRuta, 0, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)))
+                    .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, pnlContenidoLayout.createSequentialGroup()
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                        .addComponent(jButton1, javax.swing.GroupLayout.PREFERRED_SIZE, 191, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addGap(28, 28, 28))))
+        );
+        pnlContenidoLayout.setVerticalGroup(
+            pnlContenidoLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(pnlContenidoLayout.createSequentialGroup()
+                .addContainerGap()
+                .addComponent(jLabel9)
+                .addGap(18, 18, 18)
+                .addGroup(pnlContenidoLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                    .addComponent(jLabel2)
+                    .addComponent(cboContenedor, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(jLabel5)
+                    .addComponent(cboTerminal, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                .addGap(18, 18, 18)
+                .addGroup(pnlContenidoLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                    .addComponent(jLabel3)
+                    .addComponent(cboTractor, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(jLabel6)
+                    .addComponent(cboCliente, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                .addGap(18, 18, 18)
+                .addGroup(pnlContenidoLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                    .addComponent(jLabel4)
+                    .addComponent(cboCarreta, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(jLabel7)
+                    .addComponent(cboRuta, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                .addGroup(pnlContenidoLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addGroup(pnlContenidoLayout.createSequentialGroup()
+                        .addGap(18, 18, 18)
+                        .addGroup(pnlContenidoLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                            .addComponent(jLabel8)
+                            .addComponent(cboPlanta, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)))
+                    .addGroup(pnlContenidoLayout.createSequentialGroup()
+                        .addGap(45, 45, 45)
+                        .addComponent(jButton1)))
+                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+        );
+
+        add(pnlContenido, new org.netbeans.lib.awtextra.AbsoluteConstraints(50, 100, 680, 290));
+        pnlContenido.getAccessibleContext().setAccessibleName("");
+
+        tblViajes.setModel(new javax.swing.table.DefaultTableModel(
+            new Object [][] {
+                {null, null, null, null, null, null},
+                {null, null, null, null, null, null},
+                {null, null, null, null, null, null},
+                {null, null, null, null, null, null}
+            },
+            new String [] {
+                "ID", "Contenedor", "Tractor", "Carreta", "Cliente", "Ruta"
+            }
+        ));
+        jScrollPane1.setViewportView(tblViajes);
+
+        add(jScrollPane1, new org.netbeans.lib.awtextra.AbsoluteConstraints(50, 400, 680, 260));
     }// </editor-fold>//GEN-END:initComponents
+
+    private void jButton1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton1ActionPerformed
+        if (cboContenedor.getSelectedIndex() == -1
+                || cboTractor.getSelectedIndex() == -1
+                || cboCarreta.getSelectedIndex() == -1
+                || cboPlanta.getSelectedIndex() == -1
+                || cboTerminal.getSelectedIndex() == -1
+                || cboCliente.getSelectedIndex() == -1
+                || cboRuta.getSelectedIndex() == -1) {
+
+            JOptionPane.showMessageDialog(
+                    this,
+                    "Debe seleccionar todos los datos del viaje."
+            );
+
+            return;
+        }
+
+        Contenedor contenedor
+                = GestorEquipos.getContenedores()
+                        .get(cboContenedor.getSelectedIndex());
+
+        Tractor tractor
+                = GestorEquipos.getTractores()
+                        .get(cboTractor.getSelectedIndex());
+
+        Carreta carreta
+                = GestorEquipos.getCarretas()
+                        .get(cboCarreta.getSelectedIndex());
+
+        Planta planta
+                = GestorLogistica.getPlantas()
+                        .get(cboPlanta.getSelectedIndex());
+
+        Terminal terminal
+                = GestorLogistica.getTerminales()
+                        .get(cboTerminal.getSelectedIndex());
+
+        Cliente cliente
+                = GestorLogistica.getClientes()
+                        .get(cboCliente.getSelectedIndex());
+
+        Ruta ruta
+                = GestorLogistica.getRutas()
+                        .get(cboRuta.getSelectedIndex());
+
+
+        int id = GestorViajes.generarId();
+
+
+        Viaje nuevoViaje = new Viaje(
+                id,
+                contenedor,
+                tractor,
+                carreta,
+                planta,
+                terminal,
+                cliente,
+                ruta
+        );
+
+
+        GestorViajes.agregarViaje(nuevoViaje);
+        cargarTablaViajes();
+
+        JOptionPane.showMessageDialog(
+                this,
+                "Viaje registrado correctamente."
+        );
+    }//GEN-LAST:event_jButton1ActionPerformed
 
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
