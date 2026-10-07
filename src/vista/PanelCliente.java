@@ -16,33 +16,70 @@ import servicio.ClienteServicio;
  * @author GIANCARLO REA
  */
 public class PanelCliente extends javax.swing.JPanel {
-   
+
     private ClienteServicio clienteServicio;
     private DefaultTableModel modelo;
     private String orden;
 
-    public PanelCliente() {
-    initComponents();
-    clienteServicio = new ClienteServicio(new ArrayList<>());
-    modelo = (DefaultTableModel) tblClientes.getModel();
-    orden = "default";
+    private Cliente clienteSeleccionado;
 
-    actualizarTabla();
-    ocultarEdicion();
-    tblClientes.setEnabled(false);
+    public PanelCliente() {
+        initComponents();
+        clienteServicio = new ClienteServicio(new ArrayList<>());
+        modelo = (DefaultTableModel) tblClientes.getModel();
+        orden = "default";
+
+        actualizarTabla();
+        ocultarEdicion();
+        tblClientes.setEnabled(false);
+    }
+
+    private void ocultarEdicion() {
+        txtRucBuscada.setVisible(false);
+        txtNombreBuscado.setVisible(false);
+        txtDireccionBuscada.setVisible(false);
+        jLabel8.setVisible(false);
+        jLabel9.setVisible(false);
+        jLabel10.setVisible(false);
+
+        btnEliminarCliente.setVisible(false);
+        btnLimpiarCliente.setVisible(false);
+        btnEditarCliente.setVisible(false);
+    }
+
+    private void mostrarEdicion() {
+        txtRucBuscada.setVisible(true);
+        txtNombreBuscado.setVisible(true);
+        txtDireccionBuscada.setVisible(true);
+        jLabel8.setVisible(true);
+        jLabel9.setVisible(true);
+        jLabel10.setVisible(true);
+
+        btnEliminarCliente.setVisible(true);
+        btnLimpiarCliente.setVisible(true);
+        btnEditarCliente.setVisible(true);
+    }
+
+    private void limpiarEdicion() {
+        txtRucBuscado.setText("");
+        txtRucBuscada.setText("");
+        txtNombreBuscado.setText("");
+        txtDireccionBuscada.setText("");
+        clienteSeleccionado = null;
+        ocultarEdicion();
     }
 
     // Vuelve a llenar la tabla según el orden elegido
     public void actualizarTabla() {
         modelo.setRowCount(0);
 
-        List <Cliente> lista;
+        List<Cliente> lista;
         switch (orden) {
             case "ruc":
                 lista = clienteServicio.ordenarClientePorRuc();
                 break;
             case "nombre":
-                lista =clienteServicio.ordenarClientePorNombre();
+                lista = clienteServicio.ordenarClientePorNombre();
                 break;
             default:
                 lista = clienteServicio.getCliente();
@@ -52,18 +89,8 @@ public class PanelCliente extends javax.swing.JPanel {
         for (Cliente c : lista) {
             modelo.addRow(new Object[]{c.getRuc(), c.getNombre(), c.getDireccion()});
         }
-    
-    }
-        private void ocultarEdicion() {
-        txtRucBuscado.setVisible(false);
-        txtNombreBuscado.setVisible(false);
-        txtDireccionBuscada.setVisible(false);
 
-        btnEliminarCliente.setVisible(false);
-        btnLimpiarCliente.setVisible(false);
-        btnEditarCliente.setVisible(false);
     }
-    
 
     /**
      * This method is called from within the constructor to initialize the form.
@@ -130,14 +157,17 @@ public class PanelCliente extends javax.swing.JPanel {
         add(jLabel4, new org.netbeans.lib.awtextra.AbsoluteConstraints(30, 80, -1, -1));
 
         txtInputRuc.setBackground(new java.awt.Color(255, 255, 255));
+        txtInputRuc.setHorizontalAlignment(javax.swing.JTextField.CENTER);
         txtInputRuc.setBorder(javax.swing.BorderFactory.createLineBorder(new java.awt.Color(0, 0, 0)));
         add(txtInputRuc, new org.netbeans.lib.awtextra.AbsoluteConstraints(70, 50, 119, -1));
 
         txtInputNombre.setBackground(new java.awt.Color(255, 255, 255));
+        txtInputNombre.setHorizontalAlignment(javax.swing.JTextField.CENTER);
         txtInputNombre.setBorder(javax.swing.BorderFactory.createLineBorder(new java.awt.Color(0, 0, 0)));
         add(txtInputNombre, new org.netbeans.lib.awtextra.AbsoluteConstraints(270, 50, 250, -1));
 
         txtInputDireccion.setBackground(new java.awt.Color(255, 255, 255));
+        txtInputDireccion.setHorizontalAlignment(javax.swing.JTextField.CENTER);
         txtInputDireccion.setBorder(javax.swing.BorderFactory.createLineBorder(new java.awt.Color(0, 0, 0)));
         add(txtInputDireccion, new org.netbeans.lib.awtextra.AbsoluteConstraints(150, 80, 370, -1));
 
@@ -225,6 +255,7 @@ public class PanelCliente extends javax.swing.JPanel {
         jPanel1.add(jLabel7, new org.netbeans.lib.awtextra.AbsoluteConstraints(20, 30, 100, 20));
 
         txtRucBuscado.setBackground(new java.awt.Color(255, 255, 255));
+        txtRucBuscado.setHorizontalAlignment(javax.swing.JTextField.CENTER);
         jPanel1.add(txtRucBuscado, new org.netbeans.lib.awtextra.AbsoluteConstraints(20, 50, 180, -1));
 
         btnSelecionarCliente.setBackground(new java.awt.Color(0, 102, 204));
@@ -250,49 +281,67 @@ public class PanelCliente extends javax.swing.JPanel {
         jPanel1.add(jLabel10, new org.netbeans.lib.awtextra.AbsoluteConstraints(340, 90, -1, -1));
 
         txtRucBuscada.setBackground(new java.awt.Color(255, 255, 255));
+        txtRucBuscada.setHorizontalAlignment(javax.swing.JTextField.CENTER);
         jPanel1.add(txtRucBuscada, new org.netbeans.lib.awtextra.AbsoluteConstraints(20, 110, 120, -1));
 
         txtNombreBuscado.setBackground(new java.awt.Color(255, 255, 255));
+        txtNombreBuscado.setHorizontalAlignment(javax.swing.JTextField.CENTER);
         jPanel1.add(txtNombreBuscado, new org.netbeans.lib.awtextra.AbsoluteConstraints(160, 110, 160, -1));
 
         txtDireccionBuscada.setBackground(new java.awt.Color(255, 255, 255));
+        txtDireccionBuscada.setHorizontalAlignment(javax.swing.JTextField.CENTER);
         jPanel1.add(txtDireccionBuscada, new org.netbeans.lib.awtextra.AbsoluteConstraints(340, 110, 260, -1));
 
         btnEliminarCliente.setBackground(new java.awt.Color(255, 51, 51));
         btnEliminarCliente.setText("Eliminar");
+        btnEliminarCliente.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                btnEliminarClienteActionPerformed(evt);
+            }
+        });
         jPanel1.add(btnEliminarCliente, new org.netbeans.lib.awtextra.AbsoluteConstraints(520, 150, 80, -1));
 
         btnLimpiarCliente.setBackground(new java.awt.Color(153, 153, 255));
         btnLimpiarCliente.setForeground(new java.awt.Color(255, 255, 255));
         btnLimpiarCliente.setText("Limpiar");
+        btnLimpiarCliente.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                btnLimpiarClienteActionPerformed(evt);
+            }
+        });
         jPanel1.add(btnLimpiarCliente, new org.netbeans.lib.awtextra.AbsoluteConstraints(340, 150, 80, -1));
 
         btnEditarCliente.setBackground(new java.awt.Color(255, 204, 51));
         btnEditarCliente.setForeground(new java.awt.Color(255, 255, 255));
         btnEditarCliente.setText("Editar");
+        btnEditarCliente.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                btnEditarClienteActionPerformed(evt);
+            }
+        });
         jPanel1.add(btnEditarCliente, new org.netbeans.lib.awtextra.AbsoluteConstraints(430, 150, 80, -1));
 
         add(jPanel1, new org.netbeans.lib.awtextra.AbsoluteConstraints(30, 330, 640, 200));
     }// </editor-fold>//GEN-END:initComponents
 
     private void btnGuardarActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnGuardarActionPerformed
-        
+
         try {
-        clienteServicio.guardarCliente(
-                txtInputRuc.getText(),
-                txtInputNombre.getText(),
-                txtInputDireccion.getText());
+            clienteServicio.guardarCliente(
+                    txtInputRuc.getText(),
+                    txtInputNombre.getText(),
+                    txtInputDireccion.getText());
 
-        actualizarTabla();
+            actualizarTabla();
 
-        txtInputRuc.setText("");
-        txtInputNombre.setText("");
-        txtInputDireccion.setText("");
-        txtInputRuc.requestFocus();
+            txtInputRuc.setText("");
+            txtInputNombre.setText("");
+            txtInputDireccion.setText("");
+            txtInputRuc.requestFocus();
 
-    } catch (IllegalArgumentException ex) {
-        JOptionPane.showMessageDialog(this, ex.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
-    }
+        } catch (IllegalArgumentException ex) {
+            JOptionPane.showMessageDialog(this, ex.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
+        }
     }//GEN-LAST:event_btnGuardarActionPerformed
 
     private void btnOrRucActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnOrRucActionPerformed
@@ -306,13 +355,62 @@ public class PanelCliente extends javax.swing.JPanel {
     }//GEN-LAST:event_btnOrNombreActionPerformed
 
     private void btnOrDefaultActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnOrDefaultActionPerformed
-          orden = "default";
-          actualizarTabla();
+        orden = "default";
+        actualizarTabla();
     }//GEN-LAST:event_btnOrDefaultActionPerformed
 
     private void btnSelecionarClienteActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnSelecionarClienteActionPerformed
-        
+        String ruc = txtRucBuscado.getText().trim();
+        clienteSeleccionado = clienteServicio.obtenerClientePorRuc(ruc);
+
+        if (clienteSeleccionado == null) {
+            JOptionPane.showMessageDialog(this, "No existe un cliente con ese RUC",
+                    "Aviso", JOptionPane.WARNING_MESSAGE);
+            limpiarEdicion();
+            return;
+        }
+
+        txtRucBuscada.setText(clienteSeleccionado.getRuc());
+        txtRucBuscada.setEditable(false); // el RUC es la clave, no se edita
+        txtNombreBuscado.setText(clienteSeleccionado.getNombre());
+        txtDireccionBuscada.setText(clienteSeleccionado.getDireccion());
+        mostrarEdicion();
+
     }//GEN-LAST:event_btnSelecionarClienteActionPerformed
+
+    private void btnEditarClienteActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnEditarClienteActionPerformed
+        if (clienteSeleccionado == null) {
+            return;
+        }
+        try {
+            clienteServicio.editarCliente(
+                    clienteSeleccionado.getRuc(),
+                    txtNombreBuscado.getText(),
+                    txtDireccionBuscada.getText());
+            actualizarTabla();
+            limpiarEdicion();
+            JOptionPane.showMessageDialog(this, "Cliente actualizado");
+        } catch (IllegalArgumentException ex) {
+            JOptionPane.showMessageDialog(this, ex.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
+        }
+    }//GEN-LAST:event_btnEditarClienteActionPerformed
+
+    private void btnLimpiarClienteActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnLimpiarClienteActionPerformed
+        limpiarEdicion();
+    }//GEN-LAST:event_btnLimpiarClienteActionPerformed
+
+    private void btnEliminarClienteActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnEliminarClienteActionPerformed
+        if (clienteSeleccionado == null) {
+            return;
+        }
+        int op = JOptionPane.showConfirmDialog(this, "¿Eliminar este cliente?",
+                "Confirmar", JOptionPane.YES_NO_OPTION);
+        if (op == JOptionPane.YES_OPTION) {
+            clienteServicio.eliminarCliente(clienteSeleccionado.getRuc());
+            actualizarTabla();
+            limpiarEdicion();
+        }
+    }//GEN-LAST:event_btnEliminarClienteActionPerformed
 
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
