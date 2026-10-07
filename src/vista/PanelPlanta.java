@@ -4,17 +4,66 @@
  */
 package vista;
 
+import java.util.ArrayList;
+import java.util.List;
+import javax.swing.JOptionPane;
+import javax.swing.table.DefaultTableModel;
+import modelo.Planta;
+import servicio.PlantaServicio;
+
 /**
  *
  * @author GIANCARLO REA
  */
 public class PanelPlanta extends javax.swing.JPanel {
 
-    /**
-     * Creates new form PanelPlanta
-     */
+    PlantaServicio plantaServicio;
+    DefaultTableModel modelo; 
+    private String orden;
+    
+    
     public PanelPlanta() {
         initComponents();
+        plantaServicio = new PlantaServicio(new ArrayList<>());
+        modelo = (DefaultTableModel) tblPlantas.getModel();
+        orden = "default";
+
+        actualizarTabla();
+        ocultarEdicion();
+        tblPlantas.setEnabled(false);
+    }
+    
+    // Vuelve a llenar la tabla según el orden elegido
+    public void actualizarTabla() {
+        modelo.setRowCount(0);
+
+        List<Planta> lista;
+        switch (orden) {
+            case "ruc":
+                lista = plantaServicio.ordenarPlantaPorRuc();
+                break;
+            case "nombre":
+                lista = plantaServicio.ordenarPlantaPorNombre();
+                break;
+            default:
+                lista = plantaServicio.getPlantas();
+                break;
+        }
+
+        for (Planta p : lista) {
+            modelo.addRow(new Object[]{p.getRuc(), p.getNombre(), p.getDireccion()});
+        }
+    }
+
+    // Esconde la zona de edición hasta que se seleccione una planta
+    private void ocultarEdicion() {
+        txtRucBuscado.setVisible(false);
+        txtNombreBuscado.setVisible(false);
+        txtDireccionBuscada.setVisible(false);
+
+        btnEliminarPlanta.setVisible(false);
+        btnLimpiarPlanta.setVisible(false);
+        btnEditarPlanta.setVisible(false);
     }
 
     /**
@@ -30,90 +79,337 @@ public class PanelPlanta extends javax.swing.JPanel {
         jLabel2 = new javax.swing.JLabel();
         jLabel3 = new javax.swing.JLabel();
         jLabel4 = new javax.swing.JLabel();
-        jTextField1 = new javax.swing.JTextField();
-        jTextField2 = new javax.swing.JTextField();
-        jTextField3 = new javax.swing.JTextField();
-        jButton1 = new javax.swing.JButton();
+        txtImputNombre = new javax.swing.JTextField();
+        btnGuardar = new javax.swing.JButton();
+        txtImputDireccion = new javax.swing.JTextField();
+        txtImputRuc = new javax.swing.JTextField();
+        jScrollPane1 = new javax.swing.JScrollPane();
+        tblPlantas = new javax.swing.JTable();
+        jLabel5 = new javax.swing.JLabel();
+        btnOrRuc = new javax.swing.JButton();
+        btnOrNombre = new javax.swing.JButton();
+        btnOrDefault = new javax.swing.JButton();
+        jLabel6 = new javax.swing.JLabel();
+        txtDireccionBuscada = new javax.swing.JTextField();
+        btnEditarPlanta = new javax.swing.JButton();
+        txtPlantaBuscada = new javax.swing.JTextField();
+        txtRucBuscado = new javax.swing.JTextField();
+        txtNombreBuscado = new javax.swing.JTextField();
+        btnSeleccionarPlanta = new javax.swing.JButton();
+        btnEliminarPlanta = new javax.swing.JButton();
+        btnLimpiarPlanta = new javax.swing.JButton();
 
         setBackground(new java.awt.Color(255, 255, 255));
         setMaximumSize(new java.awt.Dimension(810, 540));
         setMinimumSize(new java.awt.Dimension(810, 540));
         setPreferredSize(new java.awt.Dimension(810, 540));
+        setLayout(new org.netbeans.lib.awtextra.AbsoluteLayout());
 
         jLabel1.setFont(new java.awt.Font("Sans Serif Collection", 1, 14)); // NOI18N
+        jLabel1.setForeground(new java.awt.Color(0, 0, 0));
         jLabel1.setText("REGISTRAR PLANTA");
+        add(jLabel1, new org.netbeans.lib.awtextra.AbsoluteConstraints(30, 10, 140, 30));
 
         jLabel2.setFont(new java.awt.Font("Sans Serif Collection", 1, 14)); // NOI18N
+        jLabel2.setForeground(new java.awt.Color(0, 0, 0));
         jLabel2.setText("Ruc:");
+        add(jLabel2, new org.netbeans.lib.awtextra.AbsoluteConstraints(30, 60, -1, -1));
 
         jLabel3.setFont(new java.awt.Font("Sans Serif Collection", 1, 14)); // NOI18N
+        jLabel3.setForeground(new java.awt.Color(0, 0, 0));
         jLabel3.setText("Nombre:");
+        add(jLabel3, new org.netbeans.lib.awtextra.AbsoluteConstraints(250, 60, -1, -1));
 
         jLabel4.setFont(new java.awt.Font("Sans Serif Collection", 1, 14)); // NOI18N
+        jLabel4.setForeground(new java.awt.Color(0, 0, 0));
         jLabel4.setText("Dirección:");
+        add(jLabel4, new org.netbeans.lib.awtextra.AbsoluteConstraints(30, 110, -1, -1));
 
-        jTextField1.setBorder(javax.swing.BorderFactory.createLineBorder(new java.awt.Color(0, 0, 0)));
+        txtImputNombre.setBackground(new java.awt.Color(255, 255, 255));
+        txtImputNombre.setBorder(javax.swing.BorderFactory.createLineBorder(new java.awt.Color(0, 0, 0)));
+        add(txtImputNombre, new org.netbeans.lib.awtextra.AbsoluteConstraints(320, 50, 420, 30));
 
-        jTextField2.setBorder(javax.swing.BorderFactory.createLineBorder(new java.awt.Color(0, 0, 0)));
+        btnGuardar.setBackground(new java.awt.Color(0, 153, 255));
+        btnGuardar.setForeground(new java.awt.Color(255, 255, 255));
+        btnGuardar.setText("Guardar");
+        btnGuardar.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                btnGuardarActionPerformed(evt);
+            }
+        });
+        add(btnGuardar, new org.netbeans.lib.awtextra.AbsoluteConstraints(630, 100, 110, 30));
 
-        jTextField3.setBorder(javax.swing.BorderFactory.createLineBorder(new java.awt.Color(0, 0, 0)));
+        txtImputDireccion.setBackground(new java.awt.Color(255, 255, 255));
+        txtImputDireccion.setBorder(javax.swing.BorderFactory.createLineBorder(new java.awt.Color(0, 0, 0)));
+        add(txtImputDireccion, new org.netbeans.lib.awtextra.AbsoluteConstraints(110, 100, 490, 30));
 
-        jButton1.setText("Guardar");
+        txtImputRuc.setBackground(new java.awt.Color(255, 255, 255));
+        txtImputRuc.setBorder(javax.swing.BorderFactory.createLineBorder(new java.awt.Color(0, 0, 0)));
+        add(txtImputRuc, new org.netbeans.lib.awtextra.AbsoluteConstraints(70, 50, 150, 30));
 
-        javax.swing.GroupLayout layout = new javax.swing.GroupLayout(this);
-        this.setLayout(layout);
-        layout.setHorizontalGroup(
-            layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(layout.createSequentialGroup()
-                .addGap(49, 49, 49)
-                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addComponent(jLabel2)
-                    .addComponent(jLabel3)
-                    .addComponent(jLabel4))
-                .addGap(24, 24, 24)
-                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
-                    .addComponent(jLabel1, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                    .addComponent(jTextField3)
-                    .addComponent(jTextField2)
-                    .addComponent(jTextField1))
-                .addContainerGap(530, Short.MAX_VALUE))
-            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
-                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                .addComponent(jButton1, javax.swing.GroupLayout.PREFERRED_SIZE, 150, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addContainerGap())
-        );
-        layout.setVerticalGroup(
-            layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(layout.createSequentialGroup()
-                .addGap(17, 17, 17)
-                .addComponent(jLabel1)
-                .addGap(21, 21, 21)
-                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                    .addComponent(jTextField1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addComponent(jLabel2))
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                    .addComponent(jLabel3)
-                    .addComponent(jTextField3, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                    .addComponent(jLabel4)
-                    .addComponent(jTextField2, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
-                .addGap(19, 19, 19)
-                .addComponent(jButton1)
-                .addGap(44, 44, 44))
-        );
+        tblPlantas.setBackground(new java.awt.Color(255, 255, 255));
+        tblPlantas.setModel(new javax.swing.table.DefaultTableModel(
+            new Object [][] {
+                {null, null, null},
+                {null, null, null},
+                {null, null, null},
+                {null, null, null}
+            },
+            new String [] {
+                "RUC", "Nombre", "Direccion"
+            }
+        ) {
+            Class[] types = new Class [] {
+                java.lang.String.class, java.lang.String.class, java.lang.String.class
+            };
+
+            public Class getColumnClass(int columnIndex) {
+                return types [columnIndex];
+            }
+        });
+        jScrollPane1.setViewportView(tblPlantas);
+
+        add(jScrollPane1, new org.netbeans.lib.awtextra.AbsoluteConstraints(30, 200, 710, 200));
+
+        jLabel5.setBackground(new java.awt.Color(255, 255, 255));
+        jLabel5.setForeground(new java.awt.Color(0, 0, 0));
+        jLabel5.setText("Ordenar por:");
+        add(jLabel5, new org.netbeans.lib.awtextra.AbsoluteConstraints(30, 160, 90, 20));
+
+        btnOrRuc.setBackground(new java.awt.Color(204, 153, 255));
+        btnOrRuc.setForeground(new java.awt.Color(255, 255, 255));
+        btnOrRuc.setText("RUC");
+        btnOrRuc.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                btnOrRucActionPerformed(evt);
+            }
+        });
+        add(btnOrRuc, new org.netbeans.lib.awtextra.AbsoluteConstraints(130, 160, -1, -1));
+
+        btnOrNombre.setBackground(new java.awt.Color(255, 153, 204));
+        btnOrNombre.setForeground(new java.awt.Color(255, 255, 255));
+        btnOrNombre.setText("Nombre");
+        btnOrNombre.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                btnOrNombreActionPerformed(evt);
+            }
+        });
+        add(btnOrNombre, new org.netbeans.lib.awtextra.AbsoluteConstraints(210, 160, -1, -1));
+
+        btnOrDefault.setBackground(new java.awt.Color(0, 153, 204));
+        btnOrDefault.setForeground(new java.awt.Color(255, 255, 255));
+        btnOrDefault.setText("Default");
+        btnOrDefault.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                btnOrDefaultActionPerformed(evt);
+            }
+        });
+        add(btnOrDefault, new org.netbeans.lib.awtextra.AbsoluteConstraints(670, 160, -1, -1));
+
+        jLabel6.setBackground(new java.awt.Color(255, 255, 255));
+        jLabel6.setForeground(new java.awt.Color(0, 0, 0));
+        jLabel6.setText("Ingresar el RUC de la Planta:");
+        add(jLabel6, new org.netbeans.lib.awtextra.AbsoluteConstraints(30, 410, 190, -1));
+
+        txtDireccionBuscada.setBackground(new java.awt.Color(255, 255, 255));
+        add(txtDireccionBuscada, new org.netbeans.lib.awtextra.AbsoluteConstraints(410, 490, 230, -1));
+
+        btnEditarPlanta.setBackground(new java.awt.Color(255, 153, 0));
+        btnEditarPlanta.setForeground(new java.awt.Color(255, 255, 255));
+        btnEditarPlanta.setText("Editar");
+        btnEditarPlanta.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                btnEditarPlantaActionPerformed(evt);
+            }
+        });
+        add(btnEditarPlanta, new org.netbeans.lib.awtextra.AbsoluteConstraints(670, 460, -1, -1));
+
+        txtPlantaBuscada.setBackground(new java.awt.Color(255, 255, 255));
+        add(txtPlantaBuscada, new org.netbeans.lib.awtextra.AbsoluteConstraints(30, 430, 230, -1));
+
+        txtRucBuscado.setBackground(new java.awt.Color(255, 255, 255));
+        add(txtRucBuscado, new org.netbeans.lib.awtextra.AbsoluteConstraints(410, 430, 230, -1));
+
+        txtNombreBuscado.setBackground(new java.awt.Color(255, 255, 255));
+        add(txtNombreBuscado, new org.netbeans.lib.awtextra.AbsoluteConstraints(410, 460, 230, -1));
+
+        btnSeleccionarPlanta.setBackground(new java.awt.Color(0, 153, 204));
+        btnSeleccionarPlanta.setForeground(new java.awt.Color(255, 255, 255));
+        btnSeleccionarPlanta.setText("Seleccionar");
+        btnSeleccionarPlanta.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                btnSeleccionarPlantaActionPerformed(evt);
+            }
+        });
+        add(btnSeleccionarPlanta, new org.netbeans.lib.awtextra.AbsoluteConstraints(280, 430, -1, -1));
+
+        btnEliminarPlanta.setBackground(new java.awt.Color(255, 51, 51));
+        btnEliminarPlanta.setForeground(new java.awt.Color(255, 255, 255));
+        btnEliminarPlanta.setText("Eliminar");
+        btnEliminarPlanta.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                btnEliminarPlantaActionPerformed(evt);
+            }
+        });
+        add(btnEliminarPlanta, new org.netbeans.lib.awtextra.AbsoluteConstraints(670, 490, -1, -1));
+
+        btnLimpiarPlanta.setBackground(new java.awt.Color(0, 153, 204));
+        btnLimpiarPlanta.setForeground(new java.awt.Color(255, 255, 255));
+        btnLimpiarPlanta.setText("Limpiar");
+        btnLimpiarPlanta.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                btnLimpiarPlantaActionPerformed(evt);
+            }
+        });
+        add(btnLimpiarPlanta, new org.netbeans.lib.awtextra.AbsoluteConstraints(670, 430, -1, -1));
     }// </editor-fold>//GEN-END:initComponents
+
+    private void btnGuardarActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnGuardarActionPerformed
+        try {
+            
+            plantaServicio.guardarPlanta(txtImputRuc.getText(),txtImputNombre.getText(),txtImputDireccion.getText());
+
+            actualizarTabla();
+
+            txtImputRuc.setText("");
+            txtImputNombre.setText("");
+            txtImputDireccion.setText("");
+            txtImputRuc.requestFocus();
+
+        } catch (IllegalArgumentException ex) {
+        JOptionPane.showMessageDialog(this, ex.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
+               
+    }
+          
+          
+    }//GEN-LAST:event_btnGuardarActionPerformed
+
+    private void btnSeleccionarPlantaActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnSeleccionarPlantaActionPerformed
+        
+        Planta planta = plantaServicio.obtenerPlantaPorRuc(txtPlantaBuscada.getText());
+
+        if (planta == null) {
+        JOptionPane.showMessageDialog(this, "No existe una planta con ese RUC",
+                "Error", JOptionPane.ERROR_MESSAGE);
+        return;
+        }
+
+        txtRucBuscado.setText(planta.getRuc());
+        txtNombreBuscado.setText(planta.getNombre());
+        txtDireccionBuscada.setText(planta.getDireccion());
+
+        txtRucBuscado.setEditable(false);
+
+        txtRucBuscado.setVisible(true);
+        txtNombreBuscado.setVisible(true);
+        txtDireccionBuscada.setVisible(true);
+        btnEliminarPlanta.setVisible(true);
+        btnLimpiarPlanta.setVisible(true);
+        btnEditarPlanta.setVisible(true);
+
+        txtPlantaBuscada.setEditable(false);
+        btnSeleccionarPlanta.setEnabled(false);
+        
+        
+    }//GEN-LAST:event_btnSeleccionarPlantaActionPerformed
+
+    private void btnLimpiarPlantaActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnLimpiarPlantaActionPerformed
+      
+        limpiarSeleccion();
+        
+     }
+        private void limpiarSeleccion() {
+        txtRucBuscado.setText("");
+        txtNombreBuscado.setText("");
+        txtDireccionBuscada.setText("");
+
+        ocultarEdicion();
+
+        txtPlantaBuscada.setText("");
+        txtPlantaBuscada.setEditable(true);
+        btnSeleccionarPlanta.setEnabled(true);
+        txtPlantaBuscada.requestFocus();
+        
+    }//GEN-LAST:event_btnLimpiarPlantaActionPerformed
+
+    private void btnEditarPlantaActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnEditarPlantaActionPerformed
+        
+        try {
+            plantaServicio.editarPlanta(
+                txtRucBuscado.getText(),
+                txtNombreBuscado.getText(),
+                txtDireccionBuscada.getText());
+
+            actualizarTabla();
+            limpiarSeleccion();
+
+            } catch (IllegalArgumentException ex) {
+                        JOptionPane.showMessageDialog(this, ex.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
+            }
+
+    }//GEN-LAST:event_btnEditarPlantaActionPerformed
+
+    private void btnEliminarPlantaActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnEliminarPlantaActionPerformed
+        String ruc = txtRucBuscado.getText();
+
+        int respuesta = JOptionPane.showConfirmDialog(this,
+            "¿Eliminar la planta " + ruc + "?",
+            "Confirmar", JOptionPane.YES_NO_OPTION);
+
+         if (respuesta != JOptionPane.YES_OPTION) {
+                return;
+        }
+
+        try {
+            plantaServicio.eliminarPlanta(ruc);
+
+            actualizarTabla();
+            limpiarSeleccion();
+
+            } catch (IllegalArgumentException ex) {
+                        JOptionPane.showMessageDialog(this, ex.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
+            }
+    }//GEN-LAST:event_btnEliminarPlantaActionPerformed
+
+    private void btnOrRucActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnOrRucActionPerformed
+        orden = "ruc";
+        actualizarTabla();
+    }//GEN-LAST:event_btnOrRucActionPerformed
+
+    private void btnOrNombreActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnOrNombreActionPerformed
+         orden = "nombre";
+         actualizarTabla();
+    }//GEN-LAST:event_btnOrNombreActionPerformed
+
+    private void btnOrDefaultActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnOrDefaultActionPerformed
+         orden = "default";
+         actualizarTabla();
+    }//GEN-LAST:event_btnOrDefaultActionPerformed
 
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
-    private javax.swing.JButton jButton1;
+    private javax.swing.JButton btnEditarPlanta;
+    private javax.swing.JButton btnEliminarPlanta;
+    private javax.swing.JButton btnGuardar;
+    private javax.swing.JButton btnLimpiarPlanta;
+    private javax.swing.JButton btnOrDefault;
+    private javax.swing.JButton btnOrNombre;
+    private javax.swing.JButton btnOrRuc;
+    private javax.swing.JButton btnSeleccionarPlanta;
     private javax.swing.JLabel jLabel1;
     private javax.swing.JLabel jLabel2;
     private javax.swing.JLabel jLabel3;
     private javax.swing.JLabel jLabel4;
-    private javax.swing.JTextField jTextField1;
-    private javax.swing.JTextField jTextField2;
-    private javax.swing.JTextField jTextField3;
+    private javax.swing.JLabel jLabel5;
+    private javax.swing.JLabel jLabel6;
+    private javax.swing.JScrollPane jScrollPane1;
+    private javax.swing.JTable tblPlantas;
+    private javax.swing.JTextField txtDireccionBuscada;
+    private javax.swing.JTextField txtImputDireccion;
+    private javax.swing.JTextField txtImputNombre;
+    private javax.swing.JTextField txtImputRuc;
+    private javax.swing.JTextField txtNombreBuscado;
+    private javax.swing.JTextField txtPlantaBuscada;
+    private javax.swing.JTextField txtRucBuscado;
     // End of variables declaration//GEN-END:variables
 }
