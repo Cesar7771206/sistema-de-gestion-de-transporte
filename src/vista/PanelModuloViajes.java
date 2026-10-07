@@ -131,6 +131,7 @@ public class PanelModuloViajes extends javax.swing.JPanel {
         btnEliminar = new javax.swing.JButton();
         btnActualizar = new javax.swing.JButton();
         btnEditar = new javax.swing.JButton();
+        btnRegistrarUrgencia = new javax.swing.JButton();
 
         setBackground(new java.awt.Color(255, 255, 255));
         setPreferredSize(new java.awt.Dimension(880, 680));
@@ -173,6 +174,12 @@ public class PanelModuloViajes extends javax.swing.JPanel {
         jButton1.setToolTipText("");
         jButton1.setBorder(javax.swing.BorderFactory.createBevelBorder(javax.swing.border.BevelBorder.RAISED));
         jButton1.addActionListener(this::jButton1ActionPerformed);
+
+        btnRegistrarUrgencia.setBackground(new java.awt.Color(0, 153, 153));
+        btnRegistrarUrgencia.setText("REGISTRAR CON URGENCIA");
+        btnRegistrarUrgencia.setToolTipText("");
+        btnRegistrarUrgencia.setBorder(javax.swing.BorderFactory.createBevelBorder(javax.swing.border.BevelBorder.RAISED));
+        btnRegistrarUrgencia.addActionListener(this::btnRegistrarUrgenciaActionPerformed);
 
         jLabel6.setFont(new java.awt.Font("Sans Serif Collection", 1, 12)); // NOI18N
         jLabel6.setText("Cliente:");
@@ -238,6 +245,8 @@ public class PanelModuloViajes extends javax.swing.JPanel {
                     .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, pnlContenidoLayout.createSequentialGroup()
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                         .addComponent(jButton1, javax.swing.GroupLayout.PREFERRED_SIZE, 191, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addGap(10, 10, 10)
+                        .addComponent(btnRegistrarUrgencia, javax.swing.GroupLayout.PREFERRED_SIZE, 191, javax.swing.GroupLayout.PREFERRED_SIZE)
                         .addGap(39, 39, 39))))
         );
         pnlContenidoLayout.setVerticalGroup(
@@ -272,7 +281,9 @@ public class PanelModuloViajes extends javax.swing.JPanel {
                         .addContainerGap(38, Short.MAX_VALUE))
                     .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, pnlContenidoLayout.createSequentialGroup()
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                        .addComponent(jButton1)
+                        .addGroup(pnlContenidoLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                            .addComponent(jButton1)
+                            .addComponent(btnRegistrarUrgencia))
                         .addGap(24, 24, 24))))
         );
 
@@ -382,6 +393,73 @@ public class PanelModuloViajes extends javax.swing.JPanel {
                 "Viaje registrado correctamente."
         );
     }//GEN-LAST:event_jButton1ActionPerformed
+
+    private void btnRegistrarUrgenciaActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnRegistrarUrgenciaActionPerformed
+        if (cboContenedor.getSelectedIndex() == -1
+                || cboTractor.getSelectedIndex() == -1
+                || cboCarreta.getSelectedIndex() == -1
+                || cboPlanta.getSelectedIndex() == -1
+                || cboTerminal.getSelectedIndex() == -1
+                || cboCliente.getSelectedIndex() == -1
+                || cboRuta.getSelectedIndex() == -1) {
+
+            JOptionPane.showMessageDialog(
+                    this,
+                    "Debe seleccionar todos los datos del viaje."
+            );
+
+            return;
+        }
+
+        Contenedor contenedor
+                = GestorEquipos.getContenedores()
+                        .get(cboContenedor.getSelectedIndex());
+
+        Tractor tractor
+                = GestorEquipos.getTractores()
+                        .get(cboTractor.getSelectedIndex());
+
+        Carreta carreta
+                = GestorEquipos.getCarretas()
+                        .get(cboCarreta.getSelectedIndex());
+
+        Planta planta
+                = GestorLogistica.getPlantas()
+                        .get(cboPlanta.getSelectedIndex());
+
+        Terminal terminal
+                = GestorLogistica.getTerminales()
+                        .get(cboTerminal.getSelectedIndex());
+
+        Cliente cliente
+                = GestorLogistica.getClientes()
+                        .get(cboCliente.getSelectedIndex());
+
+        Ruta ruta
+                = GestorLogistica.getRutas()
+                        .get(cboRuta.getSelectedIndex());
+
+        int id = GestorViajes.generarId();
+
+        Viaje nuevoViaje = new Viaje(
+                id,
+                contenedor,
+                tractor,
+                carreta,
+                planta,
+                terminal,
+                cliente,
+                ruta
+        );
+
+        GestorViajes.agregarViajeUrgente(nuevoViaje);
+        cargarTablaViajes();
+
+        JOptionPane.showMessageDialog(
+                this,
+                "Viaje urgente registrado al inicio de la cola."
+        );
+    }//GEN-LAST:event_btnRegistrarUrgenciaActionPerformed
 
     private void btnActualizarActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnActualizarActionPerformed
         if (idViajeEditando == -1) {
@@ -594,6 +672,7 @@ public class PanelModuloViajes extends javax.swing.JPanel {
     private javax.swing.JButton btnActualizar;
     private javax.swing.JButton btnEditar;
     private javax.swing.JButton btnEliminar;
+    private javax.swing.JButton btnRegistrarUrgencia;
     private javax.swing.JComboBox<String> cboCarreta;
     private javax.swing.JComboBox<String> cboCliente;
     private javax.swing.JComboBox<String> cboContenedor;

@@ -1,19 +1,23 @@
 package servicio;
 
-import java.util.ArrayList;
+import java.util.LinkedList;
 import modelo.Viaje;
 
 public class GestorViajes {
 
-    private static ArrayList<Viaje> viajes = new ArrayList<>();
+    private static LinkedList<Viaje> viajes = new LinkedList<>();
 
  
     public static void agregarViaje(Viaje viaje) {
-        viajes.add(viaje);
+        viajes.addLast(viaje);
+    }
+
+    public static void agregarViajeUrgente(Viaje viaje) {
+        viajes.addFirst(viaje);
     }
 
  
-    public static ArrayList<Viaje> getViajes() {
+    public static LinkedList<Viaje> getViajes() {
         return viajes;
     }
 
