@@ -26,18 +26,20 @@ import modelo.Ubicacion;
  */
 public class PanelModuloViajes extends javax.swing.JPanel {
 
+    private int idViajeEditando = -1;
+
     /**
      * Creates new form PanelControlViajes
      */
     public PanelModuloViajes() {
-        initComponents();        
+        initComponents();
         cargarCombos();
         cargarTablaViajes();
-        
+
     }
-    
+
     public void cargarCombos() {
-     
+
         cboContenedor.removeAllItems();
         cboTractor.removeAllItems();
         cboCarreta.removeAllItems();
@@ -126,9 +128,9 @@ public class PanelModuloViajes extends javax.swing.JPanel {
         cboPlanta = new javax.swing.JComboBox<>();
         jScrollPane1 = new javax.swing.JScrollPane();
         tblViajes = new javax.swing.JTable();
-        jButton2 = new javax.swing.JButton();
-        jButton3 = new javax.swing.JButton();
-        jButton4 = new javax.swing.JButton();
+        btnEliminar = new javax.swing.JButton();
+        btnActualizar = new javax.swing.JButton();
+        btnEditar = new javax.swing.JButton();
 
         setBackground(new java.awt.Color(255, 255, 255));
         setPreferredSize(new java.awt.Dimension(880, 680));
@@ -236,7 +238,7 @@ public class PanelModuloViajes extends javax.swing.JPanel {
                     .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, pnlContenidoLayout.createSequentialGroup()
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                         .addComponent(jButton1, javax.swing.GroupLayout.PREFERRED_SIZE, 191, javax.swing.GroupLayout.PREFERRED_SIZE)
-                        .addGap(28, 28, 28))))
+                        .addGap(39, 39, 39))))
         );
         pnlContenidoLayout.setVerticalGroup(
             pnlContenidoLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -266,11 +268,12 @@ public class PanelModuloViajes extends javax.swing.JPanel {
                         .addGap(18, 18, 18)
                         .addGroup(pnlContenidoLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                             .addComponent(jLabel8)
-                            .addComponent(cboPlanta, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)))
-                    .addGroup(pnlContenidoLayout.createSequentialGroup()
-                        .addGap(45, 45, 45)
-                        .addComponent(jButton1)))
-                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                            .addComponent(cboPlanta, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                        .addContainerGap(38, Short.MAX_VALUE))
+                    .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, pnlContenidoLayout.createSequentialGroup()
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                        .addComponent(jButton1)
+                        .addGap(24, 24, 24))))
         );
 
         add(pnlContenido, new org.netbeans.lib.awtextra.AbsoluteConstraints(50, 100, 800, 290));
@@ -289,26 +292,28 @@ public class PanelModuloViajes extends javax.swing.JPanel {
         ));
         jScrollPane1.setViewportView(tblViajes);
 
-        add(jScrollPane1, new org.netbeans.lib.awtextra.AbsoluteConstraints(50, 400, 640, 260));
+        add(jScrollPane1, new org.netbeans.lib.awtextra.AbsoluteConstraints(50, 400, 660, 260));
 
-        jButton2.setBackground(new java.awt.Color(255, 51, 51));
-        jButton2.setFont(new java.awt.Font("Sans Serif Collection", 0, 12)); // NOI18N
-        jButton2.setText("ELIMINAR");
-        jButton2.setBorder(javax.swing.BorderFactory.createBevelBorder(javax.swing.border.BevelBorder.RAISED));
-        add(jButton2, new org.netbeans.lib.awtextra.AbsoluteConstraints(740, 440, 110, -1));
+        btnEliminar.setBackground(new java.awt.Color(255, 51, 51));
+        btnEliminar.setFont(new java.awt.Font("Sans Serif Collection", 0, 12)); // NOI18N
+        btnEliminar.setText("ELIMINAR");
+        btnEliminar.setBorder(javax.swing.BorderFactory.createBevelBorder(javax.swing.border.BevelBorder.RAISED));
+        btnEliminar.addActionListener(this::btnEliminarActionPerformed);
+        add(btnEliminar, new org.netbeans.lib.awtextra.AbsoluteConstraints(740, 440, 110, -1));
 
-        jButton3.setBackground(new java.awt.Color(153, 153, 153));
-        jButton3.setFont(new java.awt.Font("Sans Serif Collection", 0, 12)); // NOI18N
-        jButton3.setText("ACTUALIZAR");
-        jButton3.setBorder(javax.swing.BorderFactory.createBevelBorder(javax.swing.border.BevelBorder.RAISED));
-        jButton3.addActionListener(this::jButton3ActionPerformed);
-        add(jButton3, new org.netbeans.lib.awtextra.AbsoluteConstraints(740, 500, 110, 40));
+        btnActualizar.setBackground(new java.awt.Color(153, 153, 153));
+        btnActualizar.setFont(new java.awt.Font("Sans Serif Collection", 0, 12)); // NOI18N
+        btnActualizar.setText("ACTUALIZAR");
+        btnActualizar.setBorder(javax.swing.BorderFactory.createBevelBorder(javax.swing.border.BevelBorder.RAISED));
+        btnActualizar.addActionListener(this::btnActualizarActionPerformed);
+        add(btnActualizar, new org.netbeans.lib.awtextra.AbsoluteConstraints(740, 500, 110, 40));
 
-        jButton4.setBackground(new java.awt.Color(0, 153, 153));
-        jButton4.setFont(new java.awt.Font("Sans Serif Collection", 0, 12)); // NOI18N
-        jButton4.setText("EDITAR");
-        jButton4.setBorder(javax.swing.BorderFactory.createBevelBorder(javax.swing.border.BevelBorder.RAISED));
-        add(jButton4, new org.netbeans.lib.awtextra.AbsoluteConstraints(740, 560, 110, -1));
+        btnEditar.setBackground(new java.awt.Color(0, 153, 153));
+        btnEditar.setFont(new java.awt.Font("Sans Serif Collection", 0, 12)); // NOI18N
+        btnEditar.setText("EDITAR");
+        btnEditar.setBorder(javax.swing.BorderFactory.createBevelBorder(javax.swing.border.BevelBorder.RAISED));
+        btnEditar.addActionListener(this::btnEditarActionPerformed);
+        add(btnEditar, new org.netbeans.lib.awtextra.AbsoluteConstraints(740, 560, 110, -1));
     }// </editor-fold>//GEN-END:initComponents
 
     private void jButton1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton1ActionPerformed
@@ -378,12 +383,217 @@ public class PanelModuloViajes extends javax.swing.JPanel {
         );
     }//GEN-LAST:event_jButton1ActionPerformed
 
-    private void jButton3ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton3ActionPerformed
-        // TODO add your handling code here:
-    }//GEN-LAST:event_jButton3ActionPerformed
+    private void btnActualizarActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnActualizarActionPerformed
+        if (idViajeEditando == -1) {
+            JOptionPane.showMessageDialog(
+                    this,
+                    "Primero seleccione un viaje y presione EDITAR."
+            );
+            return;
+        }
+
+        if (cboContenedor.getSelectedIndex() == -1
+                || cboTractor.getSelectedIndex() == -1
+                || cboCarreta.getSelectedIndex() == -1
+                || cboPlanta.getSelectedIndex() == -1
+                || cboTerminal.getSelectedIndex() == -1
+                || cboCliente.getSelectedIndex() == -1
+                || cboRuta.getSelectedIndex() == -1) {
+
+            JOptionPane.showMessageDialog(
+                    this,
+                    "Debe seleccionar todos los datos del viaje."
+            );
+            return;
+        }
+
+        Viaje viajeEditar = null;
+
+        for (Viaje viaje : GestorViajes.getViajes()) {
+            if (viaje.getId() == idViajeEditando) {
+                viajeEditar = viaje;
+                break;
+            }
+        }
+
+        if (viajeEditar == null) {
+            JOptionPane.showMessageDialog(
+                    this,
+                    "No se encontró el viaje."
+            );
+            return;
+        }
+
+        Contenedor contenedor
+                = GestorEquipos.getContenedores()
+                        .get(cboContenedor.getSelectedIndex());
+
+        Tractor tractor
+                = GestorEquipos.getTractores()
+                        .get(cboTractor.getSelectedIndex());
+
+        Carreta carreta
+                = GestorEquipos.getCarretas()
+                        .get(cboCarreta.getSelectedIndex());
+
+        Planta planta
+                = GestorLogistica.getPlantas()
+                        .get(cboPlanta.getSelectedIndex());
+
+        Terminal terminal
+                = GestorLogistica.getTerminales()
+                        .get(cboTerminal.getSelectedIndex());
+
+        Cliente cliente
+                = GestorLogistica.getClientes()
+                        .get(cboCliente.getSelectedIndex());
+
+        Ruta ruta
+                = GestorLogistica.getRutas()
+                        .get(cboRuta.getSelectedIndex());
+
+        viajeEditar.setContenedor(contenedor);
+        viajeEditar.setTractor(tractor);
+        viajeEditar.setCarreta(carreta);
+        viajeEditar.setPlanta(planta);
+        viajeEditar.setTerminal(terminal);
+        viajeEditar.setCliente(cliente);
+        viajeEditar.setRuta(ruta);
+
+        cargarTablaViajes();
+
+        idViajeEditando = -1;
+
+        JOptionPane.showMessageDialog(
+                this,
+                "Viaje actualizado correctamente."
+        );
+    }//GEN-LAST:event_btnActualizarActionPerformed
+
+    private void btnEditarActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnEditarActionPerformed
+        int fila = tblViajes.getSelectedRow();
+
+        if (fila == -1) {
+            JOptionPane.showMessageDialog(
+                    this,
+                    "Seleccione un viaje de la tabla."
+            );
+            return;
+        }
+
+        idViajeEditando = (int) tblViajes.getValueAt(fila, 0);
+
+        Viaje viajeSeleccionado = null;
+
+        for (Viaje viaje : GestorViajes.getViajes()) {
+
+            if (viaje.getId() == idViajeEditando) {
+                viajeSeleccionado = viaje;
+                break;
+            }
+        }
+
+        if (viajeSeleccionado == null) {
+            JOptionPane.showMessageDialog(
+                    this,
+                    "No se encontró el viaje seleccionado."
+            );
+            return;
+        }
+
+        cboContenedor.setSelectedItem(
+                viajeSeleccionado.getContenedor().getCodigo()
+        );
+
+        cboTractor.setSelectedItem(
+                viajeSeleccionado.getTractor().getPlaca()
+        );
+
+        cboCarreta.setSelectedItem(
+                viajeSeleccionado.getCarreta().getPlaca()
+        );
+
+        cboPlanta.setSelectedItem(
+                viajeSeleccionado.getPlanta().getNombre()
+        );
+
+        cboTerminal.setSelectedItem(
+                viajeSeleccionado.getTerminal().getNombre()
+        );
+
+        cboCliente.setSelectedItem(
+                viajeSeleccionado.getCliente().getNombre()
+        );
+
+        cboRuta.setSelectedItem(
+                "Ruta " + viajeSeleccionado.getRuta().getId()
+        );
+
+        JOptionPane.showMessageDialog(
+                this,
+                "Datos cargados. Modifique las opciones y presione ACTUALIZAR."
+        );
+    }//GEN-LAST:event_btnEditarActionPerformed
+
+    private void btnEliminarActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnEliminarActionPerformed
+        int fila = tblViajes.getSelectedRow();
+
+        if (fila == -1) {
+            JOptionPane.showMessageDialog(
+                    this,
+                    "Seleccione un viaje de la tabla."
+            );
+            return;
+        }
+
+        int id = (int) tblViajes.getValueAt(fila, 0);
+
+        int respuesta = JOptionPane.showConfirmDialog(
+                this,
+                "¿Está seguro de eliminar el viaje " + id + "?",
+                "Confirmar eliminación",
+                JOptionPane.YES_NO_OPTION
+        );
+
+        if (respuesta != JOptionPane.YES_OPTION) {
+            return;
+        }
+
+        Viaje viajeEliminar = null;
+
+        for (Viaje viaje : GestorViajes.getViajes()) {
+
+            if (viaje.getId() == id) {
+                viajeEliminar = viaje;
+                break;
+            }
+        }
+
+        if (viajeEliminar == null) {
+            JOptionPane.showMessageDialog(
+                    this,
+                    "No se encontró el viaje."
+            );
+            return;
+        }
+
+        GestorViajes.getViajes().remove(viajeEliminar);
+
+        cargarTablaViajes();
+
+        idViajeEditando = -1;
+
+        JOptionPane.showMessageDialog(
+                this,
+                "Viaje eliminado correctamente."
+        );
+    }//GEN-LAST:event_btnEliminarActionPerformed
 
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
+    private javax.swing.JButton btnActualizar;
+    private javax.swing.JButton btnEditar;
+    private javax.swing.JButton btnEliminar;
     private javax.swing.JComboBox<String> cboCarreta;
     private javax.swing.JComboBox<String> cboCliente;
     private javax.swing.JComboBox<String> cboContenedor;
@@ -392,9 +602,6 @@ public class PanelModuloViajes extends javax.swing.JPanel {
     private javax.swing.JComboBox<String> cboTerminal;
     private javax.swing.JComboBox<String> cboTractor;
     private javax.swing.JButton jButton1;
-    private javax.swing.JButton jButton2;
-    private javax.swing.JButton jButton3;
-    private javax.swing.JButton jButton4;
     private javax.swing.JLabel jLabel1;
     private javax.swing.JLabel jLabel2;
     private javax.swing.JLabel jLabel3;

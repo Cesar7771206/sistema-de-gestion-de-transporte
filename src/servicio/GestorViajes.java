@@ -19,8 +19,17 @@ public class GestorViajes {
 
    
     public static int generarId() {
-        return viajes.size() + 1;
+
+    int mayorId = 0;
+
+    for (Viaje viaje : viajes) {
+        if (viaje.getId() > mayorId) {
+            mayorId = viaje.getId();
+        }
     }
+
+    return mayorId + 1;
+}
 
     
     public static Viaje buscarPorContenedor(String codigo) {
