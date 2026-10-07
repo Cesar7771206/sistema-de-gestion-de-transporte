@@ -4,6 +4,13 @@
  */
 package vista;
 
+import modelo.Ruta;
+import modelo.Ubicacion;
+import modelo.Planta;
+import modelo.Terminal;
+import servicio.GestorLogistica;
+import javax.swing.JOptionPane;
+
 /**
  *
  * @author GIANCARLO REA
@@ -79,6 +86,11 @@ public class PanelRuta extends javax.swing.JPanel {
         jTextField6.setBorder(javax.swing.BorderFactory.createLineBorder(new java.awt.Color(0, 0, 0)));
 
         jButton1.setText("Guardar");
+        jButton1.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jButton1ActionPerformed(evt);
+            }
+        });
 
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(this);
         this.setLayout(layout);
@@ -158,6 +170,115 @@ public class PanelRuta extends javax.swing.JPanel {
                 .addGap(45, 45, 45))
         );
     }// </editor-fold>//GEN-END:initComponents
+
+    private void jButton1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton1ActionPerformed
+        try {
+            int id = Integer.parseInt(jTextField1.getText().trim());
+            String cocheraTexto = jTextField4.getText().trim();
+            String terminalRetiroTexto = jTextField6.getText().trim();
+            String plantaCargaTexto = jTextField2.getText().trim();
+            String terminalFinalTexto = jTextField5.getText().trim();
+            double tarifa = Double.parseDouble(jTextField3.getText().trim());
+
+            if (cocheraTexto.isEmpty()
+                    || terminalRetiroTexto.isEmpty()
+                    || plantaCargaTexto.isEmpty()
+                    || terminalFinalTexto.isEmpty()) {
+
+                JOptionPane.showMessageDialog(
+                        this,
+                        "Complete todos los campos."
+                );
+                return;
+            }
+
+            Terminal terminalRetiro = null;
+            Terminal terminalFinal = null;
+            Planta plantaCarga = null;
+
+            for (Terminal terminal : GestorLogistica.getTerminales()) {
+
+                if (terminal.getNombre().equalsIgnoreCase(terminalRetiroTexto)) {
+                    terminalRetiro = terminal;
+                }
+
+                if (terminal.getNombre().equalsIgnoreCase(terminalFinalTexto)) {
+                    terminalFinal = terminal;
+                }
+            }
+
+            for (Planta planta : GestorLogistica.getPlantas()) {
+
+                if (planta.getNombre().equalsIgnoreCase(plantaCargaTexto)) {
+                    plantaCarga = planta;
+                }
+            }
+
+            if (terminalRetiro == null) {
+                JOptionPane.showMessageDialog(
+                        this,
+                        "El Terminal de Retiro no está registrado."
+                );
+                return;
+            }
+
+            if (terminalFinal == null) {
+                JOptionPane.showMessageDialog(
+                        this,
+                        "El Terminal Final no está registrado."
+                );
+                return;
+            }
+
+            if (plantaCarga == null) {
+                JOptionPane.showMessageDialog(
+                        this,
+                        "La Planta de Carga no está registrada."
+                );
+                return;
+            }
+
+            Ubicacion cochera = new Ubicacion(
+                    id,
+                    "",
+                    "",
+                    "",
+                    cocheraTexto
+            );
+
+            Ruta nuevaRuta = new Ruta(
+                    id,
+                    cochera,
+                    terminalRetiro,
+                    plantaCarga,
+                    terminalFinal,
+                    tarifa
+            );
+
+            GestorLogistica.agregarRuta(nuevaRuta);
+
+            JOptionPane.showMessageDialog(
+                    this,
+                    "Ruta registrada correctamente."
+            );
+
+            jTextField1.setText("");
+            jTextField2.setText("");
+            jTextField3.setText("");
+            jTextField4.setText("");
+            jTextField5.setText("");
+            jTextField6.setText("");
+
+            jTextField1.requestFocus();
+
+        } catch (NumberFormatException e) {
+
+            JOptionPane.showMessageDialog(
+                    this,
+                    "El ID debe ser un número entero y la tarifa debe ser numérica."
+            );
+        }
+    }//GEN-LAST:event_jButton1ActionPerformed
 
 
     // Variables declaration - do not modify//GEN-BEGIN:variables

@@ -18,6 +18,7 @@ import modelo.Ruta;
 import servicio.GestorViajes;
 import modelo.Viaje;
 import javax.swing.JOptionPane;
+import modelo.Ubicacion;
 
 /**
  *
@@ -29,13 +30,14 @@ public class PanelModuloViajes extends javax.swing.JPanel {
      * Creates new form PanelControlViajes
      */
     public PanelModuloViajes() {
-    initComponents();
-    cargarCombos();
-    cargarTablaViajes();
-}
+        initComponents();        
+        cargarCombos();
+        cargarTablaViajes();
+        
+    }
     
-    private void cargarCombos() {
-
+    public void cargarCombos() {
+     
         cboContenedor.removeAllItems();
         cboTractor.removeAllItems();
         cboCarreta.removeAllItems();
@@ -72,29 +74,28 @@ public class PanelModuloViajes extends javax.swing.JPanel {
             cboRuta.addItem("Ruta " + ruta.getId());
         }
     }
+
     private void cargarTablaViajes() {
 
-    DefaultTableModel modelo =
-            (DefaultTableModel) tblViajes.getModel();
+        DefaultTableModel modelo
+                = (DefaultTableModel) tblViajes.getModel();
 
-    
-    modelo.setRowCount(0);
+        modelo.setRowCount(0);
 
-    for (Viaje viaje : GestorViajes.getViajes()) {
+        for (Viaje viaje : GestorViajes.getViajes()) {
 
-        Object[] fila = {
-            viaje.getId(),
-            viaje.getContenedor().getCodigo(),
-            viaje.getTractor().getPlaca(),
-            viaje.getCarreta().getPlaca(),
-            viaje.getCliente().getNombre(),
-            "Ruta " + viaje.getRuta().getId()
-        };
+            Object[] fila = {
+                viaje.getId(),
+                viaje.getContenedor().getCodigo(),
+                viaje.getTractor().getPlaca(),
+                viaje.getCarreta().getPlaca(),
+                viaje.getCliente().getNombre(),
+                "Ruta " + viaje.getRuta().getId()
+            };
 
-        modelo.addRow(fila);
+            modelo.addRow(fila);
+        }
     }
-}
-
 
     /**
      * This method is called from within the constructor to initialize the form.
@@ -326,9 +327,7 @@ public class PanelModuloViajes extends javax.swing.JPanel {
                 = GestorLogistica.getRutas()
                         .get(cboRuta.getSelectedIndex());
 
-
         int id = GestorViajes.generarId();
-
 
         Viaje nuevoViaje = new Viaje(
                 id,
@@ -340,7 +339,6 @@ public class PanelModuloViajes extends javax.swing.JPanel {
                 cliente,
                 ruta
         );
-
 
         GestorViajes.agregarViaje(nuevoViaje);
         cargarTablaViajes();
