@@ -22,9 +22,8 @@ public class FrmPrincipal extends javax.swing.JFrame {
         vistaCards = (java.awt.CardLayout) panelContenido.getLayout();
         
         panelContenido.add(new PanelModuloInicio(), "MODULO_INICIO");
-        panelContenido.add(new PanelModuloViajes(), "MODULO_VIAJES");
         panelContenido.add(new PanelModuloData(), "MODULO_DATA");
-        
+        panelContenido.add(new PanelModuloViajes(), "MODULO_VIAJES");
         vistaCards.show(panelContenido, "MODULO_INICIO");
         
         PanelUserSidebar sidebar = new PanelUserSidebar(this);
