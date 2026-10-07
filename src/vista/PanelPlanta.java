@@ -174,7 +174,7 @@ public class PanelPlanta extends javax.swing.JPanel {
         jLabel5.setBackground(new java.awt.Color(255, 255, 255));
         jLabel5.setForeground(new java.awt.Color(0, 0, 0));
         jLabel5.setText("Ordenar por:");
-        add(jLabel5, new org.netbeans.lib.awtextra.AbsoluteConstraints(30, 160, 70, 20));
+        add(jLabel5, new org.netbeans.lib.awtextra.AbsoluteConstraints(30, 160, 90, 20));
 
         btnOrRuc.setBackground(new java.awt.Color(204, 153, 255));
         btnOrRuc.setForeground(new java.awt.Color(255, 255, 255));
@@ -184,7 +184,7 @@ public class PanelPlanta extends javax.swing.JPanel {
                 btnOrRucActionPerformed(evt);
             }
         });
-        add(btnOrRuc, new org.netbeans.lib.awtextra.AbsoluteConstraints(110, 160, -1, -1));
+        add(btnOrRuc, new org.netbeans.lib.awtextra.AbsoluteConstraints(130, 160, -1, -1));
 
         btnOrNombre.setBackground(new java.awt.Color(255, 153, 204));
         btnOrNombre.setForeground(new java.awt.Color(255, 255, 255));
@@ -194,7 +194,7 @@ public class PanelPlanta extends javax.swing.JPanel {
                 btnOrNombreActionPerformed(evt);
             }
         });
-        add(btnOrNombre, new org.netbeans.lib.awtextra.AbsoluteConstraints(200, 160, -1, -1));
+        add(btnOrNombre, new org.netbeans.lib.awtextra.AbsoluteConstraints(210, 160, -1, -1));
 
         btnOrDefault.setBackground(new java.awt.Color(0, 153, 204));
         btnOrDefault.setForeground(new java.awt.Color(255, 255, 255));
@@ -209,7 +209,7 @@ public class PanelPlanta extends javax.swing.JPanel {
         jLabel6.setBackground(new java.awt.Color(255, 255, 255));
         jLabel6.setForeground(new java.awt.Color(0, 0, 0));
         jLabel6.setText("Ingresar el RUC de la Planta:");
-        add(jLabel6, new org.netbeans.lib.awtextra.AbsoluteConstraints(30, 410, 160, -1));
+        add(jLabel6, new org.netbeans.lib.awtextra.AbsoluteConstraints(30, 410, 190, -1));
 
         txtDireccionBuscada.setBackground(new java.awt.Color(255, 255, 255));
         add(txtDireccionBuscada, new org.netbeans.lib.awtextra.AbsoluteConstraints(410, 490, 230, -1));
