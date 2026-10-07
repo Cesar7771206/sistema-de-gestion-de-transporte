@@ -8,12 +8,13 @@ import java.awt.CardLayout;
 import servicio.UsuarioServicio;
 import modelo.Usuario;
 import modelo.Direccion;
+
 /**
  *
  * @author cesar
  */
 public class FrmLoginRegistro extends javax.swing.JFrame {
-    
+
     private static final java.util.logging.Logger logger = java.util.logging.Logger.getLogger(FrmLoginRegistro.class.getName());
     private UsuarioServicio usuarioServicio = new UsuarioServicio();
 
@@ -23,18 +24,18 @@ public class FrmLoginRegistro extends javax.swing.JFrame {
     public FrmLoginRegistro() {
         initComponents();
     }
-    
+
     private void limpiarRegistro() {
-    txtDni.setText("");
-    txtNombres.setText("");
-    txtApellidos.setText("");
-    txtCorreoRegistro.setText("");
-    txtContraseñaRegistro.setText("");
-    txtDistrito.setText("");
-    txtProvincia.setText("");
-    txtDepartamento.setText("");
-    txtDirección.setText("");
-}
+        txtDni.setText("");
+        txtNombres.setText("");
+        txtApellidos.setText("");
+        txtCorreoRegistro.setText("");
+        txtContraseñaRegistro.setText("");
+        txtDistrito.setText("");
+        txtProvincia.setText("");
+        txtDepartamento.setText("");
+        txtDirección.setText("");
+    }
 
     /**
      * This method is called from within the constructor to initialize the form.
@@ -346,50 +347,50 @@ public class FrmLoginRegistro extends javax.swing.JFrame {
     }//GEN-LAST:event_lblRegistroMouseClicked
 
     private void lblIrLoginMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_lblIrLoginMouseClicked
-            CardLayout cl = (CardLayout) cardPanel.getLayout();
-            cl.show(cardPanel, "panelLogin");
+        CardLayout cl = (CardLayout) cardPanel.getLayout();
+        cl.show(cardPanel, "panelLogin");
     }//GEN-LAST:event_lblIrLoginMouseClicked
 
     private void btnRegistrarActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnRegistrarActionPerformed
-        
+
         try {
-    String nombreCompleto = txtNombres.getText().trim() + " " + txtApellidos.getText().trim();
+            String nombreCompleto = txtNombres.getText().trim() + " " + txtApellidos.getText().trim();
 
-    Direccion cochera = new Direccion(
-            1,
-            txtDistrito.getText().trim(),
-            txtProvincia.getText().trim(),
-            txtDepartamento.getText().trim(),
-            txtDirección.getText().trim()); 
+            Direccion cochera = new Direccion(
+                    1,
+                    txtDistrito.getText().trim(),
+                    txtProvincia.getText().trim(),
+                    txtDepartamento.getText().trim(),
+                    txtDirección.getText().trim());
 
-    usuarioServicio.guardarUsuario(
-            txtDni.getText(),
-            nombreCompleto,
-            cochera,
-            txtCorreoRegistro.getText(),
-            new String(txtContraseñaRegistro.getPassword()));
+            usuarioServicio.guardarUsuario(
+                    txtDni.getText(),
+                    nombreCompleto,
+                    cochera,
+                    txtCorreoRegistro.getText(),
+                    new String(txtContraseñaRegistro.getPassword()));
 
-    javax.swing.JOptionPane.showMessageDialog(this, "Usuario registrado correctamente");
-    limpiarRegistro();
-    ((CardLayout) cardPanel.getLayout()).show(cardPanel, "card2");
-} catch (IllegalArgumentException ex) {
-    javax.swing.JOptionPane.showMessageDialog(this, ex.getMessage(),
-            "Error", javax.swing.JOptionPane.WARNING_MESSAGE);
-}
+            javax.swing.JOptionPane.showMessageDialog(this, "Usuario registrado correctamente");
+            limpiarRegistro();
+            ((CardLayout) cardPanel.getLayout()).show(cardPanel, "card2");
+        } catch (IllegalArgumentException ex) {
+            javax.swing.JOptionPane.showMessageDialog(this, ex.getMessage(),
+                    "Error", javax.swing.JOptionPane.WARNING_MESSAGE);
+        }
     }//GEN-LAST:event_btnRegistrarActionPerformed
 
     private void btbIngresarActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btbIngresarActionPerformed
-        
-        Usuario u = usuarioServicio.autenticar(
-        txtCorreo.getText(),
-        new String(txtContraseña.getPassword()));
 
-if (u == null) {
-    javax.swing.JOptionPane.showMessageDialog(this, "Correo o contraseña incorrectos",
-            "Error", javax.swing.JOptionPane.ERROR_MESSAGE);
-    return;
-}
-javax.swing.JOptionPane.showMessageDialog(this, "Bienvenido, " + u.getNombre());
+        Usuario u = usuarioServicio.autenticar(
+                txtCorreo.getText(),
+                new String(txtContraseña.getPassword()));
+
+        if (u == null) {
+            javax.swing.JOptionPane.showMessageDialog(this, "Correo o contraseña incorrectos",
+                    "Error", javax.swing.JOptionPane.ERROR_MESSAGE);
+            return;
+        }
+        javax.swing.JOptionPane.showMessageDialog(this, "Bienvenido, " + u.getNombre());
     }//GEN-LAST:event_btbIngresarActionPerformed
 
     /**
@@ -454,5 +455,4 @@ javax.swing.JOptionPane.showMessageDialog(this, "Bienvenido, " + u.getNombre());
     private javax.swing.JTextField txtProvincia;
     // End of variables declaration//GEN-END:variables
 
-    
 }
