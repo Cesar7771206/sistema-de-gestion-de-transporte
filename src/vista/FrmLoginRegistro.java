@@ -4,6 +4,10 @@
  */
 package vista;
 
+import java.awt.CardLayout;
+import servicio.UsuarioServicio;
+import modelo.Usuario;
+import modelo.Direccion;
 /**
  *
  * @author cesar
@@ -11,6 +15,7 @@ package vista;
 public class FrmLoginRegistro extends javax.swing.JFrame {
     
     private static final java.util.logging.Logger logger = java.util.logging.Logger.getLogger(FrmLoginRegistro.class.getName());
+    private UsuarioServicio usuarioServicio = new UsuarioServicio();
 
     /**
      * Creates new form FrmLoginRegistro
@@ -18,6 +23,18 @@ public class FrmLoginRegistro extends javax.swing.JFrame {
     public FrmLoginRegistro() {
         initComponents();
     }
+    
+    private void limpiarRegistro() {
+    txtDni.setText("");
+    txtNombres.setText("");
+    txtApellidos.setText("");
+    txtCorreoRegistro.setText("");
+    txtContraseñaRegistro.setText("");
+    txtDistrito.setText("");
+    txtProvincia.setText("");
+    txtDepartamento.setText("");
+    txtDirección.setText("");
+}
 
     /**
      * This method is called from within the constructor to initialize the form.
@@ -64,6 +81,7 @@ public class FrmLoginRegistro extends javax.swing.JFrame {
         lblFondo = new javax.swing.JLabel();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
+        setPreferredSize(new java.awt.Dimension(1110, 730));
 
         fondoPanel.setBackground(new java.awt.Color(204, 204, 204));
         fondoPanel.setLayout(new org.netbeans.lib.awtextra.AbsoluteLayout());
@@ -71,12 +89,15 @@ public class FrmLoginRegistro extends javax.swing.JFrame {
         cardPanel.setBackground(new java.awt.Color(204, 204, 204));
         cardPanel.setLayout(new java.awt.CardLayout());
 
+        panelLogin.setBackground(new java.awt.Color(255, 255, 255));
+
         txtCorreo.setBorder(javax.swing.BorderFactory.createLineBorder(new java.awt.Color(0, 0, 0)));
 
         txtContraseña.setBorder(javax.swing.BorderFactory.createLineBorder(new java.awt.Color(0, 0, 0)));
 
         btbIngresar.setBackground(new java.awt.Color(25, 55, 105));
         btbIngresar.setText("Ingresar");
+        btbIngresar.addActionListener(this::btbIngresarActionPerformed);
 
         lblCorreo.setText("Correo  Electrónico");
 
@@ -85,6 +106,11 @@ public class FrmLoginRegistro extends javax.swing.JFrame {
         lblRegistro.setFont(new java.awt.Font("Segoe UI", 1, 12)); // NOI18N
         lblRegistro.setForeground(new java.awt.Color(41, 98, 255));
         lblRegistro.setText("¿No tienes cuenta? Registrate");
+        lblRegistro.addMouseListener(new java.awt.event.MouseAdapter() {
+            public void mouseClicked(java.awt.event.MouseEvent evt) {
+                lblRegistroMouseClicked(evt);
+            }
+        });
 
         lblTituloLogin.setFont(new java.awt.Font("Segoe UI", 1, 14)); // NOI18N
         lblTituloLogin.setText("Iniciar sesión");
@@ -136,7 +162,9 @@ public class FrmLoginRegistro extends javax.swing.JFrame {
                 .addGap(42, 42, 42))
         );
 
-        cardPanel.add(panelLogin, "card2");
+        cardPanel.add(panelLogin, "panelLogin");
+
+        panelRegistro.setBackground(new java.awt.Color(255, 255, 255));
 
         lblDni.setText("DNI");
 
@@ -163,10 +191,16 @@ public class FrmLoginRegistro extends javax.swing.JFrame {
 
         btnRegistrar.setBackground(new java.awt.Color(25, 55, 109));
         btnRegistrar.setText("Registrarse");
+        btnRegistrar.addActionListener(this::btnRegistrarActionPerformed);
 
         lblIrLogin.setFont(new java.awt.Font("Segoe UI", 1, 12)); // NOI18N
         lblIrLogin.setForeground(new java.awt.Color(41, 98, 255));
         lblIrLogin.setText("¿Ya tienes cuenta? Inicia sesión");
+        lblIrLogin.addMouseListener(new java.awt.event.MouseAdapter() {
+            public void mouseClicked(java.awt.event.MouseEvent evt) {
+                lblIrLoginMouseClicked(evt);
+            }
+        });
 
         lblDireccionCochera.setFont(new java.awt.Font("Segoe UI", 1, 12)); // NOI18N
         lblDireccionCochera.setText("Direccion de Cochera");
@@ -286,12 +320,12 @@ public class FrmLoginRegistro extends javax.swing.JFrame {
                 .addGap(14, 14, 14))
         );
 
-        cardPanel.add(panelRegistro, "card3");
+        cardPanel.add(panelRegistro, "panelRegistro");
 
-        fondoPanel.add(cardPanel, new org.netbeans.lib.awtextra.AbsoluteConstraints(597, 193, -1, -1));
+        fondoPanel.add(cardPanel, new org.netbeans.lib.awtextra.AbsoluteConstraints(490, 176, -1, -1));
 
         lblFondo.setIcon(new javax.swing.ImageIcon(getClass().getResource("/imagenes/FondoLogin.png"))); // NOI18N
-        fondoPanel.add(lblFondo, new org.netbeans.lib.awtextra.AbsoluteConstraints(0, 0, 1110, 730));
+        fondoPanel.add(lblFondo, new org.netbeans.lib.awtextra.AbsoluteConstraints(0, 0, 1280, 768));
 
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
         getContentPane().setLayout(layout);
@@ -306,6 +340,58 @@ public class FrmLoginRegistro extends javax.swing.JFrame {
 
         pack();
     }// </editor-fold>//GEN-END:initComponents
+
+    private void lblRegistroMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_lblRegistroMouseClicked
+        CardLayout cl = (CardLayout) cardPanel.getLayout();
+        cl.show(cardPanel, "panelRegistro");
+    }//GEN-LAST:event_lblRegistroMouseClicked
+
+    private void lblIrLoginMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_lblIrLoginMouseClicked
+            CardLayout cl = (CardLayout) cardPanel.getLayout();
+            cl.show(cardPanel, "panelLogin");
+    }//GEN-LAST:event_lblIrLoginMouseClicked
+
+    private void btnRegistrarActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnRegistrarActionPerformed
+        
+        try {
+    String nombreCompleto = txtNombres.getText().trim() + " " + txtApellidos.getText().trim();
+
+    Direccion cochera = new Direccion(
+            1,
+            txtDistrito.getText().trim(),
+            txtProvincia.getText().trim(),
+            txtDepartamento.getText().trim(),
+            txtDirección.getText().trim()); 
+
+    usuarioServicio.guardarUsuario(
+            txtDni.getText(),
+            nombreCompleto,
+            cochera,
+            txtCorreoRegistro.getText(),
+            new String(txtContraseñaRegistro.getPassword()));
+
+    javax.swing.JOptionPane.showMessageDialog(this, "Usuario registrado correctamente");
+    limpiarRegistro();
+    ((CardLayout) cardPanel.getLayout()).show(cardPanel, "card2");
+} catch (IllegalArgumentException ex) {
+    javax.swing.JOptionPane.showMessageDialog(this, ex.getMessage(),
+            "Error", javax.swing.JOptionPane.WARNING_MESSAGE);
+}
+    }//GEN-LAST:event_btnRegistrarActionPerformed
+
+    private void btbIngresarActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btbIngresarActionPerformed
+        
+        Usuario u = usuarioServicio.autenticar(
+        txtCorreo.getText(),
+        new String(txtContraseña.getPassword()));
+
+if (u == null) {
+    javax.swing.JOptionPane.showMessageDialog(this, "Correo o contraseña incorrectos",
+            "Error", javax.swing.JOptionPane.ERROR_MESSAGE);
+    return;
+}
+javax.swing.JOptionPane.showMessageDialog(this, "Bienvenido, " + u.getNombre());
+    }//GEN-LAST:event_btbIngresarActionPerformed
 
     /**
      * @param args the command line arguments
@@ -368,4 +454,6 @@ public class FrmLoginRegistro extends javax.swing.JFrame {
     private javax.swing.JTextField txtNombres;
     private javax.swing.JTextField txtProvincia;
     // End of variables declaration//GEN-END:variables
+
+    
 }
