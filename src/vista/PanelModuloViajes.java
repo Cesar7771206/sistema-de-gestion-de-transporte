@@ -3,9 +3,10 @@
  * Click nbfs://nbhost/SystemFileSystem/Templates/GUIForms/JPanel.java to edit this template
  */
 package vista;
+
 import javax.swing.table.DefaultTableModel;
-import controlador.GestorEquipos;
-import controlador.GestorLogistica;
+import servicio.GestorEquipos;
+import servicio.GestorLogistica;
 
 import modelo.Contenedor;
 import modelo.Tractor;
@@ -14,6 +15,10 @@ import modelo.Planta;
 import modelo.Terminal;
 import modelo.Cliente;
 import modelo.Ruta;
+import servicio.GestorViajes;
+import modelo.Viaje;
+import javax.swing.JOptionPane;
+
 /**
  *
  * @author cesar
@@ -23,24 +28,73 @@ public class PanelModuloViajes extends javax.swing.JPanel {
     /**
      * Creates new form PanelControlViajes
      */
-   public PanelModuloViajes() {
+    public PanelModuloViajes() {
     initComponents();
     cargarCombos();
-}
-  private void cargarCombos() {
-
-    cardLayout = new CardLayout();
-    pnlContenido.setLayout(cardLayout);
-
-    pnlContenido.add(new PanelContenedor(), "contenedor");
-    pnlContenido.add(new PanelTractor(), "tractor");
-    pnlContenido.add(new PanelCarreta(), "carreta");
-    pnlContenido.add(new PanelPlanta(), "planta");
-    pnlContenido.add(new PanelTerminal(), "terminal");
-    pnlContenido.add(new PanelCliente(), "cliente");
-    pnlContenido.add(new PanelRuta(), "ruta");
+    cargarTablaViajes();
 }
     
+    private void cargarCombos() {
+
+        cboContenedor.removeAllItems();
+        cboTractor.removeAllItems();
+        cboCarreta.removeAllItems();
+        cboPlanta.removeAllItems();
+        cboTerminal.removeAllItems();
+        cboCliente.removeAllItems();
+        cboRuta.removeAllItems();
+
+        for (Contenedor contenedor : GestorEquipos.getContenedores()) {
+            cboContenedor.addItem(contenedor.getCodigo());
+        }
+
+        for (Tractor tractor : GestorEquipos.getTractores()) {
+            cboTractor.addItem(tractor.getPlaca());
+        }
+
+        for (Carreta carreta : GestorEquipos.getCarretas()) {
+            cboCarreta.addItem(carreta.getPlaca());
+        }
+
+        for (Planta planta : GestorLogistica.getPlantas()) {
+            cboPlanta.addItem(planta.getNombre());
+        }
+
+        for (Terminal terminal : GestorLogistica.getTerminales()) {
+            cboTerminal.addItem(terminal.getNombre());
+        }
+
+        for (Cliente cliente : GestorLogistica.getClientes()) {
+            cboCliente.addItem(cliente.getNombre());
+        }
+
+        for (Ruta ruta : GestorLogistica.getRutas()) {
+            cboRuta.addItem("Ruta " + ruta.getId());
+        }
+    }
+    private void cargarTablaViajes() {
+
+    DefaultTableModel modelo =
+            (DefaultTableModel) tblViajes.getModel();
+
+    
+    modelo.setRowCount(0);
+
+    for (Viaje viaje : GestorViajes.getViajes()) {
+
+        Object[] fila = {
+            viaje.getId(),
+            viaje.getContenedor().getCodigo(),
+            viaje.getTractor().getPlaca(),
+            viaje.getCarreta().getPlaca(),
+            viaje.getCliente().getNombre(),
+            "Ruta " + viaje.getRuta().getId()
+        };
+
+        modelo.addRow(fila);
+    }
+}
+
 
     /**
      * This method is called from within the constructor to initialize the form.
@@ -76,32 +130,40 @@ public class PanelModuloViajes extends javax.swing.JPanel {
         setPreferredSize(new java.awt.Dimension(880, 680));
         setLayout(new org.netbeans.lib.awtextra.AbsoluteLayout());
 
+        jLabel1.setBackground(new java.awt.Color(255, 255, 255));
         jLabel1.setFont(new java.awt.Font("Javanese Text", 1, 36)); // NOI18N
         jLabel1.setText("MODULO VIAJES");
-        jLabel1.setBorder(javax.swing.BorderFactory.createLineBorder(new java.awt.Color(0, 0, 0)));
-        add(jLabel1, new org.netbeans.lib.awtextra.AbsoluteConstraints(50, 30, 320, 60));
+        add(jLabel1, new org.netbeans.lib.awtextra.AbsoluteConstraints(50, 40, 320, 60));
 
-        pnlContenido.setBorder(javax.swing.BorderFactory.createLineBorder(new java.awt.Color(0, 0, 0)));
+        pnlContenido.setBackground(new java.awt.Color(204, 204, 204));
+        pnlContenido.setBorder(javax.swing.BorderFactory.createEtchedBorder());
 
         jLabel2.setFont(new java.awt.Font("Sans Serif Collection", 1, 12)); // NOI18N
         jLabel2.setText("Contenedor:");
 
+        cboTerminal.setBackground(new java.awt.Color(0, 153, 153));
         cboTerminal.setModel(new javax.swing.DefaultComboBoxModel<>(new String[] { "Item 1", "Item 2", "Item 3", "Item 4" }));
 
         jLabel3.setFont(new java.awt.Font("Sans Serif Collection", 1, 12)); // NOI18N
         jLabel3.setText("Tractor:");
 
+        cboCliente.setBackground(new java.awt.Color(0, 153, 153));
         cboCliente.setModel(new javax.swing.DefaultComboBoxModel<>(new String[] { "Item 1", "Item 2", "Item 3", "Item 4" }));
 
         jLabel4.setFont(new java.awt.Font("Sans Serif Collection", 1, 12)); // NOI18N
         jLabel4.setText("Carreta:");
 
+        cboRuta.setBackground(new java.awt.Color(0, 153, 153));
         cboRuta.setModel(new javax.swing.DefaultComboBoxModel<>(new String[] { "Item 1", "Item 2", "Item 3", "Item 4" }));
 
         jLabel5.setFont(new java.awt.Font("Sans Serif Collection", 1, 12)); // NOI18N
         jLabel5.setText("Terminal:");
 
+        jButton1.setBackground(new java.awt.Color(0, 153, 153));
         jButton1.setText("REGISTRAR VIAJE");
+        jButton1.setToolTipText("");
+        jButton1.setBorder(javax.swing.BorderFactory.createBevelBorder(javax.swing.border.BevelBorder.RAISED));
+        jButton1.addActionListener(this::jButton1ActionPerformed);
 
         jLabel6.setFont(new java.awt.Font("Sans Serif Collection", 1, 12)); // NOI18N
         jLabel6.setText("Cliente:");
@@ -112,15 +174,19 @@ public class PanelModuloViajes extends javax.swing.JPanel {
         jLabel8.setFont(new java.awt.Font("Sans Serif Collection", 1, 12)); // NOI18N
         jLabel8.setText("Planta:");
 
+        cboContenedor.setBackground(new java.awt.Color(0, 153, 153));
         cboContenedor.setModel(new javax.swing.DefaultComboBoxModel<>(new String[] { "Item 1", "Item 2", "Item 3", "Item 4" }));
 
+        cboTractor.setBackground(new java.awt.Color(0, 153, 153));
         cboTractor.setModel(new javax.swing.DefaultComboBoxModel<>(new String[] { "Item 1", "Item 2", "Item 3", "Item 4" }));
 
+        cboCarreta.setBackground(new java.awt.Color(0, 153, 153));
         cboCarreta.setModel(new javax.swing.DefaultComboBoxModel<>(new String[] { "Item 1", "Item 2", "Item 3", "Item 4" }));
 
         jLabel9.setFont(new java.awt.Font("Sans Serif Collection", 1, 14)); // NOI18N
         jLabel9.setText("REGISTRAR / EDITAR VIAJE");
 
+        cboPlanta.setBackground(new java.awt.Color(0, 153, 153));
         cboPlanta.setModel(new javax.swing.DefaultComboBoxModel<>(new String[] { "Item 1", "Item 2", "Item 3", "Item 4" }));
 
         javax.swing.GroupLayout pnlContenidoLayout = new javax.swing.GroupLayout(pnlContenido);
@@ -130,7 +196,7 @@ public class PanelModuloViajes extends javax.swing.JPanel {
             .addGroup(pnlContenidoLayout.createSequentialGroup()
                 .addGap(199, 199, 199)
                 .addComponent(jLabel9)
-                .addContainerGap(295, Short.MAX_VALUE))
+                .addContainerGap(293, Short.MAX_VALUE))
             .addGroup(pnlContenidoLayout.createSequentialGroup()
                 .addGap(24, 24, 24)
                 .addGroup(pnlContenidoLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
@@ -193,10 +259,11 @@ public class PanelModuloViajes extends javax.swing.JPanel {
                     .addGroup(pnlContenidoLayout.createSequentialGroup()
                         .addGap(45, 45, 45)
                         .addComponent(jButton1)))
-                .addContainerGap(23, Short.MAX_VALUE))
+                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
         );
 
         add(pnlContenido, new org.netbeans.lib.awtextra.AbsoluteConstraints(50, 100, 680, 290));
+        pnlContenido.getAccessibleContext().setAccessibleName("");
 
         tblViajes.setModel(new javax.swing.table.DefaultTableModel(
             new Object [][] {
@@ -206,13 +273,83 @@ public class PanelModuloViajes extends javax.swing.JPanel {
                 {null, null, null, null, null, null}
             },
             new String [] {
-                "ID", "Destino", "Fecha", "Origen", "Transporte", "Estado"
+                "ID", "Contenedor", "Tractor", "Carreta", "Cliente", "Ruta"
             }
         ));
         jScrollPane1.setViewportView(tblViajes);
 
         add(jScrollPane1, new org.netbeans.lib.awtextra.AbsoluteConstraints(50, 400, 680, 260));
     }// </editor-fold>//GEN-END:initComponents
+
+    private void jButton1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton1ActionPerformed
+        if (cboContenedor.getSelectedIndex() == -1
+                || cboTractor.getSelectedIndex() == -1
+                || cboCarreta.getSelectedIndex() == -1
+                || cboPlanta.getSelectedIndex() == -1
+                || cboTerminal.getSelectedIndex() == -1
+                || cboCliente.getSelectedIndex() == -1
+                || cboRuta.getSelectedIndex() == -1) {
+
+            JOptionPane.showMessageDialog(
+                    this,
+                    "Debe seleccionar todos los datos del viaje."
+            );
+
+            return;
+        }
+
+        Contenedor contenedor
+                = GestorEquipos.getContenedores()
+                        .get(cboContenedor.getSelectedIndex());
+
+        Tractor tractor
+                = GestorEquipos.getTractores()
+                        .get(cboTractor.getSelectedIndex());
+
+        Carreta carreta
+                = GestorEquipos.getCarretas()
+                        .get(cboCarreta.getSelectedIndex());
+
+        Planta planta
+                = GestorLogistica.getPlantas()
+                        .get(cboPlanta.getSelectedIndex());
+
+        Terminal terminal
+                = GestorLogistica.getTerminales()
+                        .get(cboTerminal.getSelectedIndex());
+
+        Cliente cliente
+                = GestorLogistica.getClientes()
+                        .get(cboCliente.getSelectedIndex());
+
+        Ruta ruta
+                = GestorLogistica.getRutas()
+                        .get(cboRuta.getSelectedIndex());
+
+
+        int id = GestorViajes.generarId();
+
+
+        Viaje nuevoViaje = new Viaje(
+                id,
+                contenedor,
+                tractor,
+                carreta,
+                planta,
+                terminal,
+                cliente,
+                ruta
+        );
+
+
+        GestorViajes.agregarViaje(nuevoViaje);
+        cargarTablaViajes();
+
+        JOptionPane.showMessageDialog(
+                this,
+                "Viaje registrado correctamente."
+        );
+    }//GEN-LAST:event_jButton1ActionPerformed
 
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
