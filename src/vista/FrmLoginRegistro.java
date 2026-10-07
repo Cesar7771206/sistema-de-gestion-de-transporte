@@ -47,14 +47,6 @@ public class FrmLoginRegistro extends javax.swing.JFrame {
 
         fondoPanel = new javax.swing.JPanel();
         cardPanel = new javax.swing.JPanel();
-        panelLogin = new javax.swing.JPanel();
-        txtCorreo = new javax.swing.JTextField();
-        txtContraseña = new javax.swing.JPasswordField();
-        btbIngresar = new javax.swing.JButton();
-        lblCorreo = new javax.swing.JLabel();
-        lblContraseña = new javax.swing.JLabel();
-        lblRegistro = new javax.swing.JLabel();
-        lblTituloLogin = new javax.swing.JLabel();
         panelRegistro = new javax.swing.JPanel();
         lblDni = new javax.swing.JLabel();
         txtDni = new javax.swing.JTextField();
@@ -78,91 +70,23 @@ public class FrmLoginRegistro extends javax.swing.JFrame {
         txtDistrito = new javax.swing.JTextField();
         txtProvincia = new javax.swing.JTextField();
         txtDirección = new javax.swing.JTextField();
+        panelLogin = new javax.swing.JPanel();
+        txtCorreo = new javax.swing.JTextField();
+        txtContraseña = new javax.swing.JPasswordField();
+        btbIngresar = new javax.swing.JButton();
+        lblCorreo = new javax.swing.JLabel();
+        lblContraseña = new javax.swing.JLabel();
+        lblRegistro = new javax.swing.JLabel();
+        lblTituloLogin = new javax.swing.JLabel();
         lblFondo = new javax.swing.JLabel();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
-        setPreferredSize(new java.awt.Dimension(1110, 730));
 
         fondoPanel.setBackground(new java.awt.Color(204, 204, 204));
         fondoPanel.setLayout(new org.netbeans.lib.awtextra.AbsoluteLayout());
 
         cardPanel.setBackground(new java.awt.Color(204, 204, 204));
         cardPanel.setLayout(new java.awt.CardLayout());
-
-        panelLogin.setBackground(new java.awt.Color(255, 255, 255));
-
-        txtCorreo.setBorder(javax.swing.BorderFactory.createLineBorder(new java.awt.Color(0, 0, 0)));
-
-        txtContraseña.setBorder(javax.swing.BorderFactory.createLineBorder(new java.awt.Color(0, 0, 0)));
-
-        btbIngresar.setBackground(new java.awt.Color(25, 55, 105));
-        btbIngresar.setText("Ingresar");
-        btbIngresar.addActionListener(this::btbIngresarActionPerformed);
-
-        lblCorreo.setText("Correo  Electrónico");
-
-        lblContraseña.setText("Contraseña");
-
-        lblRegistro.setFont(new java.awt.Font("Segoe UI", 1, 12)); // NOI18N
-        lblRegistro.setForeground(new java.awt.Color(41, 98, 255));
-        lblRegistro.setText("¿No tienes cuenta? Registrate");
-        lblRegistro.addMouseListener(new java.awt.event.MouseAdapter() {
-            public void mouseClicked(java.awt.event.MouseEvent evt) {
-                lblRegistroMouseClicked(evt);
-            }
-        });
-
-        lblTituloLogin.setFont(new java.awt.Font("Segoe UI", 1, 14)); // NOI18N
-        lblTituloLogin.setText("Iniciar sesión");
-
-        javax.swing.GroupLayout panelLoginLayout = new javax.swing.GroupLayout(panelLogin);
-        panelLogin.setLayout(panelLoginLayout);
-        panelLoginLayout.setHorizontalGroup(
-            panelLoginLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, panelLoginLayout.createSequentialGroup()
-                .addContainerGap(68, Short.MAX_VALUE)
-                .addGroup(panelLoginLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
-                    .addComponent(lblRegistro)
-                    .addGroup(panelLoginLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING, false)
-                        .addComponent(txtContraseña, javax.swing.GroupLayout.DEFAULT_SIZE, 113, Short.MAX_VALUE)
-                        .addComponent(txtCorreo)))
-                .addGap(67, 67, 67))
-            .addGroup(panelLoginLayout.createSequentialGroup()
-                .addGroup(panelLoginLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addGroup(panelLoginLayout.createSequentialGroup()
-                        .addGap(52, 52, 52)
-                        .addGroup(panelLoginLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                            .addComponent(lblCorreo)
-                            .addComponent(lblContraseña, javax.swing.GroupLayout.PREFERRED_SIZE, 70, javax.swing.GroupLayout.PREFERRED_SIZE)))
-                    .addGroup(panelLoginLayout.createSequentialGroup()
-                        .addGap(100, 100, 100)
-                        .addComponent(btbIngresar, javax.swing.GroupLayout.PREFERRED_SIZE, 98, javax.swing.GroupLayout.PREFERRED_SIZE))
-                    .addGroup(panelLoginLayout.createSequentialGroup()
-                        .addGap(105, 105, 105)
-                        .addComponent(lblTituloLogin)))
-                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
-        );
-        panelLoginLayout.setVerticalGroup(
-            panelLoginLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(panelLoginLayout.createSequentialGroup()
-                .addContainerGap(87, Short.MAX_VALUE)
-                .addComponent(lblTituloLogin, javax.swing.GroupLayout.PREFERRED_SIZE, 26, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addGap(32, 32, 32)
-                .addComponent(lblCorreo, javax.swing.GroupLayout.PREFERRED_SIZE, 26, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(txtCorreo, javax.swing.GroupLayout.PREFERRED_SIZE, 18, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addGap(18, 18, 18)
-                .addComponent(lblContraseña, javax.swing.GroupLayout.PREFERRED_SIZE, 24, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addGap(4, 4, 4)
-                .addComponent(txtContraseña, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addGap(45, 45, 45)
-                .addComponent(btbIngresar)
-                .addGap(18, 18, 18)
-                .addComponent(lblRegistro, javax.swing.GroupLayout.PREFERRED_SIZE, 28, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addGap(42, 42, 42))
-        );
-
-        cardPanel.add(panelLogin, "panelLogin");
 
         panelRegistro.setBackground(new java.awt.Color(255, 255, 255));
 
@@ -242,7 +166,7 @@ public class FrmLoginRegistro extends javax.swing.JFrame {
                 .addGroup(panelRegistroLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addGroup(panelRegistroLayout.createSequentialGroup()
                         .addGroup(panelRegistroLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
-                            .addComponent(lblContraseñaRegistro, javax.swing.GroupLayout.DEFAULT_SIZE, 61, Short.MAX_VALUE)
+                            .addComponent(lblContraseñaRegistro, javax.swing.GroupLayout.PREFERRED_SIZE, 61, Short.MAX_VALUE)
                             .addComponent(lblDni, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                             .addComponent(lblApellidos, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                             .addComponent(lblNombres, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
@@ -321,6 +245,81 @@ public class FrmLoginRegistro extends javax.swing.JFrame {
         );
 
         cardPanel.add(panelRegistro, "panelRegistro");
+
+        panelLogin.setBackground(new java.awt.Color(255, 255, 255));
+
+        txtCorreo.setBorder(javax.swing.BorderFactory.createLineBorder(new java.awt.Color(0, 0, 0)));
+
+        txtContraseña.setBorder(javax.swing.BorderFactory.createLineBorder(new java.awt.Color(0, 0, 0)));
+
+        btbIngresar.setBackground(new java.awt.Color(25, 55, 105));
+        btbIngresar.setText("Ingresar");
+        btbIngresar.addActionListener(this::btbIngresarActionPerformed);
+
+        lblCorreo.setText("Correo  Electrónico");
+
+        lblContraseña.setText("Contraseña");
+
+        lblRegistro.setFont(new java.awt.Font("Segoe UI", 1, 12)); // NOI18N
+        lblRegistro.setForeground(new java.awt.Color(41, 98, 255));
+        lblRegistro.setText("¿No tienes cuenta? Registrate");
+        lblRegistro.addMouseListener(new java.awt.event.MouseAdapter() {
+            public void mouseClicked(java.awt.event.MouseEvent evt) {
+                lblRegistroMouseClicked(evt);
+            }
+        });
+
+        lblTituloLogin.setFont(new java.awt.Font("Segoe UI", 1, 14)); // NOI18N
+        lblTituloLogin.setText("Iniciar sesión");
+
+        javax.swing.GroupLayout panelLoginLayout = new javax.swing.GroupLayout(panelLogin);
+        panelLogin.setLayout(panelLoginLayout);
+        panelLoginLayout.setHorizontalGroup(
+            panelLoginLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, panelLoginLayout.createSequentialGroup()
+                .addContainerGap(68, Short.MAX_VALUE)
+                .addGroup(panelLoginLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
+                    .addComponent(lblRegistro)
+                    .addGroup(panelLoginLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING, false)
+                        .addComponent(txtContraseña, javax.swing.GroupLayout.DEFAULT_SIZE, 113, Short.MAX_VALUE)
+                        .addComponent(txtCorreo)))
+                .addGap(67, 67, 67))
+            .addGroup(panelLoginLayout.createSequentialGroup()
+                .addGroup(panelLoginLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addGroup(panelLoginLayout.createSequentialGroup()
+                        .addGap(52, 52, 52)
+                        .addGroup(panelLoginLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                            .addComponent(lblCorreo)
+                            .addComponent(lblContraseña, javax.swing.GroupLayout.PREFERRED_SIZE, 70, javax.swing.GroupLayout.PREFERRED_SIZE)))
+                    .addGroup(panelLoginLayout.createSequentialGroup()
+                        .addGap(100, 100, 100)
+                        .addComponent(btbIngresar, javax.swing.GroupLayout.PREFERRED_SIZE, 98, javax.swing.GroupLayout.PREFERRED_SIZE))
+                    .addGroup(panelLoginLayout.createSequentialGroup()
+                        .addGap(105, 105, 105)
+                        .addComponent(lblTituloLogin)))
+                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+        );
+        panelLoginLayout.setVerticalGroup(
+            panelLoginLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(panelLoginLayout.createSequentialGroup()
+                .addContainerGap(87, Short.MAX_VALUE)
+                .addComponent(lblTituloLogin, javax.swing.GroupLayout.PREFERRED_SIZE, 26, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addGap(32, 32, 32)
+                .addComponent(lblCorreo, javax.swing.GroupLayout.PREFERRED_SIZE, 26, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addComponent(txtCorreo, javax.swing.GroupLayout.PREFERRED_SIZE, 18, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addGap(18, 18, 18)
+                .addComponent(lblContraseña, javax.swing.GroupLayout.PREFERRED_SIZE, 24, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addGap(4, 4, 4)
+                .addComponent(txtContraseña, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addGap(45, 45, 45)
+                .addComponent(btbIngresar)
+                .addGap(18, 18, 18)
+                .addComponent(lblRegistro, javax.swing.GroupLayout.PREFERRED_SIZE, 28, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addGap(42, 42, 42))
+        );
+
+        cardPanel.add(panelLogin, "panelLogin");
 
         fondoPanel.add(cardPanel, new org.netbeans.lib.awtextra.AbsoluteConstraints(490, 176, -1, -1));
 
