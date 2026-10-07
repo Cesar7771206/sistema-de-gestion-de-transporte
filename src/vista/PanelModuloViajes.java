@@ -4,6 +4,16 @@
  */
 package vista;
 import javax.swing.table.DefaultTableModel;
+import controlador.GestorEquipos;
+import controlador.GestorLogistica;
+
+import modelo.Contenedor;
+import modelo.Tractor;
+import modelo.Carreta;
+import modelo.Planta;
+import modelo.Terminal;
+import modelo.Cliente;
+import modelo.Ruta;
 /**
  *
  * @author cesar
@@ -15,8 +25,48 @@ public class PanelModuloViajes extends javax.swing.JPanel {
      */
    public PanelModuloViajes() {
     initComponents();
+    cargarCombos();
+}
+  private void cargarCombos() {
 
     
+    cboContenedor.removeAllItems();
+    cboTractor.removeAllItems();
+    cboCarreta.removeAllItems();
+    cboPlanta.removeAllItems();
+    cboTerminal.removeAllItems();
+    cboCliente.removeAllItems();
+    cboRuta.removeAllItems();
+
+    // EQUIPOS
+    for (Contenedor contenedor : GestorEquipos.getContenedores()) {
+        cboContenedor.addItem(contenedor.getCodigo());
+    }
+
+    for (Tractor tractor : GestorEquipos.getTractores()) {
+        cboTractor.addItem(tractor.getPlaca());
+    }
+
+    for (Carreta carreta : GestorEquipos.getCarretas()) {
+        cboCarreta.addItem(carreta.getPlaca());
+    }
+
+    // LOGÍSTICA
+    for (Planta planta : GestorLogistica.getPlantas()) {
+        cboPlanta.addItem(planta.getNombre());
+    }
+
+    for (Terminal terminal : GestorLogistica.getTerminales()) {
+        cboTerminal.addItem(terminal.getNombre());
+    }
+
+    for (Cliente cliente : GestorLogistica.getClientes()) {
+        cboCliente.addItem(cliente.getNombre());
+    }
+
+    for (Ruta ruta : GestorLogistica.getRutas()) {
+        cboRuta.addItem("Ruta " + ruta.getId());
+    }
 }
     
 
