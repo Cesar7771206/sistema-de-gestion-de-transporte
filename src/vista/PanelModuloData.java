@@ -77,7 +77,7 @@ public class PanelModuloData extends javax.swing.JPanel {
             .addGap(0, 538, Short.MAX_VALUE)
         );
 
-        add(pnlContenidoData, new org.netbeans.lib.awtextra.AbsoluteConstraints(30, 90, 810, 540));
+        add(pnlContenidoData, new org.netbeans.lib.awtextra.AbsoluteConstraints(30, 80, 810, 540));
     }// </editor-fold>//GEN-END:initComponents
 
     private void cboOpcionesActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_cboOpcionesActionPerformed
