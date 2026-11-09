@@ -1,53 +1,96 @@
+
 package servicio;
 
 import java.util.LinkedList;
+import java.util.Stack;
+import java.util.Queue;
 import modelo.Viaje;
 
 public class GestorViajes {
 
+    // LISTA ENLAZADA: almacena todos los viajes
     private static LinkedList<Viaje> viajes = new LinkedList<>();
 
- 
+    // PILA: almacena los viajes eliminados
+    private static Stack<Viaje> pilaEliminados = new Stack<>();
+
+    // COLA: almacena los viajes pendientes
+    private static Queue<Viaje> colaPendientes = new LinkedList<>();
+
+    // AGREGAR VIAJE NORMAL
     public static void agregarViaje(Viaje viaje) {
         viajes.addLast(viaje);
+        colaPendientes.offer(viaje);
     }
 
+    // AGREGAR VIAJE URGENTE
     public static void agregarViajeUrgente(Viaje viaje) {
         viajes.addFirst(viaje);
+        colaPendientes.offer(viaje);
     }
 
- 
+    // OBTENER TODOS LOS VIAJES
     public static LinkedList<Viaje> getViajes() {
         return viajes;
     }
 
-   
-    public static int generarId() {
+    // ELIMINAR VIAJE Y GUARDARLO EN LA PILA
+    public static boolean eliminarViaje(Viaje viaje) {
 
-    int mayorId = 0;
-
-    for (Viaje viaje : viajes) {
-        if (viaje.getId() > mayorId) {
-            mayorId = viaje.getId();
+        if (viajes.remove(viaje)) {
+            pilaEliminados.push(viaje);
+            colaPendientes.remove(viaje);
+            return true;
         }
+
+        return false;
     }
 
-    return mayorId + 1;
-}
+    // RECUPERAR EL ÚLTIMO VIAJE ELIMINADO
+    public static Viaje recuperarViaje() {
 
-    
-    public static Viaje buscarPorContenedor(String codigo) {
+        if (!pilaEliminados.empty()) {
 
-        for (Viaje viaje : viajes) {
+            Viaje viaje = pilaEliminados.pop();
 
-            if (viaje.getContenedor()
-                    .getCodigo()
-                    .equalsIgnoreCase(codigo)) {
+            viajes.addLast(viaje);
+            colaPendientes.offer(viaje);
 
-                return viaje;
-            }
+            return viaje;
         }
 
         return null;
     }
+
+    // ATENDER EL SIGUIENTE VIAJE
+    public static Viaje atenderSiguienteViaje() {
+        return colaPendientes.poll();
+    }
+
+    // CONSULTAR SIGUIENTE VIAJE PENDIENTE
+    public static Viaje getSiguientePendiente() {
+        return colaPendientes.peek();
+    }
+
+    // CONSULTAR CANTIDAD DE VIAJES PENDIENTES
+    public static int getCantidadPendientes() {
+        return colaPendientes.size();
+    }
+    // GENERAR ID AUTOMÁTICO PARA LOS VIAJES
+public static int generarId() {
+
+    int mayor = 0;
+
+    for (Viaje viaje : viajes) {
+        if (viaje.getId() > mayor) {
+            mayor = viaje.getId();
+        }
+    }
+
+    return mayor + 1;
+}
+
+public static LinkedList<Viaje> getColaPendientes() {
+    return new LinkedList<>(colaPendientes);
+}
 }

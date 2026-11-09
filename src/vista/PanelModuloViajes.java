@@ -32,11 +32,11 @@ public class PanelModuloViajes extends javax.swing.JPanel {
      * Creates new form PanelControlViajes
      */
     public PanelModuloViajes() {
-        initComponents();
-        cargarCombos();
-        cargarTablaViajes();
-
-    }
+    initComponents();
+    cargarCombos();
+    cargarTablaViajes();
+    actualizarContadorPendientes();
+}
 
     public void cargarCombos() {
 
@@ -117,7 +117,8 @@ public class PanelModuloViajes extends javax.swing.JPanel {
         jLabel4 = new javax.swing.JLabel();
         cboRuta = new javax.swing.JComboBox<>();
         jLabel5 = new javax.swing.JLabel();
-        jButton1 = new javax.swing.JButton();
+        btnRegistrarViaje = new javax.swing.JButton();
+        btnRegistrarUrgencia = new javax.swing.JButton();
         jLabel6 = new javax.swing.JLabel();
         jLabel7 = new javax.swing.JLabel();
         jLabel8 = new javax.swing.JLabel();
@@ -131,7 +132,10 @@ public class PanelModuloViajes extends javax.swing.JPanel {
         btnEliminar = new javax.swing.JButton();
         btnActualizar = new javax.swing.JButton();
         btnEditar = new javax.swing.JButton();
-        btnRegistrarUrgencia = new javax.swing.JButton();
+        btnRecuperar = new javax.swing.JButton();
+        btnAtender = new javax.swing.JButton();
+        btnPendientes = new javax.swing.JButton();
+        lblContadorPendientes = new javax.swing.JLabel();
 
         setBackground(new java.awt.Color(255, 255, 255));
         setPreferredSize(new java.awt.Dimension(880, 680));
@@ -169,11 +173,11 @@ public class PanelModuloViajes extends javax.swing.JPanel {
         jLabel5.setFont(new java.awt.Font("Sans Serif Collection", 1, 12)); // NOI18N
         jLabel5.setText("Terminal:");
 
-        jButton1.setBackground(new java.awt.Color(0, 153, 153));
-        jButton1.setText("REGISTRAR VIAJE");
-        jButton1.setToolTipText("");
-        jButton1.setBorder(javax.swing.BorderFactory.createBevelBorder(javax.swing.border.BevelBorder.RAISED));
-        jButton1.addActionListener(this::jButton1ActionPerformed);
+        btnRegistrarViaje.setBackground(new java.awt.Color(0, 153, 153));
+        btnRegistrarViaje.setText("REGISTRAR VIAJE");
+        btnRegistrarViaje.setToolTipText("");
+        btnRegistrarViaje.setBorder(javax.swing.BorderFactory.createBevelBorder(javax.swing.border.BevelBorder.RAISED));
+        btnRegistrarViaje.addActionListener(this::btnRegistrarViajeActionPerformed);
 
         btnRegistrarUrgencia.setBackground(new java.awt.Color(0, 153, 153));
         btnRegistrarUrgencia.setText("REGISTRAR CON URGENCIA");
@@ -216,7 +220,7 @@ public class PanelModuloViajes extends javax.swing.JPanel {
             .addGroup(pnlContenidoLayout.createSequentialGroup()
                 .addGap(199, 199, 199)
                 .addComponent(jLabel9)
-                .addContainerGap(413, Short.MAX_VALUE))
+                .addContainerGap(423, Short.MAX_VALUE))
             .addGroup(pnlContenidoLayout.createSequentialGroup()
                 .addGap(24, 24, 24)
                 .addGroup(pnlContenidoLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
@@ -244,7 +248,7 @@ public class PanelModuloViajes extends javax.swing.JPanel {
                             .addComponent(cboRuta, 0, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)))
                     .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, pnlContenidoLayout.createSequentialGroup()
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                        .addComponent(jButton1, javax.swing.GroupLayout.PREFERRED_SIZE, 191, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addComponent(btnRegistrarViaje, javax.swing.GroupLayout.PREFERRED_SIZE, 191, javax.swing.GroupLayout.PREFERRED_SIZE)
                         .addGap(10, 10, 10)
                         .addComponent(btnRegistrarUrgencia, javax.swing.GroupLayout.PREFERRED_SIZE, 191, javax.swing.GroupLayout.PREFERRED_SIZE)
                         .addGap(39, 39, 39))))
@@ -282,12 +286,12 @@ public class PanelModuloViajes extends javax.swing.JPanel {
                     .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, pnlContenidoLayout.createSequentialGroup()
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                         .addGroup(pnlContenidoLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                            .addComponent(jButton1)
+                            .addComponent(btnRegistrarViaje)
                             .addComponent(btnRegistrarUrgencia))
                         .addGap(24, 24, 24))))
         );
 
-        add(pnlContenido, new org.netbeans.lib.awtextra.AbsoluteConstraints(50, 100, 800, 290));
+        add(pnlContenido, new org.netbeans.lib.awtextra.AbsoluteConstraints(40, 100, 810, 290));
         pnlContenido.getAccessibleContext().setAccessibleName("");
 
         tblViajes.setModel(new javax.swing.table.DefaultTableModel(
@@ -303,31 +307,56 @@ public class PanelModuloViajes extends javax.swing.JPanel {
         ));
         jScrollPane1.setViewportView(tblViajes);
 
-        add(jScrollPane1, new org.netbeans.lib.awtextra.AbsoluteConstraints(50, 400, 660, 260));
+        add(jScrollPane1, new org.netbeans.lib.awtextra.AbsoluteConstraints(40, 430, 660, 230));
 
         btnEliminar.setBackground(new java.awt.Color(255, 51, 51));
         btnEliminar.setFont(new java.awt.Font("Sans Serif Collection", 0, 12)); // NOI18N
         btnEliminar.setText("ELIMINAR");
         btnEliminar.setBorder(javax.swing.BorderFactory.createBevelBorder(javax.swing.border.BevelBorder.RAISED));
         btnEliminar.addActionListener(this::btnEliminarActionPerformed);
-        add(btnEliminar, new org.netbeans.lib.awtextra.AbsoluteConstraints(740, 440, 110, -1));
+        add(btnEliminar, new org.netbeans.lib.awtextra.AbsoluteConstraints(710, 400, 150, 30));
 
         btnActualizar.setBackground(new java.awt.Color(153, 153, 153));
         btnActualizar.setFont(new java.awt.Font("Sans Serif Collection", 0, 12)); // NOI18N
         btnActualizar.setText("ACTUALIZAR");
         btnActualizar.setBorder(javax.swing.BorderFactory.createBevelBorder(javax.swing.border.BevelBorder.RAISED));
         btnActualizar.addActionListener(this::btnActualizarActionPerformed);
-        add(btnActualizar, new org.netbeans.lib.awtextra.AbsoluteConstraints(740, 500, 110, 40));
+        add(btnActualizar, new org.netbeans.lib.awtextra.AbsoluteConstraints(710, 440, 150, 30));
 
         btnEditar.setBackground(new java.awt.Color(0, 153, 153));
         btnEditar.setFont(new java.awt.Font("Sans Serif Collection", 0, 12)); // NOI18N
         btnEditar.setText("EDITAR");
         btnEditar.setBorder(javax.swing.BorderFactory.createBevelBorder(javax.swing.border.BevelBorder.RAISED));
         btnEditar.addActionListener(this::btnEditarActionPerformed);
-        add(btnEditar, new org.netbeans.lib.awtextra.AbsoluteConstraints(740, 560, 110, -1));
+        add(btnEditar, new org.netbeans.lib.awtextra.AbsoluteConstraints(710, 480, 150, 30));
+
+        btnRecuperar.setBackground(new java.awt.Color(153, 0, 153));
+        btnRecuperar.setFont(new java.awt.Font("Sans Serif Collection", 0, 12)); // NOI18N
+        btnRecuperar.setText("RECUPERAR VIAJE");
+        btnRecuperar.setBorder(javax.swing.BorderFactory.createBevelBorder(javax.swing.border.BevelBorder.RAISED));
+        btnRecuperar.addActionListener(this::btnRecuperarActionPerformed);
+        add(btnRecuperar, new org.netbeans.lib.awtextra.AbsoluteConstraints(710, 520, 150, 30));
+
+        btnAtender.setBackground(new java.awt.Color(51, 153, 0));
+        btnAtender.setFont(new java.awt.Font("Sans Serif Collection", 0, 12)); // NOI18N
+        btnAtender.setText("ATENDER SIGUIENTE");
+        btnAtender.setBorder(javax.swing.BorderFactory.createBevelBorder(javax.swing.border.BevelBorder.RAISED));
+        btnAtender.addActionListener(this::btnAtenderActionPerformed);
+        add(btnAtender, new org.netbeans.lib.awtextra.AbsoluteConstraints(710, 560, 150, 30));
+
+        btnPendientes.setBackground(new java.awt.Color(0, 102, 204));
+        btnPendientes.setFont(new java.awt.Font("Sans Serif Collection", 0, 12)); // NOI18N
+        btnPendientes.setText("VER PENDIENTES");
+        btnPendientes.setBorder(javax.swing.BorderFactory.createBevelBorder(javax.swing.border.BevelBorder.RAISED));
+        btnPendientes.addActionListener(this::btnPendientesActionPerformed);
+        add(btnPendientes, new org.netbeans.lib.awtextra.AbsoluteConstraints(710, 600, 150, 30));
+
+        lblContadorPendientes.setFont(new java.awt.Font("Sans Serif Collection", 1, 14)); // NOI18N
+        lblContadorPendientes.setText("VIAJES PENDIENTES: 0");
+        add(lblContadorPendientes, new org.netbeans.lib.awtextra.AbsoluteConstraints(40, 390, -1, -1));
     }// </editor-fold>//GEN-END:initComponents
 
-    private void jButton1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton1ActionPerformed
+    private void btnRegistrarViajeActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnRegistrarViajeActionPerformed
         if (cboContenedor.getSelectedIndex() == -1
                 || cboTractor.getSelectedIndex() == -1
                 || cboCarreta.getSelectedIndex() == -1
@@ -387,12 +416,13 @@ public class PanelModuloViajes extends javax.swing.JPanel {
 
         GestorViajes.agregarViaje(nuevoViaje);
         cargarTablaViajes();
+        actualizarContadorPendientes();
 
         JOptionPane.showMessageDialog(
                 this,
                 "Viaje registrado correctamente."
         );
-    }//GEN-LAST:event_jButton1ActionPerformed
+    }//GEN-LAST:event_btnRegistrarViajeActionPerformed
 
     private void btnRegistrarUrgenciaActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnRegistrarUrgenciaActionPerformed
         if (cboContenedor.getSelectedIndex() == -1
@@ -454,6 +484,7 @@ public class PanelModuloViajes extends javax.swing.JPanel {
 
         GestorViajes.agregarViajeUrgente(nuevoViaje);
         cargarTablaViajes();
+        actualizarContadorPendientes();
 
         JOptionPane.showMessageDialog(
                 this,
@@ -655,9 +686,9 @@ public class PanelModuloViajes extends javax.swing.JPanel {
             return;
         }
 
-        GestorViajes.getViajes().remove(viajeEliminar);
-
+        GestorViajes.eliminarViaje(viajeEliminar);
         cargarTablaViajes();
+        actualizarContadorPendientes();
 
         idViajeEditando = -1;
 
@@ -667,12 +698,83 @@ public class PanelModuloViajes extends javax.swing.JPanel {
         );
     }//GEN-LAST:event_btnEliminarActionPerformed
 
+    private void btnAtenderActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnAtenderActionPerformed
+        Viaje viaje = GestorViajes.atenderSiguienteViaje();
+        actualizarContadorPendientes();
+
+    if (viaje != null) {
+
+        JOptionPane.showMessageDialog(
+                this,
+                "Se atendió el viaje ID: " + viaje.getId()
+        );
+
+    } else {
+
+        JOptionPane.showMessageDialog(
+                this,
+                "No hay viajes pendientes en la cola."
+        );
+    }
+    }//GEN-LAST:event_btnAtenderActionPerformed
+
+    private void btnPendientesActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnPendientesActionPerformed
+          StringBuilder mensaje = new StringBuilder();
+          actualizarContadorPendientes();
+
+    for (Viaje viaje : GestorViajes.getColaPendientes()) {
+
+        mensaje.append("Viaje ID: ")
+                .append(viaje.getId())
+                .append("\n");
+    }
+
+    if (mensaje.length() == 0) {
+
+        mensaje.append("No hay viajes pendientes.");
+
+    }
+
+    JOptionPane.showMessageDialog(
+            this,
+            mensaje.toString(),
+            "VIAJES PENDIENTES",
+            JOptionPane.INFORMATION_MESSAGE
+    );
+    }//GEN-LAST:event_btnPendientesActionPerformed
+
+    private void btnRecuperarActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnRecuperarActionPerformed
+         Viaje viaje = GestorViajes.recuperarViaje();
+         actualizarContadorPendientes();
+
+    if (viaje != null) {
+
+        cargarTablaViajes();
+
+        JOptionPane.showMessageDialog(
+                this,
+                "Se recuperó el viaje ID: " + viaje.getId()
+        );
+
+    } else {
+
+        JOptionPane.showMessageDialog(
+                this,
+                "No hay viajes eliminados para recuperar."
+        );
+    }
+    }//GEN-LAST:event_btnRecuperarActionPerformed
+
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JButton btnActualizar;
+    private javax.swing.JButton btnAtender;
     private javax.swing.JButton btnEditar;
     private javax.swing.JButton btnEliminar;
+    private javax.swing.JButton btnPendientes;
+    private javax.swing.JButton btnRecuperar;
     private javax.swing.JButton btnRegistrarUrgencia;
+    private javax.swing.JButton btnRegistrarViaje;
     private javax.swing.JComboBox<String> cboCarreta;
     private javax.swing.JComboBox<String> cboCliente;
     private javax.swing.JComboBox<String> cboContenedor;
@@ -680,7 +782,6 @@ public class PanelModuloViajes extends javax.swing.JPanel {
     private javax.swing.JComboBox<String> cboRuta;
     private javax.swing.JComboBox<String> cboTerminal;
     private javax.swing.JComboBox<String> cboTractor;
-    private javax.swing.JButton jButton1;
     private javax.swing.JLabel jLabel1;
     private javax.swing.JLabel jLabel2;
     private javax.swing.JLabel jLabel3;
@@ -691,7 +792,16 @@ public class PanelModuloViajes extends javax.swing.JPanel {
     private javax.swing.JLabel jLabel8;
     private javax.swing.JLabel jLabel9;
     private javax.swing.JScrollPane jScrollPane1;
+    private javax.swing.JLabel lblContadorPendientes;
     private javax.swing.JPanel pnlContenido;
     private javax.swing.JTable tblViajes;
     // End of variables declaration//GEN-END:variables
+private void actualizarContadorPendientes() {
+
+    int cantidad = GestorViajes.getCantidadPendientes();
+
+    lblContadorPendientes.setText(
+        "VIAJES PENDIENTES: " + cantidad
+    );
+}
 }
