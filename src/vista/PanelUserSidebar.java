@@ -36,6 +36,7 @@ public class PanelUserSidebar extends javax.swing.JPanel {
         btnInicio = new javax.swing.JButton();
         btnViajes = new javax.swing.JButton();
         btnData = new javax.swing.JButton();
+        btnCochera = new javax.swing.JButton();
 
         setBackground(new java.awt.Color(0, 153, 255));
         setForeground(new java.awt.Color(0, 0, 0));
@@ -67,17 +68,16 @@ public class PanelUserSidebar extends javax.swing.JPanel {
         btnData.setText("DATA");
         btnData.addActionListener(this::btnDataActionPerformed);
 
+        btnCochera.setBackground(new java.awt.Color(255, 255, 255));
+        btnCochera.setFont(new java.awt.Font("Arial", 0, 14)); // NOI18N
+        btnCochera.setForeground(new java.awt.Color(0, 0, 0));
+        btnCochera.setText("COCHERA");
+        btnCochera.addActionListener(this::btnCocheraActionPerformed);
+
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(this);
         this.setLayout(layout);
         layout.setHorizontalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
-                .addContainerGap(16, Short.MAX_VALUE)
-                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addComponent(btnViajes, javax.swing.GroupLayout.PREFERRED_SIZE, 190, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addComponent(btnData, javax.swing.GroupLayout.PREFERRED_SIZE, 190, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addComponent(btnInicio, javax.swing.GroupLayout.PREFERRED_SIZE, 190, javax.swing.GroupLayout.PREFERRED_SIZE))
-                .addGap(14, 14, 14))
             .addGroup(layout.createSequentialGroup()
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addGroup(layout.createSequentialGroup()
@@ -87,6 +87,14 @@ public class PanelUserSidebar extends javax.swing.JPanel {
                         .addGap(77, 77, 77)
                         .addComponent(lblUsuarioDNI)))
                 .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
+                .addContainerGap(16, Short.MAX_VALUE)
+                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addComponent(btnCochera, javax.swing.GroupLayout.PREFERRED_SIZE, 190, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(btnViajes, javax.swing.GroupLayout.PREFERRED_SIZE, 190, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(btnData, javax.swing.GroupLayout.PREFERRED_SIZE, 190, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(btnInicio, javax.swing.GroupLayout.PREFERRED_SIZE, 190, javax.swing.GroupLayout.PREFERRED_SIZE))
+                .addGap(14, 14, 14))
         );
         layout.setVerticalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -101,7 +109,9 @@ public class PanelUserSidebar extends javax.swing.JPanel {
                 .addComponent(btnViajes, javax.swing.GroupLayout.PREFERRED_SIZE, 37, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addGap(18, 18, 18)
                 .addComponent(btnData, javax.swing.GroupLayout.PREFERRED_SIZE, 37, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addContainerGap(294, Short.MAX_VALUE))
+                .addGap(18, 18, 18)
+                .addComponent(btnCochera, javax.swing.GroupLayout.PREFERRED_SIZE, 37, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addContainerGap(233, Short.MAX_VALUE))
         );
     }// </editor-fold>//GEN-END:initComponents
 
@@ -123,8 +133,15 @@ public class PanelUserSidebar extends javax.swing.JPanel {
         }
     }//GEN-LAST:event_btnInicioActionPerformed
 
+    private void btnCocheraActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnCocheraActionPerformed
+        if (framePadre != null){
+            framePadre.navegar("MODULO_COCHERA");
+        }
+    }//GEN-LAST:event_btnCocheraActionPerformed
+
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
+    private javax.swing.JButton btnCochera;
     private javax.swing.JButton btnData;
     private javax.swing.JButton btnInicio;
     private javax.swing.JButton btnViajes;
