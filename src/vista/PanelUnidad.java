@@ -4,8 +4,11 @@
  */
 package vista;
 
+import java.awt.Color;
+import java.awt.Dimension;
 import java.util.List;
 import javax.swing.JOptionPane;
+import javax.swing.SwingUtilities;
 import javax.swing.table.DefaultTableModel;
 import modelo.Carreta;
 import modelo.Tractor;
@@ -18,8 +21,25 @@ import servicio.GestorEquipos;
  */
 public class PanelUnidad extends javax.swing.JPanel {
 
+    private DefaultTableModel modeloTabla;
+
+    /**
+     * Creates new form PanelUnidad
+     */
     public PanelUnidad() {
         initComponents();
+
+        modeloTabla = (DefaultTableModel) tblUnidades.getModel();
+
+        jSplitPane.setResizeWeight(0);
+        panelFormulario.setMinimumSize(new Dimension(0, 0));
+        panelTabla.setMinimumSize(new Dimension(0, 0));
+        ocultarFormulario();
+
+        cargarDatos();
+    }
+
+    public void cargarDatos() {
         cargarCombos();
         cargarTabla();
     }
@@ -58,8 +78,7 @@ public class PanelUnidad extends javax.swing.JPanel {
     }
 
     public void cargarTabla() {
-        DefaultTableModel modelo = (DefaultTableModel) tblUnidades.getModel();
-        modelo.setRowCount(0);
+        modeloTabla.setRowCount(0);
 
         List<UnidadTransporte> unidades = GestorEquipos.getUnidades();
         int index = 1;
@@ -70,7 +89,7 @@ public class PanelUnidad extends javax.swing.JPanel {
             String carretaMarca = u.getCarreta() != null ? u.getCarreta().getMarca() : "-";
             String estado = u.getEstado() != null ? u.getEstado().name() : "DISPONIBLE";
 
-            modelo.addRow(new Object[]{
+            modeloTabla.addRow(new Object[]{
                 index++,
                 tractorPlaca,
                 tractorMarca,
@@ -80,7 +99,28 @@ public class PanelUnidad extends javax.swing.JPanel {
             });
         }
 
-        lblContador.setText("Unidades registradas: " + unidades.size() + " / 7 (Límite máximo de 7 unidades)");
+        lblContador.setText("Unidades: " + unidades.size() + " / 7 (Límite máximo)");
+        if (unidades.size() >= 7) {
+            lblContador.setForeground(new Color(204, 0, 0));
+        } else {
+            lblContador.setForeground(new Color(102, 102, 102));
+        }
+    }
+
+    private void mostrarFormulario() {
+        jSplitPane.setDividerSize(8);
+        SwingUtilities.invokeLater(() -> {
+            int h = jSplitPane.getHeight();
+            int loc = (h > 0) ? Math.min(220, Math.max(180, h / 3)) : 200;
+            jSplitPane.setDividerLocation(loc);
+        });
+        btnAgregar.setText("Cerrar formulario");
+    }
+
+    private void ocultarFormulario() {
+        jSplitPane.setDividerSize(0);
+        SwingUtilities.invokeLater(() -> jSplitPane.setDividerLocation(0));
+        btnAgregar.setText("Agregar");
     }
 
     /**
@@ -92,60 +132,128 @@ public class PanelUnidad extends javax.swing.JPanel {
     // <editor-fold defaultstate="collapsed" desc="Generated Code">//GEN-BEGIN:initComponents
     private void initComponents() {
 
-        jLabel1 = new javax.swing.JLabel();
-        jLabel2 = new javax.swing.JLabel();
-        cboTractor = new javax.swing.JComboBox<>();
-        jLabel3 = new javax.swing.JLabel();
-        cboCarreta = new javax.swing.JComboBox<>();
-        btnGuardar = new javax.swing.JButton();
+        panelBarra = new javax.swing.JPanel();
+        lblTitulo = new javax.swing.JLabel();
+        panelBotones = new javax.swing.JPanel();
+        btnAgregar = new javax.swing.JButton();
         btnEliminar = new javax.swing.JButton();
+        jSplitPane = new javax.swing.JSplitPane();
+        panelFormulario = new javax.swing.JPanel();
+        contenidoPanelFormulario = new javax.swing.JPanel();
+        lblTractor = new javax.swing.JLabel();
+        cboTractor = new javax.swing.JComboBox<>();
+        lblCarreta = new javax.swing.JLabel();
+        cboCarreta = new javax.swing.JComboBox<>();
         lblContador = new javax.swing.JLabel();
-        jScrollPane1 = new javax.swing.JScrollPane();
+        lblDetalleAccion = new javax.swing.JLabel();
+        btnOpcion = new javax.swing.JButton();
+        btnCancelar = new javax.swing.JButton();
+        panelTabla = new javax.swing.JPanel();
+        jScrollPane = new javax.swing.JScrollPane();
         tblUnidades = new javax.swing.JTable();
 
         setBackground(new java.awt.Color(255, 255, 255));
         setMaximumSize(new java.awt.Dimension(810, 540));
         setMinimumSize(new java.awt.Dimension(810, 540));
         setPreferredSize(new java.awt.Dimension(810, 540));
-        setLayout(new org.netbeans.lib.awtextra.AbsoluteLayout());
+        setLayout(new java.awt.BorderLayout());
 
-        jLabel1.setFont(new java.awt.Font("Sans Serif Collection", 1, 14)); // NOI18N
-        jLabel1.setForeground(new java.awt.Color(0, 0, 0));
-        jLabel1.setText("REGISTRAR UNIDAD (TRACTOR + CARRETA)");
-        add(jLabel1, new org.netbeans.lib.awtextra.AbsoluteConstraints(30, 20, -1, -1));
+        panelBarra.setBackground(new java.awt.Color(255, 255, 255));
+        panelBarra.setLayout(new java.awt.BorderLayout());
 
-        jLabel2.setFont(new java.awt.Font("Sans Serif Collection", 1, 14)); // NOI18N
-        jLabel2.setForeground(new java.awt.Color(0, 0, 0));
-        jLabel2.setText("Tractor:");
-        add(jLabel2, new org.netbeans.lib.awtextra.AbsoluteConstraints(30, 55, -1, -1));
+        lblTitulo.setFont(new java.awt.Font("sansserif", 1, 13)); // NOI18N
+        lblTitulo.setText("      UNIDADES OPERATIVAS (TRACTOR + CARRETA)");
+        panelBarra.add(lblTitulo, java.awt.BorderLayout.CENTER);
 
-        cboTractor.setBackground(new java.awt.Color(255, 255, 255));
-        add(cboTractor, new org.netbeans.lib.awtextra.AbsoluteConstraints(100, 55, 180, 28));
+        panelBotones.setBackground(new java.awt.Color(255, 255, 255));
+        panelBotones.setLayout(new java.awt.FlowLayout());
 
-        jLabel3.setFont(new java.awt.Font("Sans Serif Collection", 1, 14)); // NOI18N
-        jLabel3.setForeground(new java.awt.Color(0, 0, 0));
-        jLabel3.setText("Carreta:");
-        add(jLabel3, new org.netbeans.lib.awtextra.AbsoluteConstraints(300, 55, -1, -1));
-
-        cboCarreta.setBackground(new java.awt.Color(255, 255, 255));
-        add(cboCarreta, new org.netbeans.lib.awtextra.AbsoluteConstraints(375, 55, 180, 28));
-
-        btnGuardar.setBackground(new java.awt.Color(0, 153, 204));
-        btnGuardar.setForeground(new java.awt.Color(255, 255, 255));
-        btnGuardar.setText("Unir Unidad");
-        btnGuardar.addActionListener(this::btnGuardarActionPerformed);
-        add(btnGuardar, new org.netbeans.lib.awtextra.AbsoluteConstraints(580, 55, 115, 28));
+        btnAgregar.setBackground(new java.awt.Color(51, 153, 255));
+        btnAgregar.setForeground(new java.awt.Color(255, 255, 255));
+        btnAgregar.setText("Agregar");
+        btnAgregar.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                btnAgregarActionPerformed(evt);
+            }
+        });
+        panelBotones.add(btnAgregar);
 
         btnEliminar.setBackground(new java.awt.Color(255, 51, 51));
         btnEliminar.setForeground(new java.awt.Color(255, 255, 255));
         btnEliminar.setText("Eliminar");
-        btnEliminar.addActionListener(this::btnEliminarActionPerformed);
-        add(btnEliminar, new org.netbeans.lib.awtextra.AbsoluteConstraints(705, 55, 85, 28));
+        btnEliminar.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                btnEliminarActionPerformed(evt);
+            }
+        });
+        panelBotones.add(btnEliminar);
 
-        lblContador.setFont(new java.awt.Font("Sans Serif Collection", 0, 12)); // NOI18N
+        panelBarra.add(panelBotones, java.awt.BorderLayout.LINE_END);
+
+        add(panelBarra, java.awt.BorderLayout.PAGE_START);
+
+        jSplitPane.setBackground(new java.awt.Color(255, 255, 255));
+        jSplitPane.setDividerLocation(200);
+        jSplitPane.setOrientation(javax.swing.JSplitPane.VERTICAL_SPLIT);
+
+        panelFormulario.setBackground(new java.awt.Color(255, 255, 255));
+        panelFormulario.setMinimumSize(new java.awt.Dimension(100, 100));
+        panelFormulario.setLayout(new org.netbeans.lib.awtextra.AbsoluteLayout());
+
+        contenidoPanelFormulario.setBackground(new java.awt.Color(255, 255, 255));
+        contenidoPanelFormulario.setLayout(new org.netbeans.lib.awtextra.AbsoluteLayout());
+
+        lblTractor.setFont(new java.awt.Font("sansserif", 1, 13)); // NOI18N
+        lblTractor.setText("Tractor Disponible");
+        contenidoPanelFormulario.add(lblTractor, new org.netbeans.lib.awtextra.AbsoluteConstraints(20, 25, -1, -1));
+
+        cboTractor.setBackground(new java.awt.Color(255, 255, 255));
+        contenidoPanelFormulario.add(cboTractor, new org.netbeans.lib.awtextra.AbsoluteConstraints(20, 50, 240, 30));
+
+        lblCarreta.setFont(new java.awt.Font("sansserif", 1, 13)); // NOI18N
+        lblCarreta.setText("Carreta Disponible (Opcional)");
+        contenidoPanelFormulario.add(lblCarreta, new org.netbeans.lib.awtextra.AbsoluteConstraints(280, 25, -1, -1));
+
+        cboCarreta.setBackground(new java.awt.Color(255, 255, 255));
+        contenidoPanelFormulario.add(cboCarreta, new org.netbeans.lib.awtextra.AbsoluteConstraints(280, 50, 240, 30));
+
+        lblContador.setFont(new java.awt.Font("sansserif", 1, 12)); // NOI18N
         lblContador.setForeground(new java.awt.Color(102, 102, 102));
-        lblContador.setText("Unidades registradas: 0 / 7 (Límite máximo de 7 unidades)");
-        add(lblContador, new org.netbeans.lib.awtextra.AbsoluteConstraints(30, 90, 450, 20));
+        lblContador.setText("Unidades: 0 / 7 (Límite máximo)");
+        contenidoPanelFormulario.add(lblContador, new org.netbeans.lib.awtextra.AbsoluteConstraints(540, 55, 250, 25));
+
+        lblDetalleAccion.setFont(new java.awt.Font("sansserif", 1, 13)); // NOI18N
+        lblDetalleAccion.setText("Vincular tractor y carreta para habilitar unidad en la flota:");
+        contenidoPanelFormulario.add(lblDetalleAccion, new org.netbeans.lib.awtextra.AbsoluteConstraints(20, 95, 500, -1));
+
+        btnOpcion.setBackground(new java.awt.Color(40, 167, 69));
+        btnOpcion.setForeground(new java.awt.Color(255, 255, 255));
+        btnOpcion.setText("Unir Unidad");
+        btnOpcion.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                btnOpcionActionPerformed(evt);
+            }
+        });
+        contenidoPanelFormulario.add(btnOpcion, new org.netbeans.lib.awtextra.AbsoluteConstraints(20, 125, 130, 30));
+
+        btnCancelar.setBackground(new java.awt.Color(255, 102, 102));
+        btnCancelar.setForeground(new java.awt.Color(255, 255, 255));
+        btnCancelar.setText("Cancelar");
+        btnCancelar.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                btnCancelarActionPerformed(evt);
+            }
+        });
+        contenidoPanelFormulario.add(btnCancelar, new org.netbeans.lib.awtextra.AbsoluteConstraints(160, 125, 120, 30));
+
+        panelFormulario.add(contenidoPanelFormulario, new org.netbeans.lib.awtextra.AbsoluteConstraints(0, 0, 810, 200));
+
+        jSplitPane.setTopComponent(panelFormulario);
+
+        panelTabla.setBackground(new java.awt.Color(255, 255, 255));
+        panelTabla.setLayout(new java.awt.BorderLayout());
+
+        jScrollPane.setBackground(new java.awt.Color(255, 255, 255));
 
         tblUnidades.setModel(new javax.swing.table.DefaultTableModel(
             new Object [][] {
@@ -155,56 +263,58 @@ public class PanelUnidad extends javax.swing.JPanel {
                 "N°", "Tractor", "Marca Tractor", "Carreta", "Marca Carreta", "Estado"
             }
         ) {
+            Class[] types = new Class [] {
+                java.lang.Integer.class, java.lang.String.class, java.lang.String.class, java.lang.String.class, java.lang.String.class, java.lang.String.class
+            };
             boolean[] canEdit = new boolean [] {
                 false, false, false, false, false, false
             };
+
+            public Class getColumnClass(int columnIndex) {
+                return types [columnIndex];
+            }
 
             public boolean isCellEditable(int rowIndex, int columnIndex) {
                 return canEdit [columnIndex];
             }
         });
-        jScrollPane1.setViewportView(tblUnidades);
+        jScrollPane.setViewportView(tblUnidades);
 
-        add(jScrollPane1, new org.netbeans.lib.awtextra.AbsoluteConstraints(30, 120, 760, 390));
+        panelTabla.add(jScrollPane, java.awt.BorderLayout.CENTER);
+
+        jSplitPane.setRightComponent(panelTabla);
+
+        add(jSplitPane, java.awt.BorderLayout.CENTER);
     }// </editor-fold>//GEN-END:initComponents
 
-    private void btnGuardarActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnGuardarActionPerformed
+    private void btnAgregarActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnAgregarActionPerformed
+        if (btnAgregar.getText().equals("Cerrar formulario")) {
+            ocultarFormulario();
+            return;
+        }
+
         if (GestorEquipos.getUnidades().size() >= 7) {
-            JOptionPane.showMessageDialog(this, "Se ha alcanzado el límite máximo permitido de 7 unidades operativas.", "Límite Alcanzado", JOptionPane.WARNING_MESSAGE);
+            JOptionPane.showMessageDialog(this,
+                    "Se ha alcanzado el límite máximo permitido de 7 unidades operativas.",
+                    "Límite Alcanzado", JOptionPane.WARNING_MESSAGE);
             return;
         }
 
-        if (cboTractor.getSelectedIndex() == -1) {
-            JOptionPane.showMessageDialog(this, "Debe seleccionar un tractor disponible.", "Aviso", JOptionPane.WARNING_MESSAGE);
+        cargarCombos();
+        if (cboTractor.getItemCount() == 0) {
+            JOptionPane.showMessageDialog(this,
+                    "No hay tractores disponibles para formar una nueva unidad.\nRegistre tractores en 'Tractor' o separe alguna unidad existente.",
+                    "Sin tractores disponibles", JOptionPane.WARNING_MESSAGE);
             return;
         }
 
-        String itemTractor = (String) cboTractor.getSelectedItem();
-        String placaTractor = itemTractor.split(" - ")[0].trim();
-        Tractor tractor = GestorEquipos.buscarTractorPorPlaca(placaTractor);
-
-        Carreta carreta = null;
-        if (cboCarreta.getSelectedIndex() > 0) {
-            String itemCarreta = (String) cboCarreta.getSelectedItem();
-            String placaCarreta = itemCarreta.split(" - ")[0].trim();
-            carreta = GestorEquipos.buscarCarretaPorPlaca(placaCarreta);
-        }
-
-        try {
-            UnidadTransporte nuevaUnidad = new UnidadTransporte(tractor, carreta);
-            GestorEquipos.agregarUnidad(nuevaUnidad);
-            cargarCombos();
-            cargarTabla();
-            JOptionPane.showMessageDialog(this, "Unidad de transporte creada exitosamente.", "Éxito", JOptionPane.INFORMATION_MESSAGE);
-        } catch (Exception ex) {
-            JOptionPane.showMessageDialog(this, ex.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
-        }
-    }//GEN-LAST:event_btnGuardarActionPerformed
+        mostrarFormulario();
+    }//GEN-LAST:event_btnAgregarActionPerformed
 
     private void btnEliminarActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnEliminarActionPerformed
         int fila = tblUnidades.getSelectedRow();
         if (fila == -1) {
-            JOptionPane.showMessageDialog(this, "Seleccione una unidad de la tabla para eliminar.", "Aviso", JOptionPane.WARNING_MESSAGE);
+            JOptionPane.showMessageDialog(this, "Seleccione una unidad de la tabla para separar / eliminar.", "Aviso", JOptionPane.WARNING_MESSAGE);
             return;
         }
 
@@ -218,30 +328,78 @@ public class PanelUnidad extends javax.swing.JPanel {
 
         int resp = JOptionPane.showConfirmDialog(
                 this,
-                "¿Está seguro de eliminar la unidad con tractor " + placaTractor + "?",
-                "Confirmar Eliminación",
-                JOptionPane.YES_NO_OPTION
+                "¿Está seguro de separar la unidad con tractor " + placaTractor + "?\nEl tractor y la carreta volverán a estar disponibles de forma independiente.",
+                "Confirmar Separación",
+                JOptionPane.YES_NO_OPTION,
+                JOptionPane.WARNING_MESSAGE
         );
 
         if (resp == JOptionPane.YES_OPTION) {
             GestorEquipos.eliminarUnidad(unidad);
             cargarCombos();
             cargarTabla();
-            JOptionPane.showMessageDialog(this, "Unidad eliminada correctamente.", "Éxito", JOptionPane.INFORMATION_MESSAGE);
+            JOptionPane.showMessageDialog(this, "Unidad separada y eliminada correctamente.", "Éxito", JOptionPane.INFORMATION_MESSAGE);
         }
     }//GEN-LAST:event_btnEliminarActionPerformed
 
+    private void btnOpcionActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnOpcionActionPerformed
+        if (GestorEquipos.getUnidades().size() >= 7) {
+            JOptionPane.showMessageDialog(this, "Se ha alcanzado el límite máximo permitido de 7 unidades operativas.", "Límite Alcanzado", JOptionPane.WARNING_MESSAGE);
+            return;
+        }
+
+        if (cboTractor.getSelectedIndex() == -1 || cboTractor.getSelectedItem() == null) {
+            JOptionPane.showMessageDialog(this, "Debe seleccionar un tractor disponible.", "Aviso", JOptionPane.WARNING_MESSAGE);
+            return;
+        }
+
+        String itemTractor = (String) cboTractor.getSelectedItem();
+        String placaTractor = itemTractor.split(" - ")[0].trim();
+        Tractor tractor = GestorEquipos.buscarTractorPorPlaca(placaTractor);
+
+        Carreta carreta = null;
+        if (cboCarreta.getSelectedIndex() > 0 && cboCarreta.getSelectedItem() != null) {
+            String itemCarreta = (String) cboCarreta.getSelectedItem();
+            String placaCarreta = itemCarreta.split(" - ")[0].trim();
+            carreta = GestorEquipos.buscarCarretaPorPlaca(placaCarreta);
+        }
+
+        try {
+            UnidadTransporte nuevaUnidad = new UnidadTransporte(tractor, carreta);
+            GestorEquipos.agregarUnidad(nuevaUnidad);
+            cargarCombos();
+            cargarTabla();
+            ocultarFormulario();
+            JOptionPane.showMessageDialog(this, "Unidad de transporte creada y habilitada exitosamente.", "Éxito", JOptionPane.INFORMATION_MESSAGE);
+        } catch (Exception ex) {
+            JOptionPane.showMessageDialog(this, ex.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
+        }
+    }//GEN-LAST:event_btnOpcionActionPerformed
+
+    private void btnCancelarActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnCancelarActionPerformed
+        ocultarFormulario();
+    }//GEN-LAST:event_btnCancelarActionPerformed
+
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
+    private javax.swing.JButton btnAgregar;
+    private javax.swing.JButton btnCancelar;
     private javax.swing.JButton btnEliminar;
-    private javax.swing.JButton btnGuardar;
+    private javax.swing.JButton btnOpcion;
     private javax.swing.JComboBox<String> cboCarreta;
     private javax.swing.JComboBox<String> cboTractor;
-    private javax.swing.JLabel jLabel1;
-    private javax.swing.JLabel jLabel2;
-    private javax.swing.JLabel jLabel3;
-    private javax.swing.JScrollPane jScrollPane1;
+    private javax.swing.JPanel contenidoPanelFormulario;
+    private javax.swing.JScrollPane jScrollPane;
+    private javax.swing.JSplitPane jSplitPane;
+    private javax.swing.JLabel lblCarreta;
     private javax.swing.JLabel lblContador;
+    private javax.swing.JLabel lblDetalleAccion;
+    private javax.swing.JLabel lblTitulo;
+    private javax.swing.JLabel lblTractor;
+    private javax.swing.JPanel panelBarra;
+    private javax.swing.JPanel panelBotones;
+    private javax.swing.JPanel panelFormulario;
+    private javax.swing.JPanel panelTabla;
     private javax.swing.JTable tblUnidades;
     // End of variables declaration//GEN-END:variables
 }
