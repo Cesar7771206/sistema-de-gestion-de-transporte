@@ -31,7 +31,6 @@ public class PanelModuloViajes extends javax.swing.JPanel {
      */
     public PanelModuloViajes() {
         initComponents();
-        cboTractor.addActionListener(e -> actualizarCarretaDeUnidad());
 
         tblViajes.addMouseListener(new MouseAdapter() {
             @Override
@@ -48,24 +47,9 @@ public class PanelModuloViajes extends javax.swing.JPanel {
         cargarTablaViajes();
     }
 
-    private void actualizarCarretaDeUnidad() {
-        int idx = cboTractor.getSelectedIndex();
-        cboCarreta.removeAllItems();
-        if (idx != -1 && idx < GestorEquipos.getUnidades().size()) {
-            UnidadTransporte u = GestorEquipos.getUnidades().get(idx);
-            if (u.getCarreta() != null) {
-                cboCarreta.addItem(u.getCarreta().getPlaca());
-            } else {
-                cboCarreta.addItem("(Sin Carreta)");
-            }
-        }
-        cboCarreta.setEnabled(false);
-    }
-
     public void cargarCombos() {
         cboContenedor.removeAllItems();
         cboTractor.removeAllItems();
-        cboCarreta.removeAllItems();
         cboPlanta.removeAllItems();
         cboTerminal.removeAllItems();
         cboCliente.removeAllItems();
@@ -77,9 +61,8 @@ public class PanelModuloViajes extends javax.swing.JPanel {
 
         for (UnidadTransporte unidad : GestorEquipos.getUnidades()) {
             String carretaInfo = (unidad.getCarreta() != null ? unidad.getCarreta().getPlaca() : "Sin Carreta");
-            cboTractor.addItem(unidad.getPlaca() + " (" + carretaInfo + ")");
+            cboTractor.addItem(unidad.getPlaca() + " - " + carretaInfo);
         }
-        actualizarCarretaDeUnidad();
 
         for (Planta planta : GestorLogistica.getPlantas()) {
             cboPlanta.addItem(planta.getNombre());
@@ -188,7 +171,6 @@ public class PanelModuloViajes extends javax.swing.JPanel {
         cboTerminal = new javax.swing.JComboBox<>();
         jLabel3 = new javax.swing.JLabel();
         cboCliente = new javax.swing.JComboBox<>();
-        jLabel4 = new javax.swing.JLabel();
         cboRuta = new javax.swing.JComboBox<>();
         jLabel5 = new javax.swing.JLabel();
         jButton1 = new javax.swing.JButton();
@@ -198,7 +180,6 @@ public class PanelModuloViajes extends javax.swing.JPanel {
         jLabel8 = new javax.swing.JLabel();
         cboContenedor = new javax.swing.JComboBox<>();
         cboTractor = new javax.swing.JComboBox<>();
-        cboCarreta = new javax.swing.JComboBox<>();
         jLabel9 = new javax.swing.JLabel();
         cboPlanta = new javax.swing.JComboBox<>();
         jScrollPane1 = new javax.swing.JScrollPane();
@@ -231,10 +212,6 @@ public class PanelModuloViajes extends javax.swing.JPanel {
         jLabel3.setText("Unidad:");
 
         cboCliente.setBackground(new java.awt.Color(255, 255, 255));
-
-        jLabel4.setFont(new java.awt.Font("sansserif", 1, 12)); // NOI18N
-        jLabel4.setForeground(new java.awt.Color(51, 51, 51));
-        jLabel4.setText("Carreta:");
 
         cboRuta.setBackground(new java.awt.Color(255, 255, 255));
 
@@ -278,8 +255,6 @@ public class PanelModuloViajes extends javax.swing.JPanel {
 
         cboTractor.setBackground(new java.awt.Color(255, 255, 255));
 
-        cboCarreta.setBackground(new java.awt.Color(255, 255, 255));
-
         jLabel9.setFont(new java.awt.Font("sansserif", 1, 14)); // NOI18N
         jLabel9.setForeground(new java.awt.Color(0, 0, 0));
         jLabel9.setText("REGISTRAR / EDITAR VIAJE");
@@ -298,14 +273,12 @@ public class PanelModuloViajes extends javax.swing.JPanel {
                         .addGroup(pnlContenidoLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
                             .addComponent(jLabel2)
                             .addComponent(jLabel3, javax.swing.GroupLayout.Alignment.LEADING)
-                            .addComponent(jLabel4, javax.swing.GroupLayout.Alignment.LEADING)
                             .addComponent(jLabel8, javax.swing.GroupLayout.Alignment.LEADING))
                         .addGroup(pnlContenidoLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                             .addGroup(pnlContenidoLayout.createSequentialGroup()
                                 .addGap(18, 18, 18)
                                 .addGroup(pnlContenidoLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
                                     .addComponent(cboTractor, 0, 230, Short.MAX_VALUE)
-                                    .addComponent(cboCarreta, 0, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                                     .addComponent(cboPlanta, 0, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                                     .addComponent(cboContenedor, 0, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
                                 .addGap(40, 40, 40)
@@ -344,26 +317,18 @@ public class PanelModuloViajes extends javax.swing.JPanel {
                     .addComponent(cboCliente, javax.swing.GroupLayout.PREFERRED_SIZE, 30, javax.swing.GroupLayout.PREFERRED_SIZE))
                 .addGap(18, 18, 18)
                 .addGroup(pnlContenidoLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                    .addComponent(jLabel4)
-                    .addComponent(cboCarreta, javax.swing.GroupLayout.PREFERRED_SIZE, 30, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(jLabel8)
+                    .addComponent(cboPlanta, javax.swing.GroupLayout.PREFERRED_SIZE, 30, javax.swing.GroupLayout.PREFERRED_SIZE)
                     .addComponent(jLabel7)
                     .addComponent(cboRuta, javax.swing.GroupLayout.PREFERRED_SIZE, 30, javax.swing.GroupLayout.PREFERRED_SIZE))
-                .addGroup(pnlContenidoLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addGroup(pnlContenidoLayout.createSequentialGroup()
-                        .addGap(18, 18, 18)
-                        .addGroup(pnlContenidoLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                            .addComponent(jLabel8)
-                            .addComponent(cboPlanta, javax.swing.GroupLayout.PREFERRED_SIZE, 30, javax.swing.GroupLayout.PREFERRED_SIZE))
-                        .addContainerGap(35, Short.MAX_VALUE))
-                    .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, pnlContenidoLayout.createSequentialGroup()
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                        .addGroup(pnlContenidoLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                            .addComponent(jButton1, javax.swing.GroupLayout.PREFERRED_SIZE, 32, javax.swing.GroupLayout.PREFERRED_SIZE)
-                            .addComponent(btnRegistrarUrgencia, javax.swing.GroupLayout.PREFERRED_SIZE, 32, javax.swing.GroupLayout.PREFERRED_SIZE))
-                        .addGap(20, 20, 20))))
+                .addGap(18, 18, 18)
+                .addGroup(pnlContenidoLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                    .addComponent(jButton1, javax.swing.GroupLayout.PREFERRED_SIZE, 32, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(btnRegistrarUrgencia, javax.swing.GroupLayout.PREFERRED_SIZE, 32, javax.swing.GroupLayout.PREFERRED_SIZE))
+                .addContainerGap(16, Short.MAX_VALUE))
         );
 
-        add(pnlContenido, new org.netbeans.lib.awtextra.AbsoluteConstraints(50, 85, 800, 295));
+        add(pnlContenido, new org.netbeans.lib.awtextra.AbsoluteConstraints(50, 85, 800, 245));
 
         tblViajes.setModel(new javax.swing.table.DefaultTableModel(
             new Object [][] {
@@ -383,7 +348,7 @@ public class PanelModuloViajes extends javax.swing.JPanel {
         });
         jScrollPane1.setViewportView(tblViajes);
 
-        add(jScrollPane1, new org.netbeans.lib.awtextra.AbsoluteConstraints(50, 395, 670, 260));
+        add(jScrollPane1, new org.netbeans.lib.awtextra.AbsoluteConstraints(50, 345, 670, 310));
 
         btnEliminar.setBackground(new java.awt.Color(255, 51, 51));
         btnEliminar.setFont(new java.awt.Font("sansserif", 1, 12)); // NOI18N
@@ -394,7 +359,7 @@ public class PanelModuloViajes extends javax.swing.JPanel {
                 btnEliminarActionPerformed(evt);
             }
         });
-        add(btnEliminar, new org.netbeans.lib.awtextra.AbsoluteConstraints(735, 420, 115, 34));
+        add(btnEliminar, new org.netbeans.lib.awtextra.AbsoluteConstraints(735, 370, 115, 34));
 
         btnActualizar.setBackground(new java.awt.Color(0, 153, 255));
         btnActualizar.setFont(new java.awt.Font("sansserif", 1, 12)); // NOI18N
@@ -405,7 +370,7 @@ public class PanelModuloViajes extends javax.swing.JPanel {
                 btnActualizarActionPerformed(evt);
             }
         });
-        add(btnActualizar, new org.netbeans.lib.awtextra.AbsoluteConstraints(735, 470, 115, 34));
+        add(btnActualizar, new org.netbeans.lib.awtextra.AbsoluteConstraints(735, 420, 115, 34));
 
         btnEditar.setBackground(new java.awt.Color(255, 153, 102));
         btnEditar.setFont(new java.awt.Font("sansserif", 1, 12)); // NOI18N
@@ -416,7 +381,7 @@ public class PanelModuloViajes extends javax.swing.JPanel {
                 btnEditarActionPerformed(evt);
             }
         });
-        add(btnEditar, new org.netbeans.lib.awtextra.AbsoluteConstraints(735, 520, 115, 34));
+        add(btnEditar, new org.netbeans.lib.awtextra.AbsoluteConstraints(735, 470, 115, 34));
     }// </editor-fold>//GEN-END:initComponents
 
     private void jButton1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton1ActionPerformed
@@ -723,7 +688,6 @@ public class PanelModuloViajes extends javax.swing.JPanel {
     private javax.swing.JButton btnEditar;
     private javax.swing.JButton btnEliminar;
     private javax.swing.JButton btnRegistrarUrgencia;
-    private javax.swing.JComboBox<String> cboCarreta;
     private javax.swing.JComboBox<String> cboCliente;
     private javax.swing.JComboBox<String> cboContenedor;
     private javax.swing.JComboBox<String> cboPlanta;
@@ -734,7 +698,6 @@ public class PanelModuloViajes extends javax.swing.JPanel {
     private javax.swing.JLabel jLabel1;
     private javax.swing.JLabel jLabel2;
     private javax.swing.JLabel jLabel3;
-    private javax.swing.JLabel jLabel4;
     private javax.swing.JLabel jLabel5;
     private javax.swing.JLabel jLabel6;
     private javax.swing.JLabel jLabel7;
