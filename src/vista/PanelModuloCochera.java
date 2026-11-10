@@ -1,28 +1,19 @@
+/*
+ * Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
+ * Click nbfs://nbhost/SystemFileSystem/Templates/GUIForms/JPanel.java to edit this template
+ */
 package vista;
 
-import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.Cursor;
-import java.awt.Dimension;
-import java.awt.FlowLayout;
 import java.awt.Font;
-import java.awt.GridLayout;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.util.List;
-import javax.swing.BorderFactory;
-import javax.swing.Box;
-import javax.swing.BoxLayout;
-import javax.swing.JButton;
-import javax.swing.JComboBox;
 import javax.swing.JLabel;
 import javax.swing.JOptionPane;
-import javax.swing.JPanel;
-import javax.swing.JScrollPane;
 import javax.swing.SwingConstants;
-import javax.swing.border.EmptyBorder;
 import javax.swing.border.LineBorder;
-import javax.swing.border.TitledBorder;
 import modelo.UnidadTransporte;
 import modelo.Viaje;
 import servicio.CocheraServicio;
@@ -34,6 +25,8 @@ import servicio.GestorViajes;
  * Representa la cuadrícula 10x10 del patio de estacionamiento y gestiona
  * la asignación y reubicación de unidades de transporte según la proximidad
  * de sus viajes programados (Prioridad 1: inmediata, 2: media, 3: baja/sin viaje).
+ * 
+ * Totalmente compatible y editable con el diseñador visual de NetBeans GUI Builder.
  */
 public class PanelModuloCochera extends javax.swing.JPanel {
 
@@ -51,253 +44,14 @@ public class PanelModuloCochera extends javax.swing.JPanel {
     private int celdaSeleccionadaFila = -1;
     private int celdaSeleccionadaCol = -1;
 
-    // Componentes del panel lateral de detalles y operaciones
-    private JLabel lblCapacidad;
-    private JLabel lblDetalleCoord;
-    private JLabel lblDetalleZona;
-    private JLabel lblDetalleEstado;
-    private JLabel lblDetalleTractor;
-    private JLabel lblDetalleCarreta;
-    private JLabel lblDetalleViaje;
-    private JLabel lblDetalleProximidad;
-
-    private JButton btnDespacharViaje;
-    private JButton btnLiberarEspacio;
-    private JComboBox<String> cboUnidadesFuera;
-    private JButton btnRegistrarLlegada;
-    private JButton btnReorganizarProximidad;
-
+    /**
+     * Creates new form PanelModuloCochera
+     */
     public PanelModuloCochera() {
         initComponents();
-        configurarEstructuraVisual();
         inicializarDatosDemoSiEsNecesario();
         construirCuadricula();
         refrescar();
-    }
-
-    /**
-     * Reconfigura el diseño general del panel con una cabecera informativa,
-     * el patio cuadriculado central y la consola de control y detalle lateral.
-     */
-    private void configurarEstructuraVisual() {
-        this.removeAll();
-        this.setLayout(new BorderLayout(15, 15));
-        this.setBackground(Color.WHITE);
-        this.setBorder(new EmptyBorder(15, 20, 15, 20));
-
-        // 1. Cabecera superior
-        JPanel panelCabecera = new JPanel(new BorderLayout());
-        panelCabecera.setOpaque(false);
-
-        JLabel lblTitulo = new JLabel("MÓDULO COCHERA - CONTROL DE PATIO");
-        lblTitulo.setFont(new Font("Segoe UI", Font.BOLD, 22));
-        lblTitulo.setForeground(new Color(30, 41, 59));
-
-        lblCapacidad = new JLabel("Cargando estado...");
-        lblCapacidad.setFont(new Font("Segoe UI", Font.BOLD, 13));
-        lblCapacidad.setForeground(new Color(71, 85, 105));
-
-        panelCabecera.add(lblTitulo, BorderLayout.WEST);
-        panelCabecera.add(lblCapacidad, BorderLayout.EAST);
-        this.add(panelCabecera, BorderLayout.NORTH);
-
-        // 2. Panel Central (Cuadrícula Cochera)
-        JPanel panelContenedorCuadricula = new JPanel(new FlowLayout(FlowLayout.CENTER, 0, 0));
-        panelContenedorCuadricula.setOpaque(false);
-
-        panelCochera.setPreferredSize(new Dimension(560, 560));
-        panelCochera.setMaximumSize(new Dimension(560, 560));
-        panelCochera.setBackground(new Color(20, 24, 27));
-        panelCochera.setBorder(BorderFactory.createCompoundBorder(
-                new LineBorder(new Color(51, 65, 85), 2),
-                new EmptyBorder(4, 4, 4, 4)
-        ));
-        panelContenedorCuadricula.add(panelCochera);
-        this.add(panelContenedorCuadricula, BorderLayout.CENTER);
-
-        // 3. Panel Lateral Este (Información y Acciones)
-        JPanel panelLateral = construirPanelLateral();
-        JScrollPane scrollLateral = new JScrollPane(panelLateral);
-        scrollLateral.setBorder(null);
-        scrollLateral.setPreferredSize(new Dimension(285, 560));
-        scrollLateral.setHorizontalScrollBarPolicy(JScrollPane.HORIZONTAL_SCROLLBAR_NEVER);
-        this.add(scrollLateral, BorderLayout.EAST);
-    }
-
-    /**
-     * Construye el panel lateral derecho con secciones de detalle, acciones
-     * de llegada/salida y leyenda interactiva.
-     */
-    private JPanel construirPanelLateral() {
-        JPanel panel = new JPanel();
-        panel.setLayout(new BoxLayout(panel, BoxLayout.Y_AXIS));
-        panel.setBackground(Color.WHITE);
-        panel.setBorder(new EmptyBorder(0, 5, 5, 5));
-
-        // Tarjeta: Detalle de Celda Seleccionada
-        JPanel pnlDetalle = new JPanel();
-        pnlDetalle.setLayout(new BoxLayout(pnlDetalle, BoxLayout.Y_AXIS));
-        pnlDetalle.setBackground(new Color(248, 250, 252));
-        pnlDetalle.setBorder(BorderFactory.createTitledBorder(
-                new LineBorder(new Color(203, 213, 225), 1),
-                "Información del Espacio",
-                TitledBorder.DEFAULT_JUSTIFICATION,
-                TitledBorder.DEFAULT_POSITION,
-                new Font("Segoe UI", Font.BOLD, 12),
-                new Color(30, 41, 59)
-        ));
-
-        lblDetalleCoord = new JLabel("Coordenadas: Seleccione una celda");
-        lblDetalleZona = new JLabel("Zona: -");
-        lblDetalleEstado = new JLabel("Estado: -");
-        lblDetalleTractor = new JLabel("Tractor: -");
-        lblDetalleCarreta = new JLabel("Carreta: -");
-        lblDetalleViaje = new JLabel("Próximo Viaje: -");
-        lblDetalleProximidad = new JLabel("Proximidad: -");
-
-        Font fontEtiquetas = new Font("Segoe UI", Font.PLAIN, 12);
-        for (JLabel lbl : new JLabel[]{lblDetalleCoord, lblDetalleZona, lblDetalleEstado,
-                lblDetalleTractor, lblDetalleCarreta, lblDetalleViaje, lblDetalleProximidad}) {
-            lbl.setFont(fontEtiquetas);
-            lbl.setAlignmentX(LEFT_ALIGNMENT);
-            lbl.setBorder(new EmptyBorder(2, 4, 2, 4));
-            pnlDetalle.add(lbl);
-        }
-
-        pnlDetalle.add(Box.createVerticalStrut(8));
-
-        // Botones de acción para la celda seleccionada
-        btnDespacharViaje = new JButton("Despachar a Viaje (Salida)");
-        btnDespacharViaje.setFont(new Font("Segoe UI", Font.BOLD, 11));
-        btnDespacharViaje.setBackground(new Color(13, 110, 253));
-        btnDespacharViaje.setForeground(Color.WHITE);
-        btnDespacharViaje.setAlignmentX(LEFT_ALIGNMENT);
-        btnDespacharViaje.setMaximumSize(new Dimension(260, 30));
-        btnDespacharViaje.setEnabled(false);
-        btnDespacharViaje.addActionListener(e -> despacharUnidadSeleccionada());
-
-        btnLiberarEspacio = new JButton("Liberar Espacio");
-        btnLiberarEspacio.setFont(new Font("Segoe UI", Font.PLAIN, 11));
-        btnLiberarEspacio.setBackground(new Color(220, 53, 69));
-        btnLiberarEspacio.setForeground(Color.WHITE);
-        btnLiberarEspacio.setAlignmentX(LEFT_ALIGNMENT);
-        btnLiberarEspacio.setMaximumSize(new Dimension(260, 28));
-        btnLiberarEspacio.setEnabled(false);
-        btnLiberarEspacio.addActionListener(e -> liberarEspacioSeleccionado());
-
-        pnlDetalle.add(btnDespacharViaje);
-        pnlDetalle.add(Box.createVerticalStrut(4));
-        pnlDetalle.add(btnLiberarEspacio);
-        panel.add(pnlDetalle);
-
-        panel.add(Box.createVerticalStrut(10));
-
-        // Tarjeta: Llegada y Asignación por Prioridad
-        JPanel pnlLlegada = new JPanel();
-        pnlLlegada.setLayout(new BoxLayout(pnlLlegada, BoxLayout.Y_AXIS));
-        pnlLlegada.setBackground(new Color(248, 250, 252));
-        pnlLlegada.setBorder(BorderFactory.createTitledBorder(
-                new LineBorder(new Color(203, 213, 225), 1),
-                "Llegada de Unidad (Fin de Viaje)",
-                TitledBorder.DEFAULT_JUSTIFICATION,
-                TitledBorder.DEFAULT_POSITION,
-                new Font("Segoe UI", Font.BOLD, 12),
-                new Color(30, 41, 59)
-        ));
-
-        JLabel lblComboTexto = new JLabel("Unidad en arribo / retorno:");
-        lblComboTexto.setFont(new Font("Segoe UI", Font.PLAIN, 11));
-        lblComboTexto.setAlignmentX(LEFT_ALIGNMENT);
-        pnlLlegada.add(lblComboTexto);
-        pnlLlegada.add(Box.createVerticalStrut(4));
-
-        cboUnidadesFuera = new JComboBox<>();
-        cboUnidadesFuera.setFont(new Font("Segoe UI", Font.PLAIN, 12));
-        cboUnidadesFuera.setAlignmentX(LEFT_ALIGNMENT);
-        cboUnidadesFuera.setMaximumSize(new Dimension(260, 28));
-        pnlLlegada.add(cboUnidadesFuera);
-
-        pnlLlegada.add(Box.createVerticalStrut(6));
-
-        btnRegistrarLlegada = new JButton("Registrar Llegada a Cochera");
-        btnRegistrarLlegada.setFont(new Font("Segoe UI", Font.BOLD, 11));
-        btnRegistrarLlegada.setBackground(new Color(25, 135, 84));
-        btnRegistrarLlegada.setForeground(Color.WHITE);
-        btnRegistrarLlegada.setAlignmentX(LEFT_ALIGNMENT);
-        btnRegistrarLlegada.setMaximumSize(new Dimension(260, 30));
-        btnRegistrarLlegada.addActionListener(e -> registrarLlegadaDeUnidad());
-        pnlLlegada.add(btnRegistrarLlegada);
-
-        panel.add(pnlLlegada);
-
-        panel.add(Box.createVerticalStrut(10));
-
-        // Tarjeta: Sincronización y Reorganización
-        JPanel pnlAcciones = new JPanel();
-        pnlAcciones.setLayout(new BoxLayout(pnlAcciones, BoxLayout.Y_AXIS));
-        pnlAcciones.setBackground(new Color(248, 250, 252));
-        pnlAcciones.setBorder(BorderFactory.createTitledBorder(
-                new LineBorder(new Color(203, 213, 225), 1),
-                "Optimización de Patio",
-                TitledBorder.DEFAULT_JUSTIFICATION,
-                TitledBorder.DEFAULT_POSITION,
-                new Font("Segoe UI", Font.BOLD, 12),
-                new Color(30, 41, 59)
-        ));
-
-        btnReorganizarProximidad = new JButton("Reorganizar según Proximidad");
-        btnReorganizarProximidad.setFont(new Font("Segoe UI", Font.BOLD, 11));
-        btnReorganizarProximidad.setBackground(new Color(102, 16, 242));
-        btnReorganizarProximidad.setForeground(Color.WHITE);
-        btnReorganizarProximidad.setAlignmentX(LEFT_ALIGNMENT);
-        btnReorganizarProximidad.setMaximumSize(new Dimension(260, 30));
-        btnReorganizarProximidad.addActionListener(e -> reorganizarPorProximidad());
-        pnlAcciones.add(btnReorganizarProximidad);
-
-        panel.add(pnlAcciones);
-
-        panel.add(Box.createVerticalStrut(10));
-
-        // Tarjeta: Leyenda de Prioridades
-        JPanel pnlLeyenda = new JPanel();
-        pnlLeyenda.setLayout(new BoxLayout(pnlLeyenda, BoxLayout.Y_AXIS));
-        pnlLeyenda.setBackground(Color.WHITE);
-        pnlLeyenda.setBorder(BorderFactory.createTitledBorder(
-                new LineBorder(new Color(226, 232, 240), 1),
-                "Leyenda de Zonas y Prioridad",
-                TitledBorder.DEFAULT_JUSTIFICATION,
-                TitledBorder.DEFAULT_POSITION,
-                new Font("Segoe UI", Font.BOLD, 11),
-                new Color(71, 85, 105)
-        ));
-
-        pnlLeyenda.add(crearFilaLeyenda(COLOR_OCUPADO, "Ocupado: Unidad en Cochera"));
-        pnlLeyenda.add(crearFilaLeyenda(COLOR_P1_LIBRE, "P1: Salida Inmediata (Próximo)"));
-        pnlLeyenda.add(crearFilaLeyenda(COLOR_P2_LIBRE, "P2: Salida Media (Intermedio)"));
-        pnlLeyenda.add(crearFilaLeyenda(COLOR_P3_LIBRE, "P3: Estancia Larga / Sin Viaje"));
-        pnlLeyenda.add(crearFilaLeyenda(COLOR_FONDO_PASILLO, "Vía de Maniobras y Circulación"));
-
-        panel.add(pnlLeyenda);
-
-        return panel;
-    }
-
-    private JPanel crearFilaLeyenda(Color color, String texto) {
-        JPanel fila = new JPanel(new FlowLayout(FlowLayout.LEFT, 6, 2));
-        fila.setOpaque(false);
-        JLabel muestra = new JLabel();
-        muestra.setOpaque(true);
-        muestra.setBackground(color);
-        muestra.setPreferredSize(new Dimension(14, 14));
-        muestra.setBorder(new LineBorder(Color.DARK_GRAY, 1));
-
-        JLabel lblTexto = new JLabel(texto);
-        lblTexto.setFont(new Font("Segoe UI", Font.PLAIN, 10));
-        lblTexto.setForeground(new Color(51, 65, 85));
-
-        fila.add(muestra);
-        fila.add(lblTexto);
-        return fila;
     }
 
     /**
@@ -320,11 +74,11 @@ public class PanelModuloCochera extends javax.swing.JPanel {
     }
 
     /**
-     * Construye la cuadrícula de 10x10 JLabels dentro del panel de cochera.
+     * Construye la cuadrícula de 10x10 JLabels dentro del panelCochera
+     * configurado por el diseñador visual de NetBeans.
      */
     private void construirCuadricula() {
         panelCochera.removeAll();
-        panelCochera.setLayout(new GridLayout(10, 10, 2, 2));
 
         for (int f = 0; f < 10; f++) {
             for (int c = 0; c < 10; c++) {
@@ -359,6 +113,7 @@ public class PanelModuloCochera extends javax.swing.JPanel {
         for (int f = 0; f < 10; f++) {
             for (int c = 0; c < 10; c++) {
                 JLabel celda = celdas[f][c];
+                if (celda == null) continue;
                 celda.setBorder(new LineBorder(new Color(40, 44, 52), 1));
                 celda.setForeground(Color.WHITE);
 
@@ -386,9 +141,11 @@ public class PanelModuloCochera extends javax.swing.JPanel {
 
         // 3. Resaltar la celda seleccionada si existe
         if (celdaSeleccionadaFila != -1 && celdaSeleccionadaCol != -1) {
-            celdas[celdaSeleccionadaFila][celdaSeleccionadaCol].setBorder(
-                    new LineBorder(COLOR_SELECCION, 2)
-            );
+            if (celdas[celdaSeleccionadaFila][celdaSeleccionadaCol] != null) {
+                celdas[celdaSeleccionadaFila][celdaSeleccionadaCol].setBorder(
+                        new LineBorder(COLOR_SELECCION, 2)
+                );
+            }
             mostrarDatos(celdaSeleccionadaFila, celdaSeleccionadaCol);
         }
 
@@ -412,6 +169,7 @@ public class PanelModuloCochera extends javax.swing.JPanel {
             int f = coordenadas[i][0];
             int c = coordenadas[i][1];
             JLabel l = celdas[f][c];
+            if (l == null) continue;
             l.setBackground(COLOR_OCUPADO);
             l.setForeground(Color.WHITE);
 
@@ -430,15 +188,15 @@ public class PanelModuloCochera extends javax.swing.JPanel {
     }
 
     /**
-     * Muestra en el panel lateral los detalles completos de la celda pulsada.
+     * Muestra en el panel de detalle los datos completos de la celda pulsada.
      */
     private void mostrarDatos(int fila, int col) {
         this.celdaSeleccionadaFila = fila;
         this.celdaSeleccionadaCol = col;
 
-        // Quitar bordes de selección previos y colocar el borde en la celda activa
         for (int f = 0; f < 10; f++) {
             for (int c = 0; c < 10; c++) {
+                if (celdas[f][c] == null) continue;
                 if (f == fila && c == col) {
                     celdas[f][c].setBorder(new LineBorder(COLOR_SELECCION, 2));
                 } else {
@@ -460,8 +218,8 @@ public class PanelModuloCochera extends javax.swing.JPanel {
             Viaje proximoViaje = buscarProximoViaje(unidad);
             if (proximoViaje != null) {
                 int turno = obtenerTurnoEnCola(proximoViaje);
-                lblDetalleViaje.setText("Próximo Viaje: #" + proximoViaje.getId() + " - " + proximoViaje.getCliente().getNombre());
-                lblDetalleProximidad.setText("Proximidad: Turno #" + (turno + 1) + " (Prioridad " + unidad.getPrioridadCochera() + ")");
+                lblDetalleViaje.setText("Próximo: #" + proximoViaje.getId() + " - " + proximoViaje.getCliente().getNombre());
+                lblDetalleProximidad.setText("Proximidad: Turno #" + (turno + 1) + " (P" + unidad.getPrioridadCochera() + ")");
             } else {
                 lblDetalleViaje.setText("Próximo Viaje: Sin viaje asignado");
                 lblDetalleProximidad.setText("Proximidad: Sin urgencia (P3)");
@@ -478,7 +236,7 @@ public class PanelModuloCochera extends javax.swing.JPanel {
                 lblDetalleTractor.setText("Tractor: -");
                 lblDetalleCarreta.setText("Carreta: -");
                 lblDetalleViaje.setText("Próximo Viaje: -");
-                lblDetalleProximidad.setText("Proximidad: Espacio libre para P" + prioridadZona);
+                lblDetalleProximidad.setText("Proximidad: Espacio libre P" + prioridadZona);
             } else {
                 lblDetalleZona.setText("Zona: Vía de circulación");
                 lblDetalleEstado.setText("Estado: TRÁNSITO LIBRE");
@@ -516,7 +274,7 @@ public class PanelModuloCochera extends javax.swing.JPanel {
         for (UnidadTransporte u : todas) {
             if (!u.estaEnCochera()) {
                 int prioridadSugerida = servicio.calcularPrioridadPorProximidad(u);
-                cboUnidadesFuera.addItem(u.getPlaca() + " (Prioridad estimada: P" + prioridadSugerida + ")");
+                cboUnidadesFuera.addItem(u.getPlaca() + " (Prioridad P" + prioridadSugerida + ")");
                 conteoFuera++;
             }
         }
@@ -524,10 +282,6 @@ public class PanelModuloCochera extends javax.swing.JPanel {
         btnRegistrarLlegada.setEnabled(conteoFuera > 0 && !servicio.estaLlena());
     }
 
-    /**
-     * Acción: Despacha la unidad seleccionada para iniciar su viaje programado,
-     * liberando el espacio que ocupaba en cochera.
-     */
     private void despacharUnidadSeleccionada() {
         if (celdaSeleccionadaFila == -1 || celdaSeleccionadaCol == -1) return;
 
@@ -554,9 +308,6 @@ public class PanelModuloCochera extends javax.swing.JPanel {
         }
     }
 
-    /**
-     * Acción: Libera manualmente el espacio seleccionado.
-     */
     private void liberarEspacioSeleccionado() {
         if (celdaSeleccionadaFila == -1 || celdaSeleccionadaCol == -1) return;
 
@@ -580,10 +331,6 @@ public class PanelModuloCochera extends javax.swing.JPanel {
         }
     }
 
-    /**
-     * Acción: Registra la llegada de una unidad a cochera, determinando su prioridad
-     * según la proximidad del próximo viaje en cola y asignándole un espacio.
-     */
     private void registrarLlegadaDeUnidad() {
         int indiceSeleccionado = cboUnidadesFuera.getSelectedIndex();
         if (indiceSeleccionado == -1) {
@@ -617,10 +364,6 @@ public class PanelModuloCochera extends javax.swing.JPanel {
         }
     }
 
-    /**
-     * Acción: Reorganiza las unidades actualmente en cochera en función del
-     * estado actualizado de la cola de viajes en GestorViajes.
-     */
     private void reorganizarPorProximidad() {
         int confirmacion = JOptionPane.showConfirmDialog(
                 this,
@@ -649,44 +392,238 @@ public class PanelModuloCochera extends javax.swing.JPanel {
     // <editor-fold defaultstate="collapsed" desc="Generated Code">//GEN-BEGIN:initComponents
     private void initComponents() {
 
+        lblTitulo = new javax.swing.JLabel();
+        lblCapacidad = new javax.swing.JLabel();
         panelCochera = new javax.swing.JPanel();
+        pnlDetalle = new javax.swing.JPanel();
+        lblTituloDetalle = new javax.swing.JLabel();
+        lblDetalleCoord = new javax.swing.JLabel();
+        lblDetalleZona = new javax.swing.JLabel();
+        lblDetalleEstado = new javax.swing.JLabel();
+        lblDetalleTractor = new javax.swing.JLabel();
+        lblDetalleCarreta = new javax.swing.JLabel();
+        lblDetalleViaje = new javax.swing.JLabel();
+        lblDetalleProximidad = new javax.swing.JLabel();
+        btnDespacharViaje = new javax.swing.JButton();
+        btnLiberarEspacio = new javax.swing.JButton();
+        pnlLlegada = new javax.swing.JPanel();
+        lblTituloLlegada = new javax.swing.JLabel();
+        lblComboTexto = new javax.swing.JLabel();
+        cboUnidadesFuera = new javax.swing.JComboBox<>();
+        btnRegistrarLlegada = new javax.swing.JButton();
+        pnlAcciones = new javax.swing.JPanel();
+        lblTituloOptimizacion = new javax.swing.JLabel();
+        btnReorganizarProximidad = new javax.swing.JButton();
+        pnlLeyenda = new javax.swing.JPanel();
+        lblTituloLeyenda = new javax.swing.JLabel();
+        lblLeyendaOcupado = new javax.swing.JLabel();
+        lblLeyendaP1 = new javax.swing.JLabel();
+        lblLeyendaP2 = new javax.swing.JLabel();
+        lblLeyendaP3 = new javax.swing.JLabel();
+        lblLeyendaPasillo = new javax.swing.JLabel();
 
         setBackground(new java.awt.Color(255, 255, 255));
+        setPreferredSize(new java.awt.Dimension(880, 680));
+        setLayout(new org.netbeans.lib.awtextra.AbsoluteLayout());
 
-        panelCochera.setMaximumSize(new java.awt.Dimension(600, 600));
-        panelCochera.setPreferredSize(new java.awt.Dimension(600, 600));
+        lblTitulo.setFont(new java.awt.Font("Segoe UI", 1, 20)); // NOI18N
+        lblTitulo.setForeground(new java.awt.Color(30, 41, 59));
+        lblTitulo.setText("MÓDULO COCHERA - CONTROL DE PATIO");
+        add(lblTitulo, new org.netbeans.lib.awtextra.AbsoluteConstraints(30, 15, 460, 30));
 
-        javax.swing.GroupLayout panelCocheraLayout = new javax.swing.GroupLayout(panelCochera);
-        panelCochera.setLayout(panelCocheraLayout);
-        panelCocheraLayout.setHorizontalGroup(
-            panelCocheraLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGap(0, 600, Short.MAX_VALUE)
-        );
-        panelCocheraLayout.setVerticalGroup(
-            panelCocheraLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGap(0, 600, Short.MAX_VALUE)
-        );
+        lblCapacidad.setFont(new java.awt.Font("Segoe UI", 1, 12)); // NOI18N
+        lblCapacidad.setForeground(new java.awt.Color(71, 85, 105));
+        lblCapacidad.setText("Ocupación: 0 / 7 espacios");
+        add(lblCapacidad, new org.netbeans.lib.awtextra.AbsoluteConstraints(510, 18, 340, 25));
 
-        javax.swing.GroupLayout layout = new javax.swing.GroupLayout(this);
-        this.setLayout(layout);
-        layout.setHorizontalGroup(
-            layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(layout.createSequentialGroup()
-                .addGap(45, 45, 45)
-                .addComponent(panelCochera, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addContainerGap(239, Short.MAX_VALUE))
-        );
-        layout.setVerticalGroup(
-            layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(layout.createSequentialGroup()
-                .addGap(36, 36, 36)
-                .addComponent(panelCochera, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addContainerGap(45, Short.MAX_VALUE))
-        );
+        panelCochera.setBackground(new java.awt.Color(20, 24, 27));
+        panelCochera.setBorder(javax.swing.BorderFactory.createLineBorder(new java.awt.Color(51, 65, 85), 2));
+        panelCochera.setMaximumSize(new java.awt.Dimension(560, 560));
+        panelCochera.setPreferredSize(new java.awt.Dimension(560, 560));
+        panelCochera.setLayout(new java.awt.GridLayout(10, 10, 2, 2));
+        add(panelCochera, new org.netbeans.lib.awtextra.AbsoluteConstraints(30, 55, 560, 560));
+
+        pnlDetalle.setBackground(new java.awt.Color(248, 250, 252));
+        pnlDetalle.setBorder(javax.swing.BorderFactory.createEtchedBorder());
+        pnlDetalle.setLayout(new org.netbeans.lib.awtextra.AbsoluteLayout());
+
+        lblTituloDetalle.setFont(new java.awt.Font("Segoe UI", 1, 12)); // NOI18N
+        lblTituloDetalle.setForeground(new java.awt.Color(30, 41, 59));
+        lblTituloDetalle.setText("INFORMACIÓN DEL ESPACIO");
+        pnlDetalle.add(lblTituloDetalle, new org.netbeans.lib.awtextra.AbsoluteConstraints(10, 8, 235, 18));
+
+        lblDetalleCoord.setFont(new java.awt.Font("Segoe UI", 0, 11)); // NOI18N
+        lblDetalleCoord.setText("Coordenadas: Seleccione celda");
+        pnlDetalle.add(lblDetalleCoord, new org.netbeans.lib.awtextra.AbsoluteConstraints(10, 28, 235, 16));
+
+        lblDetalleZona.setFont(new java.awt.Font("Segoe UI", 0, 11)); // NOI18N
+        lblDetalleZona.setText("Zona: -");
+        pnlDetalle.add(lblDetalleZona, new org.netbeans.lib.awtextra.AbsoluteConstraints(10, 46, 235, 16));
+
+        lblDetalleEstado.setFont(new java.awt.Font("Segoe UI", 0, 11)); // NOI18N
+        lblDetalleEstado.setText("Estado: -");
+        pnlDetalle.add(lblDetalleEstado, new org.netbeans.lib.awtextra.AbsoluteConstraints(10, 64, 235, 16));
+
+        lblDetalleTractor.setFont(new java.awt.Font("Segoe UI", 0, 11)); // NOI18N
+        lblDetalleTractor.setText("Tractor: -");
+        pnlDetalle.add(lblDetalleTractor, new org.netbeans.lib.awtextra.AbsoluteConstraints(10, 82, 235, 16));
+
+        lblDetalleCarreta.setFont(new java.awt.Font("Segoe UI", 0, 11)); // NOI18N
+        lblDetalleCarreta.setText("Carreta: -");
+        pnlDetalle.add(lblDetalleCarreta, new org.netbeans.lib.awtextra.AbsoluteConstraints(10, 100, 235, 16));
+
+        lblDetalleViaje.setFont(new java.awt.Font("Segoe UI", 0, 11)); // NOI18N
+        lblDetalleViaje.setText("Próximo Viaje: -");
+        pnlDetalle.add(lblDetalleViaje, new org.netbeans.lib.awtextra.AbsoluteConstraints(10, 118, 235, 16));
+
+        lblDetalleProximidad.setFont(new java.awt.Font("Segoe UI", 0, 11)); // NOI18N
+        lblDetalleProximidad.setText("Proximidad: -");
+        pnlDetalle.add(lblDetalleProximidad, new org.netbeans.lib.awtextra.AbsoluteConstraints(10, 136, 235, 16));
+
+        btnDespacharViaje.setBackground(new java.awt.Color(13, 110, 253));
+        btnDespacharViaje.setFont(new java.awt.Font("Segoe UI", 1, 11)); // NOI18N
+        btnDespacharViaje.setForeground(new java.awt.Color(255, 255, 255));
+        btnDespacharViaje.setText("Despachar");
+        btnDespacharViaje.setEnabled(false);
+        btnDespacharViaje.addActionListener(this::btnDespacharViajeActionPerformed);
+        pnlDetalle.add(btnDespacharViaje, new org.netbeans.lib.awtextra.AbsoluteConstraints(10, 165, 110, 32));
+
+        btnLiberarEspacio.setBackground(new java.awt.Color(220, 53, 69));
+        btnLiberarEspacio.setFont(new java.awt.Font("Segoe UI", 1, 11)); // NOI18N
+        btnLiberarEspacio.setForeground(new java.awt.Color(255, 255, 255));
+        btnLiberarEspacio.setText("Liberar");
+        btnLiberarEspacio.setEnabled(false);
+        btnLiberarEspacio.addActionListener(this::btnLiberarEspacioActionPerformed);
+        pnlDetalle.add(btnLiberarEspacio, new org.netbeans.lib.awtextra.AbsoluteConstraints(130, 165, 110, 32));
+
+        add(pnlDetalle, new org.netbeans.lib.awtextra.AbsoluteConstraints(605, 55, 255, 215));
+
+        pnlLlegada.setBackground(new java.awt.Color(248, 250, 252));
+        pnlLlegada.setBorder(javax.swing.BorderFactory.createEtchedBorder());
+        pnlLlegada.setLayout(new org.netbeans.lib.awtextra.AbsoluteLayout());
+
+        lblTituloLlegada.setFont(new java.awt.Font("Segoe UI", 1, 12)); // NOI18N
+        lblTituloLlegada.setForeground(new java.awt.Color(30, 41, 59));
+        lblTituloLlegada.setText("LLEGADA DE UNIDAD (RETORNO)");
+        pnlLlegada.add(lblTituloLlegada, new org.netbeans.lib.awtextra.AbsoluteConstraints(10, 8, 235, 18));
+
+        lblComboTexto.setFont(new java.awt.Font("Segoe UI", 0, 11)); // NOI18N
+        lblComboTexto.setText("Unidad fuera de cochera:");
+        pnlLlegada.add(lblComboTexto, new org.netbeans.lib.awtextra.AbsoluteConstraints(10, 28, 235, 16));
+
+        cboUnidadesFuera.setFont(new java.awt.Font("Segoe UI", 0, 11)); // NOI18N
+        pnlLlegada.add(cboUnidadesFuera, new org.netbeans.lib.awtextra.AbsoluteConstraints(10, 48, 235, 28));
+
+        btnRegistrarLlegada.setBackground(new java.awt.Color(25, 135, 84));
+        btnRegistrarLlegada.setFont(new java.awt.Font("Segoe UI", 1, 11)); // NOI18N
+        btnRegistrarLlegada.setForeground(new java.awt.Color(255, 255, 255));
+        btnRegistrarLlegada.setText("Registrar Llegada a Cochera");
+        btnRegistrarLlegada.addActionListener(this::btnRegistrarLlegadaActionPerformed);
+        pnlLlegada.add(btnRegistrarLlegada, new org.netbeans.lib.awtextra.AbsoluteConstraints(10, 82, 235, 32));
+
+        add(pnlLlegada, new org.netbeans.lib.awtextra.AbsoluteConstraints(605, 280, 255, 125));
+
+        pnlAcciones.setBackground(new java.awt.Color(248, 250, 252));
+        pnlAcciones.setBorder(javax.swing.BorderFactory.createEtchedBorder());
+        pnlAcciones.setLayout(new org.netbeans.lib.awtextra.AbsoluteLayout());
+
+        lblTituloOptimizacion.setFont(new java.awt.Font("Segoe UI", 1, 12)); // NOI18N
+        lblTituloOptimizacion.setForeground(new java.awt.Color(30, 41, 59));
+        lblTituloOptimizacion.setText("OPTIMIZACIÓN DE PATIO");
+        pnlAcciones.add(lblTituloOptimizacion, new org.netbeans.lib.awtextra.AbsoluteConstraints(10, 6, 235, 18));
+
+        btnReorganizarProximidad.setBackground(new java.awt.Color(102, 16, 242));
+        btnReorganizarProximidad.setFont(new java.awt.Font("Segoe UI", 1, 11)); // NOI18N
+        btnReorganizarProximidad.setForeground(new java.awt.Color(255, 255, 255));
+        btnReorganizarProximidad.setText("Reorganizar por Proximidad");
+        btnReorganizarProximidad.addActionListener(this::btnReorganizarProximidadActionPerformed);
+        pnlAcciones.add(btnReorganizarProximidad, new org.netbeans.lib.awtextra.AbsoluteConstraints(10, 26, 235, 30));
+
+        add(pnlAcciones, new org.netbeans.lib.awtextra.AbsoluteConstraints(605, 415, 255, 65));
+
+        pnlLeyenda.setBackground(new java.awt.Color(255, 255, 255));
+        pnlLeyenda.setBorder(javax.swing.BorderFactory.createEtchedBorder());
+        pnlLeyenda.setLayout(new org.netbeans.lib.awtextra.AbsoluteLayout());
+
+        lblTituloLeyenda.setFont(new java.awt.Font("Segoe UI", 1, 11)); // NOI18N
+        lblTituloLeyenda.setForeground(new java.awt.Color(51, 65, 85));
+        lblTituloLeyenda.setText("LEYENDA DE ZONAS Y PRIORIDAD");
+        pnlLeyenda.add(lblTituloLeyenda, new org.netbeans.lib.awtextra.AbsoluteConstraints(10, 4, 235, 18));
+
+        lblLeyendaOcupado.setFont(new java.awt.Font("Segoe UI", 1, 10)); // NOI18N
+        lblLeyendaOcupado.setForeground(new java.awt.Color(40, 167, 69));
+        lblLeyendaOcupado.setText("■ Ocupado: Unidad en Cochera");
+        pnlLeyenda.add(lblLeyendaOcupado, new org.netbeans.lib.awtextra.AbsoluteConstraints(10, 24, 235, 16));
+
+        lblLeyendaP1.setFont(new java.awt.Font("Segoe UI", 1, 10)); // NOI18N
+        lblLeyendaP1.setForeground(new java.awt.Color(255, 193, 7));
+        lblLeyendaP1.setText("■ P1: Salida Inmediata (Próximo)");
+        pnlLeyenda.add(lblLeyendaP1, new org.netbeans.lib.awtextra.AbsoluteConstraints(10, 42, 235, 16));
+
+        lblLeyendaP2.setFont(new java.awt.Font("Segoe UI", 1, 10)); // NOI18N
+        lblLeyendaP2.setForeground(new java.awt.Color(23, 162, 184));
+        lblLeyendaP2.setText("■ P2: Salida Media (Intermedio)");
+        pnlLeyenda.add(lblLeyendaP2, new org.netbeans.lib.awtextra.AbsoluteConstraints(10, 60, 235, 16));
+
+        lblLeyendaP3.setFont(new java.awt.Font("Segoe UI", 1, 10)); // NOI18N
+        lblLeyendaP3.setForeground(new java.awt.Color(108, 117, 125));
+        lblLeyendaP3.setText("■ P3: Estancia Larga / Sin Viaje");
+        pnlLeyenda.add(lblLeyendaP3, new org.netbeans.lib.awtextra.AbsoluteConstraints(10, 78, 235, 16));
+
+        lblLeyendaPasillo.setFont(new java.awt.Font("Segoe UI", 1, 10)); // NOI18N
+        lblLeyendaPasillo.setForeground(new java.awt.Color(33, 37, 41));
+        lblLeyendaPasillo.setText("■ Vía de Maniobras y Circulación");
+        pnlLeyenda.add(lblLeyendaPasillo, new org.netbeans.lib.awtextra.AbsoluteConstraints(10, 96, 235, 16));
+
+        add(pnlLeyenda, new org.netbeans.lib.awtextra.AbsoluteConstraints(605, 490, 255, 125));
     }// </editor-fold>//GEN-END:initComponents
+
+    private void btnDespacharViajeActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnDespacharViajeActionPerformed
+        despacharUnidadSeleccionada();
+    }//GEN-LAST:event_btnDespacharViajeActionPerformed
+
+    private void btnLiberarEspacioActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnLiberarEspacioActionPerformed
+        liberarEspacioSeleccionado();
+    }//GEN-LAST:event_btnLiberarEspacioActionPerformed
+
+    private void btnRegistrarLlegadaActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnRegistrarLlegadaActionPerformed
+        registrarLlegadaDeUnidad();
+    }//GEN-LAST:event_btnRegistrarLlegadaActionPerformed
+
+    private void btnReorganizarProximidadActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnReorganizarProximidadActionPerformed
+        reorganizarPorProximidad();
+    }//GEN-LAST:event_btnReorganizarProximidadActionPerformed
 
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
+    private javax.swing.JButton btnDespacharViaje;
+    private javax.swing.JButton btnLiberarEspacio;
+    private javax.swing.JButton btnRegistrarLlegada;
+    private javax.swing.JButton btnReorganizarProximidad;
+    private javax.swing.JComboBox<String> cboUnidadesFuera;
+    private javax.swing.JLabel lblCapacidad;
+    private javax.swing.JLabel lblComboTexto;
+    private javax.swing.JLabel lblDetalleCarreta;
+    private javax.swing.JLabel lblDetalleCoord;
+    private javax.swing.JLabel lblDetalleEstado;
+    private javax.swing.JLabel lblDetalleProximidad;
+    private javax.swing.JLabel lblDetalleTractor;
+    private javax.swing.JLabel lblDetalleViaje;
+    private javax.swing.JLabel lblDetalleZona;
+    private javax.swing.JLabel lblLeyendaOcupado;
+    private javax.swing.JLabel lblLeyendaP1;
+    private javax.swing.JLabel lblLeyendaP2;
+    private javax.swing.JLabel lblLeyendaP3;
+    private javax.swing.JLabel lblLeyendaPasillo;
+    private javax.swing.JLabel lblTitulo;
+    private javax.swing.JLabel lblTituloDetalle;
+    private javax.swing.JLabel lblTituloLeyenda;
+    private javax.swing.JLabel lblTituloLlegada;
+    private javax.swing.JLabel lblTituloOptimizacion;
     private javax.swing.JPanel panelCochera;
+    private javax.swing.JPanel pnlAcciones;
+    private javax.swing.JPanel pnlDetalle;
+    private javax.swing.JPanel pnlLeyenda;
+    private javax.swing.JPanel pnlLlegada;
     // End of variables declaration//GEN-END:variables
 }
