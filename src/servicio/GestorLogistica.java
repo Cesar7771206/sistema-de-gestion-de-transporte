@@ -44,6 +44,19 @@ public class GestorLogistica {
         rutas.add(ruta);
     }
 
+    public static boolean eliminarRuta(int id) {
+        return rutas.removeIf(r -> r.getId() == id);
+    }
+
+    public static Ruta buscarRutaPorId(int id) {
+        for (Ruta r : rutas) {
+            if (r.getId() == id) {
+                return r;
+            }
+        }
+        return null;
+    }
+
     public static ArrayList<Ruta> getRutas() {
         return rutas;
     }

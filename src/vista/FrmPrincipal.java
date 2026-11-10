@@ -14,6 +14,7 @@ public class FrmPrincipal extends javax.swing.JFrame {
 
     private java.awt.CardLayout vistaCards;
     private PanelModuloViajes panelViajes;
+    private PanelModuloCochera panelCochera;
 
     /**
      * Creates new form FrmPrincipal
@@ -27,6 +28,8 @@ public class FrmPrincipal extends javax.swing.JFrame {
         panelContenido.add(new PanelModuloData(), "MODULO_DATA");
         panelViajes = new PanelModuloViajes();
         panelContenido.add(panelViajes, "MODULO_VIAJES");
+        panelCochera = new PanelModuloCochera();
+        panelContenido.add(panelCochera, "MODULO_COCHERA");
         vistaCards.show(panelContenido, "MODULO_INICIO");
 
         PanelUserSidebar sidebar = new PanelUserSidebar(this);
@@ -93,16 +96,15 @@ public class FrmPrincipal extends javax.swing.JFrame {
     }
 
     public void navegar(String nombreCard) {
-
-    if (vistaCards != null) {
-
-        if (nombreCard.equals("MODULO_VIAJES")) {
-            panelViajes.cargarCombos();
+        if (vistaCards != null) {
+            if (nombreCard.equals("MODULO_VIAJES")) {
+                panelViajes.cargarDatos();
+            } else if (nombreCard.equals("MODULO_COCHERA")) {
+                panelCochera.refrescar();
+            }
+            vistaCards.show(panelContenido, nombreCard);
         }
-
-        vistaCards.show(panelContenido, nombreCard);
     }
-}
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private java.awt.Panel panelContenido;

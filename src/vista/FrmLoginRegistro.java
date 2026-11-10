@@ -114,9 +114,15 @@ public class FrmLoginRegistro extends javax.swing.JFrame {
         lblTituloRegistro.setFont(new java.awt.Font("Segoe UI", 1, 18)); // NOI18N
         lblTituloRegistro.setText("Registro de Operadores ");
 
-        btnRegistrar.setBackground(new java.awt.Color(25, 55, 109));
+        btnRegistrar.setBackground(new java.awt.Color(0, 153, 255));
+        btnRegistrar.setFont(new java.awt.Font("Segoe UI", 1, 12)); // NOI18N
+        btnRegistrar.setForeground(new java.awt.Color(255, 255, 255));
         btnRegistrar.setText("Registrarse");
-        btnRegistrar.addActionListener(this::btnRegistrarActionPerformed);
+        btnRegistrar.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                btnRegistrarActionPerformed(evt);
+            }
+        });
 
         lblIrLogin.setFont(new java.awt.Font("Segoe UI", 1, 12)); // NOI18N
         lblIrLogin.setForeground(new java.awt.Color(41, 98, 255));
@@ -253,9 +259,15 @@ public class FrmLoginRegistro extends javax.swing.JFrame {
 
         txtContraseña.setBorder(javax.swing.BorderFactory.createLineBorder(new java.awt.Color(0, 0, 0)));
 
-        btbIngresar.setBackground(new java.awt.Color(25, 55, 105));
+        btbIngresar.setBackground(new java.awt.Color(0, 153, 255));
+        btbIngresar.setFont(new java.awt.Font("Segoe UI", 1, 12)); // NOI18N
+        btbIngresar.setForeground(new java.awt.Color(255, 255, 255));
         btbIngresar.setText("Ingresar");
-        btbIngresar.addActionListener(this::btbIngresarActionPerformed);
+        btbIngresar.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                btbIngresarActionPerformed(evt);
+            }
+        });
 
         lblCorreo.setText("Correo  Electrónico");
 
