@@ -98,7 +98,7 @@ public class FrmPrincipal extends javax.swing.JFrame {
     public void navegar(String nombreCard) {
         if (vistaCards != null) {
             if (nombreCard.equals("MODULO_VIAJES")) {
-                panelViajes.cargarCombos();
+                panelViajes.cargarDatos();
             } else if (nombreCard.equals("MODULO_COCHERA")) {
                 panelCochera.refrescar();
             }
