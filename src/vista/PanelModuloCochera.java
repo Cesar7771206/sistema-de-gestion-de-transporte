@@ -21,22 +21,18 @@ import servicio.GestorEquipos;
 import servicio.GestorViajes;
 
 /**
- * Panel visual para el Módulo de Cochera.
- * Representa la cuadrícula 10x10 del patio de estacionamiento y gestiona
- * la asignación y reubicación de unidades de transporte según la proximidad
- * de sus viajes programados (Prioridad 1: inmediata, 2: media, 3: baja/sin viaje).
- * 
- * Totalmente compatible y editable con el diseñador visual de NetBeans GUI Builder.
+ * Panel para el Módulo de Cochera.
+ * Representa la cuadrícula de estacionamiento (10x10) donde cada espacio
+ * está compuesto estrictamente por 3 coordenadas físicas.
+ * Asigna y reorganiza las unidades según la proximidad de los viajes en cola
+ * y las prioridades asignadas (1, 2 o 3).
  */
 public class PanelModuloCochera extends javax.swing.JPanel {
 
-    // Paleta de colores para la cochera
-    private static final Color COLOR_FONDO_PASILLO = new Color(33, 37, 41);
-    private static final Color COLOR_P1_LIBRE = new Color(255, 193, 7);      // Ámbar: Salida rápida
-    private static final Color COLOR_P2_LIBRE = new Color(23, 162, 184);     // Cian: Salida intermedia
-    private static final Color COLOR_P3_LIBRE = new Color(108, 117, 125);    // Gris: Estancia larga
-    private static final Color COLOR_OCUPADO = new Color(40, 167, 69);       // Verde: Unidad en cochera
-    private static final Color COLOR_SELECCION = new Color(255, 87, 34);     // Naranja: Celda activa
+    private static final Color COLOR_PASILLO = new Color(30, 30, 30);
+    private static final Color COLOR_LIBRE = new Color(160, 160, 160);
+    private static final Color COLOR_OCUPADO = new Color(60, 150, 80);
+    private static final Color COLOR_SELECCION = new Color(255, 153, 0);
 
     private final CocheraServicio servicio = new CocheraServicio();
     private final JLabel[][] celdas = new JLabel[10][10];
@@ -49,33 +45,12 @@ public class PanelModuloCochera extends javax.swing.JPanel {
      */
     public PanelModuloCochera() {
         initComponents();
-        inicializarDatosDemoSiEsNecesario();
         construirCuadricula();
         refrescar();
     }
 
     /**
-     * Inicializa datos demostrativos si es necesario y asigna las unidades iniciales
-     * a sus espacios en cochera según la proximidad de los viajes registrados.
-     */
-    private void inicializarDatosDemoSiEsNecesario() {
-        GestorEquipos.inicializarDatosDemo();
-
-        if (servicio.getCantidadUnidades() == 0) {
-            for (UnidadTransporte u : GestorEquipos.getUnidades()) {
-                if (!u.estaEnCochera() && !servicio.estaLlena()) {
-                    try {
-                        servicio.registrarLlegada(u);
-                    } catch (IllegalStateException ignored) {
-                    }
-                }
-            }
-        }
-    }
-
-    /**
-     * Construye la cuadrícula de 10x10 JLabels dentro del panelCochera
-     * configurado por el diseñador visual de NetBeans.
+     * Construye la cuadrícula de 10x10 dentro del contenedor panelCochera.
      */
     private void construirCuadricula() {
         panelCochera.removeAll();
@@ -84,9 +59,9 @@ public class PanelModuloCochera extends javax.swing.JPanel {
             for (int c = 0; c < 10; c++) {
                 JLabel celda = new JLabel("", SwingConstants.CENTER);
                 celda.setOpaque(true);
-                celda.setBackground(COLOR_FONDO_PASILLO);
+                celda.setBackground(COLOR_PASILLO);
                 celda.setForeground(Color.WHITE);
-                celda.setFont(new Font("Segoe UI", Font.BOLD, 10));
+                celda.setFont(new Font("Sans Serif", Font.BOLD, 10));
                 celda.setCursor(new Cursor(Cursor.HAND_CURSOR));
 
                 final int fila = f;
@@ -105,8 +80,8 @@ public class PanelModuloCochera extends javax.swing.JPanel {
     }
 
     /**
-     * Actualiza la visualización de todos los espacios libres, unidades estacionadas,
-     * capacidad global y lista de unidades fuera de cochera.
+     * Actualiza la visualización de la cuadrícula, unidades estacionadas
+     * y el combo de unidades disponibles para ingresar a cochera.
      */
     public void refrescar() {
         // 1. Restaurar pasillos y pintar espacios disponibles por prioridad
@@ -114,53 +89,51 @@ public class PanelModuloCochera extends javax.swing.JPanel {
             for (int c = 0; c < 10; c++) {
                 JLabel celda = celdas[f][c];
                 if (celda == null) continue;
-                celda.setBorder(new LineBorder(new Color(40, 44, 52), 1));
+                celda.setBorder(new LineBorder(new Color(50, 50, 50), 1));
                 celda.setForeground(Color.WHITE);
 
                 int prioridad = servicio.getPrioridadDeEspacio(f, c);
                 if (prioridad == 0) {
-                    celda.setBackground(COLOR_FONDO_PASILLO);
+                    celda.setBackground(COLOR_PASILLO);
                     celda.setText("");
-                    celda.setToolTipText("Vía de circulación [" + f + ", " + c + "]");
+                    celda.setToolTipText("Pasillo de maniobras [" + f + ", " + c + "]");
                 } else {
+                    celda.setBackground(COLOR_LIBRE);
                     celda.setText("P" + prioridad);
-                    celda.setToolTipText("Espacio Libre - Prioridad " + prioridad + " [" + f + ", " + c + "]");
-                    switch (prioridad) {
-                        case 1 -> celda.setBackground(COLOR_P1_LIBRE);
-                        case 2 -> celda.setBackground(COLOR_P2_LIBRE);
-                        case 3 -> celda.setBackground(COLOR_P3_LIBRE);
-                    }
+                    celda.setToolTipText("Espacio disponible - Prioridad " + prioridad + " [" + f + ", " + c + "]");
                 }
             }
         }
 
-        // 2. Pintar unidades actualmente estacionadas en cochera
+        // 2. Pintar las unidades actualmente estacionadas
         for (UnidadTransporte unidad : servicio.getUnidades()) {
             pintarUnidad(unidad);
         }
 
-        // 3. Resaltar la celda seleccionada si existe
+        // 3. Restaurar selección si existe
         if (celdaSeleccionadaFila != -1 && celdaSeleccionadaCol != -1) {
-            if (celdas[celdaSeleccionadaFila][celdaSeleccionadaCol] != null) {
-                celdas[celdaSeleccionadaFila][celdaSeleccionadaCol].setBorder(
-                        new LineBorder(COLOR_SELECCION, 2)
-                );
-            }
             mostrarDatos(celdaSeleccionadaFila, celdaSeleccionadaCol);
+        } else {
+            lblCoord.setText("Coords: Seleccione celda");
+            lblPrioridad.setText("Prioridad: -");
+            lblEstado.setText("Estado: -");
+            lblTractor.setText("Tractor: -");
+            lblCarreta.setText("Carreta: -");
+            lblViaje.setText("Próximo Viaje: -");
+            btnDespachar.setEnabled(false);
+            btnLiberar.setEnabled(false);
         }
 
-        // 4. Actualizar contador de capacidad
-        lblCapacidad.setText("Ocupación: " + servicio.getCantidadUnidades() + " / "
-                + servicio.getCapacidadTotal() + " espacios ("
-                + servicio.getEspaciosDisponibles() + " disponibles)");
-
-        // 5. Actualizar combo de unidades que se encuentran fuera de cochera
-        actualizarComboUnidadesFuera();
+        // 4. Actualizar combo de unidades que están fuera de cochera
+        actualizarComboUnidades();
 
         panelCochera.revalidate();
         panelCochera.repaint();
     }
 
+    /**
+     * Dibuja una unidad ocupando sus 3 coordenadas en la cuadrícula.
+     */
     private void pintarUnidad(UnidadTransporte unidad) {
         int[][] coordenadas = unidad.getCoordenadasCochera();
         if (coordenadas == null) return;
@@ -170,6 +143,7 @@ public class PanelModuloCochera extends javax.swing.JPanel {
             int c = coordenadas[i][1];
             JLabel l = celdas[f][c];
             if (l == null) continue;
+
             l.setBackground(COLOR_OCUPADO);
             l.setForeground(Color.WHITE);
 
@@ -178,8 +152,8 @@ public class PanelModuloCochera extends javax.swing.JPanel {
             } else if (i == 1) {
                 l.setText("P" + unidad.getPrioridadCochera());
             } else {
-                String carretaTexto = (unidad.getCarreta() != null) ? unidad.getCarreta().getPlaca() : "";
-                l.setText(carretaTexto);
+                String carreta = (unidad.getCarreta() != null) ? unidad.getCarreta().getPlaca() : "-";
+                l.setText(carreta);
             }
 
             l.setToolTipText("Unidad " + unidad.getPlaca() + " | Prioridad "
@@ -188,66 +162,108 @@ public class PanelModuloCochera extends javax.swing.JPanel {
     }
 
     /**
-     * Muestra en el panel de detalle los datos completos de la celda pulsada.
+     * Localiza el bloque de 3 coordenadas al que pertenece la celda (fila, col).
+     */
+    public int[][] buscarEspacio(int fila, int col) {
+        for (int p = 1; p <= 3; p++) {
+            for (int[][] esp : servicio.getEspacios(p)) {
+                for (int[] celda : esp) {
+                    if (celda[0] == fila && celda[1] == col) {
+                        return esp;
+                    }
+                }
+            }
+        }
+        return null;
+    }
+
+    private String formatoCoordenadas(int[][] espacio) {
+        if (espacio == null || espacio.length == 0) return "Coords: -";
+        StringBuilder sb = new StringBuilder("Coords: ");
+        for (int i = 0; i < espacio.length; i++) {
+            sb.append("(").append(espacio[i][0]).append(",").append(espacio[i][1]).append(")");
+            if (i < espacio.length - 1) {
+                sb.append(" ");
+            }
+        }
+        return sb.toString();
+    }
+
+    /**
+     * Muestra la información del espacio (de 3 coordenadas) seleccionado.
      */
     private void mostrarDatos(int fila, int col) {
         this.celdaSeleccionadaFila = fila;
         this.celdaSeleccionadaCol = col;
 
+        int[][] espacio = buscarEspacio(fila, col);
+
+        // Resaltar las celdas del espacio seleccionado
         for (int f = 0; f < 10; f++) {
             for (int c = 0; c < 10; c++) {
                 if (celdas[f][c] == null) continue;
-                if (f == fila && c == col) {
+                boolean seleccionado = false;
+                if (espacio != null) {
+                    for (int[] celda : espacio) {
+                        if (celda[0] == f && celda[1] == c) {
+                            seleccionado = true;
+                            break;
+                        }
+                    }
+                } else if (f == fila && c == col) {
+                    seleccionado = true;
+                }
+
+                if (seleccionado) {
                     celdas[f][c].setBorder(new LineBorder(COLOR_SELECCION, 2));
                 } else {
-                    celdas[f][c].setBorder(new LineBorder(new Color(40, 44, 52), 1));
+                    celdas[f][c].setBorder(new LineBorder(new Color(50, 50, 50), 1));
                 }
             }
         }
 
-        lblDetalleCoord.setText("Coordenadas: Fila " + fila + ", Columna " + col);
+        if (espacio == null) {
+            lblCoord.setText("Coords: (" + fila + "," + col + ") [Pasillo]");
+            lblPrioridad.setText("Prioridad: Pasillo");
+            lblEstado.setText("Estado: Maniobra libre");
+            lblEstado.setForeground(Color.BLACK);
+            lblTractor.setText("Tractor: -");
+            lblCarreta.setText("Carreta: -");
+            lblViaje.setText("Próximo Viaje: -");
+            btnDespachar.setEnabled(false);
+            btnLiberar.setEnabled(false);
+            return;
+        }
+
+        lblCoord.setText(formatoCoordenadas(espacio));
 
         UnidadTransporte unidad = servicio.getUnidadEn(fila, col);
         if (unidad != null) {
-            lblDetalleZona.setText("Zona: Prioridad " + unidad.getPrioridadCochera());
-            lblDetalleEstado.setText("Estado: OCUPADO");
-            lblDetalleEstado.setForeground(new Color(40, 167, 69));
-            lblDetalleTractor.setText("Tractor: " + unidad.getPlaca());
-            lblDetalleCarreta.setText("Carreta: " + (unidad.getCarreta() != null ? unidad.getCarreta().getPlaca() : "Ninguna"));
+            lblPrioridad.setText("Prioridad: " + unidad.getPrioridadCochera());
+            lblEstado.setText("Estado: OCUPADO");
+            lblEstado.setForeground(new Color(40, 140, 60));
+            lblTractor.setText("Tractor: " + unidad.getPlaca());
+            lblCarreta.setText("Carreta: " + (unidad.getCarreta() != null ? unidad.getCarreta().getPlaca() : "(Sin Carreta)"));
 
-            Viaje proximoViaje = buscarProximoViaje(unidad);
-            if (proximoViaje != null) {
-                int turno = obtenerTurnoEnCola(proximoViaje);
-                lblDetalleViaje.setText("Próximo: #" + proximoViaje.getId() + " - " + proximoViaje.getCliente().getNombre());
-                lblDetalleProximidad.setText("Proximidad: Turno #" + (turno + 1) + " (P" + unidad.getPrioridadCochera() + ")");
+            Viaje viaje = buscarProximoViaje(unidad);
+            if (viaje != null) {
+                lblViaje.setText("Próximo Viaje: #" + viaje.getId() + " - " + viaje.getCliente().getNombre());
             } else {
-                lblDetalleViaje.setText("Próximo Viaje: Sin viaje asignado");
-                lblDetalleProximidad.setText("Proximidad: Sin urgencia (P3)");
+                lblViaje.setText("Próximo Viaje: Sin viaje asignado");
             }
 
-            btnDespacharViaje.setEnabled(true);
-            btnLiberarEspacio.setEnabled(true);
+            btnDespachar.setEnabled(true);
+            btnLiberar.setEnabled(true);
         } else {
-            int prioridadZona = servicio.getPrioridadDeEspacio(fila, col);
-            if (prioridadZona > 0) {
-                lblDetalleZona.setText("Zona: Prioridad " + prioridadZona);
-                lblDetalleEstado.setText("Estado: DISPONIBLE");
-                lblDetalleEstado.setForeground(new Color(13, 110, 253));
-                lblDetalleTractor.setText("Tractor: -");
-                lblDetalleCarreta.setText("Carreta: -");
-                lblDetalleViaje.setText("Próximo Viaje: -");
-                lblDetalleProximidad.setText("Proximidad: Espacio libre P" + prioridadZona);
-            } else {
-                lblDetalleZona.setText("Zona: Vía de circulación");
-                lblDetalleEstado.setText("Estado: TRÁNSITO LIBRE");
-                lblDetalleEstado.setForeground(Color.DARK_GRAY);
-                lblDetalleTractor.setText("Tractor: -");
-                lblDetalleCarreta.setText("Carreta: -");
-                lblDetalleViaje.setText("Próximo Viaje: -");
-                lblDetalleProximidad.setText("Proximidad: -");
-            }
-            btnDespacharViaje.setEnabled(false);
-            btnLiberarEspacio.setEnabled(false);
+            int prioridadEspacio = servicio.getPrioridadDeEspacio(fila, col);
+            lblPrioridad.setText("Prioridad: " + prioridadEspacio);
+            lblEstado.setText("Estado: DISPONIBLE");
+            lblEstado.setForeground(new Color(0, 102, 204));
+            lblTractor.setText("Tractor: -");
+            lblCarreta.setText("Carreta: -");
+            lblViaje.setText("Próximo Viaje: -");
+            btnDespachar.setEnabled(false);
+            btnLiberar.setEnabled(false);
         }
     }
 
@@ -262,125 +278,24 @@ public class PanelModuloCochera extends javax.swing.JPanel {
         return null;
     }
 
-    private int obtenerTurnoEnCola(Viaje viaje) {
-        return GestorViajes.getViajes().indexOf(viaje);
-    }
+    public void actualizarComboUnidades() {
+        cboUnidadLlegada.removeAllItems();
+        List<UnidadTransporte> unidadesRegistradas = GestorEquipos.getUnidades();
+        int fuera = 0;
 
-    private void actualizarComboUnidadesFuera() {
-        cboUnidadesFuera.removeAllItems();
-        List<UnidadTransporte> todas = GestorEquipos.getUnidades();
-        int conteoFuera = 0;
-
-        for (UnidadTransporte u : todas) {
+        for (UnidadTransporte u : unidadesRegistradas) {
             if (!u.estaEnCochera()) {
-                int prioridadSugerida = servicio.calcularPrioridadPorProximidad(u);
-                cboUnidadesFuera.addItem(u.getPlaca() + " (Prioridad P" + prioridadSugerida + ")");
-                conteoFuera++;
+                int p = servicio.calcularPrioridadPorProximidad(u);
+                cboUnidadLlegada.addItem(u.getPlaca() + " (Prioridad " + p + ")");
+                fuera++;
             }
         }
 
-        btnRegistrarLlegada.setEnabled(conteoFuera > 0 && !servicio.estaLlena());
+        btnRegistrarLlegada.setEnabled(fuera > 0 && !servicio.estaLlena());
     }
 
-    private void despacharUnidadSeleccionada() {
-        if (celdaSeleccionadaFila == -1 || celdaSeleccionadaCol == -1) return;
-
-        UnidadTransporte unidad = servicio.getUnidadEn(celdaSeleccionadaFila, celdaSeleccionadaCol);
-        if (unidad == null) return;
-
-        int confirmacion = JOptionPane.showConfirmDialog(
-                this,
-                "¿Desea despachar la unidad " + unidad.getPlaca() + " a su viaje?\nEl espacio en cochera quedará liberado.",
-                "Confirmar Despacho a Viaje",
-                JOptionPane.YES_NO_OPTION
-        );
-
-        if (confirmacion == JOptionPane.YES_OPTION) {
-            String placa = unidad.getPlaca();
-            boolean exito = servicio.registrarSalida(unidad);
-            if (exito) {
-                JOptionPane.showMessageDialog(this,
-                        "Unidad " + placa + " despachada exitosamente.\nEspacio liberado en cochera.",
-                        "Despacho Exitoso",
-                        JOptionPane.INFORMATION_MESSAGE);
-                refrescar();
-            }
-        }
-    }
-
-    private void liberarEspacioSeleccionado() {
-        if (celdaSeleccionadaFila == -1 || celdaSeleccionadaCol == -1) return;
-
-        UnidadTransporte unidad = servicio.getUnidadEn(celdaSeleccionadaFila, celdaSeleccionadaCol);
-        if (unidad == null) return;
-
-        int confirmacion = JOptionPane.showConfirmDialog(
-                this,
-                "¿Está seguro de desalojar la unidad " + unidad.getPlaca() + " de la cochera?",
-                "Confirmar Liberación",
-                JOptionPane.YES_NO_OPTION
-        );
-
-        if (confirmacion == JOptionPane.YES_OPTION) {
-            servicio.liberarEspacio(unidad);
-            JOptionPane.showMessageDialog(this,
-                    "Espacio liberado correctamente.",
-                    "Operación Exitosa",
-                    JOptionPane.INFORMATION_MESSAGE);
-            refrescar();
-        }
-    }
-
-    private void registrarLlegadaDeUnidad() {
-        int indiceSeleccionado = cboUnidadesFuera.getSelectedIndex();
-        if (indiceSeleccionado == -1) {
-            JOptionPane.showMessageDialog(this, "Seleccione una unidad fuera de cochera.", "Aviso", JOptionPane.WARNING_MESSAGE);
-            return;
-        }
-
-        String item = (String) cboUnidadesFuera.getSelectedItem();
-        if (item == null) return;
-        String placa = item.split(" ")[0].trim();
-
-        UnidadTransporte unidad = GestorEquipos.buscarUnidadPorTractor(placa);
-        if (unidad == null) {
-            JOptionPane.showMessageDialog(this, "No se encontró la unidad seleccionada.", "Error", JOptionPane.ERROR_MESSAGE);
-            return;
-        }
-
-        try {
-            boolean asignado = servicio.registrarLlegada(unidad);
-            if (asignado) {
-                JOptionPane.showMessageDialog(this,
-                        "Llegada registrada exitosamente.\nUnidad: " + unidad.getPlaca()
-                                + "\nPrioridad calculada según proximidad de viaje: P" + unidad.getPrioridadCochera()
-                                + "\nEspacio asignado en patio.",
-                        "Llegada a Cochera",
-                        JOptionPane.INFORMATION_MESSAGE);
-                refrescar();
-            }
-        } catch (Exception ex) {
-            JOptionPane.showMessageDialog(this, ex.getMessage(), "Error de Asignación", JOptionPane.ERROR_MESSAGE);
-        }
-    }
-
-    private void reorganizarPorProximidad() {
-        int confirmacion = JOptionPane.showConfirmDialog(
-                this,
-                "Se recalcularán las prioridades de todas las unidades estacionadas\n"
-                        + "según el orden actual de viajes en cola y se reubicarán en los mejores espacios.\n¿Desea continuar?",
-                "Reorganizar por Proximidad de Viajes",
-                JOptionPane.YES_NO_OPTION
-        );
-
-        if (confirmacion == JOptionPane.YES_OPTION) {
-            servicio.reorganizarSegunProximidadViajes();
-            JOptionPane.showMessageDialog(this,
-                    "Cochera reorganizada según la proximidad actual de viajes.",
-                    "Reorganización Exitosa",
-                    JOptionPane.INFORMATION_MESSAGE);
-            refrescar();
-        }
+    public CocheraServicio getServicio() {
+        return servicio;
     }
 
     /**
@@ -392,238 +307,263 @@ public class PanelModuloCochera extends javax.swing.JPanel {
     // <editor-fold defaultstate="collapsed" desc="Generated Code">//GEN-BEGIN:initComponents
     private void initComponents() {
 
-        lblTitulo = new javax.swing.JLabel();
-        lblCapacidad = new javax.swing.JLabel();
+        jLabel1 = new javax.swing.JLabel();
         panelCochera = new javax.swing.JPanel();
-        pnlDetalle = new javax.swing.JPanel();
-        lblTituloDetalle = new javax.swing.JLabel();
-        lblDetalleCoord = new javax.swing.JLabel();
-        lblDetalleZona = new javax.swing.JLabel();
-        lblDetalleEstado = new javax.swing.JLabel();
-        lblDetalleTractor = new javax.swing.JLabel();
-        lblDetalleCarreta = new javax.swing.JLabel();
-        lblDetalleViaje = new javax.swing.JLabel();
-        lblDetalleProximidad = new javax.swing.JLabel();
-        btnDespacharViaje = new javax.swing.JButton();
-        btnLiberarEspacio = new javax.swing.JButton();
-        pnlLlegada = new javax.swing.JPanel();
-        lblTituloLlegada = new javax.swing.JLabel();
-        lblComboTexto = new javax.swing.JLabel();
-        cboUnidadesFuera = new javax.swing.JComboBox<>();
+        pnlContenido = new javax.swing.JPanel();
+        jLabelTitulo = new javax.swing.JLabel();
+        jLabelSubDetalle = new javax.swing.JLabel();
+        lblCoord = new javax.swing.JLabel();
+        lblPrioridad = new javax.swing.JLabel();
+        lblEstado = new javax.swing.JLabel();
+        lblTractor = new javax.swing.JLabel();
+        lblCarreta = new javax.swing.JLabel();
+        lblViaje = new javax.swing.JLabel();
+        btnDespachar = new javax.swing.JButton();
+        btnLiberar = new javax.swing.JButton();
+        jLabelSubLlegada = new javax.swing.JLabel();
+        jLabelSelUnidad = new javax.swing.JLabel();
+        cboUnidadLlegada = new javax.swing.JComboBox<>();
         btnRegistrarLlegada = new javax.swing.JButton();
-        pnlAcciones = new javax.swing.JPanel();
-        lblTituloOptimizacion = new javax.swing.JLabel();
-        btnReorganizarProximidad = new javax.swing.JButton();
-        pnlLeyenda = new javax.swing.JPanel();
-        lblTituloLeyenda = new javax.swing.JLabel();
-        lblLeyendaOcupado = new javax.swing.JLabel();
-        lblLeyendaP1 = new javax.swing.JLabel();
-        lblLeyendaP2 = new javax.swing.JLabel();
-        lblLeyendaP3 = new javax.swing.JLabel();
-        lblLeyendaPasillo = new javax.swing.JLabel();
+        btnReorganizar = new javax.swing.JButton();
+        jLabelLeyenda = new javax.swing.JLabel();
+        lblLeyenda1 = new javax.swing.JLabel();
+        lblLeyenda2 = new javax.swing.JLabel();
+        lblLeyenda3 = new javax.swing.JLabel();
 
         setBackground(new java.awt.Color(255, 255, 255));
         setPreferredSize(new java.awt.Dimension(880, 680));
         setLayout(new org.netbeans.lib.awtextra.AbsoluteLayout());
 
-        lblTitulo.setFont(new java.awt.Font("Segoe UI", 1, 20)); // NOI18N
-        lblTitulo.setForeground(new java.awt.Color(30, 41, 59));
-        lblTitulo.setText("MÓDULO COCHERA - CONTROL DE PATIO");
-        add(lblTitulo, new org.netbeans.lib.awtextra.AbsoluteConstraints(30, 15, 460, 30));
+        jLabel1.setBackground(new java.awt.Color(255, 255, 255));
+        jLabel1.setFont(new java.awt.Font("Javanese Text", 1, 36)); // NOI18N
+        jLabel1.setText("MODULO COCHERA");
+        add(jLabel1, new org.netbeans.lib.awtextra.AbsoluteConstraints(45, 15, 450, 55));
 
-        lblCapacidad.setFont(new java.awt.Font("Segoe UI", 1, 12)); // NOI18N
-        lblCapacidad.setForeground(new java.awt.Color(71, 85, 105));
-        lblCapacidad.setText("Ocupación: 0 / 7 espacios");
-        add(lblCapacidad, new org.netbeans.lib.awtextra.AbsoluteConstraints(510, 18, 340, 25));
-
-        panelCochera.setBackground(new java.awt.Color(20, 24, 27));
-        panelCochera.setBorder(javax.swing.BorderFactory.createLineBorder(new java.awt.Color(51, 65, 85), 2));
-        panelCochera.setMaximumSize(new java.awt.Dimension(560, 560));
-        panelCochera.setPreferredSize(new java.awt.Dimension(560, 560));
+        panelCochera.setBackground(new java.awt.Color(30, 30, 30));
+        panelCochera.setBorder(javax.swing.BorderFactory.createLineBorder(new java.awt.Color(0, 0, 0)));
+        panelCochera.setMaximumSize(new java.awt.Dimension(540, 540));
+        panelCochera.setPreferredSize(new java.awt.Dimension(540, 540));
         panelCochera.setLayout(new java.awt.GridLayout(10, 10, 2, 2));
-        add(panelCochera, new org.netbeans.lib.awtextra.AbsoluteConstraints(30, 55, 560, 560));
+        add(panelCochera, new org.netbeans.lib.awtextra.AbsoluteConstraints(45, 80, 540, 540));
 
-        pnlDetalle.setBackground(new java.awt.Color(248, 250, 252));
-        pnlDetalle.setBorder(javax.swing.BorderFactory.createEtchedBorder());
-        pnlDetalle.setLayout(new org.netbeans.lib.awtextra.AbsoluteLayout());
+        pnlContenido.setBackground(new java.awt.Color(204, 204, 204));
+        pnlContenido.setBorder(javax.swing.BorderFactory.createEtchedBorder());
+        pnlContenido.setLayout(new org.netbeans.lib.awtextra.AbsoluteLayout());
 
-        lblTituloDetalle.setFont(new java.awt.Font("Segoe UI", 1, 12)); // NOI18N
-        lblTituloDetalle.setForeground(new java.awt.Color(30, 41, 59));
-        lblTituloDetalle.setText("INFORMACIÓN DEL ESPACIO");
-        pnlDetalle.add(lblTituloDetalle, new org.netbeans.lib.awtextra.AbsoluteConstraints(10, 8, 235, 18));
+        jLabelTitulo.setFont(new java.awt.Font("Sans Serif Collection", 1, 13)); // NOI18N
+        jLabelTitulo.setText("CONTROL DE COCHERA");
+        pnlContenido.add(jLabelTitulo, new org.netbeans.lib.awtextra.AbsoluteConstraints(15, 10, 215, 25));
 
-        lblDetalleCoord.setFont(new java.awt.Font("Segoe UI", 0, 11)); // NOI18N
-        lblDetalleCoord.setText("Coordenadas: Seleccione celda");
-        pnlDetalle.add(lblDetalleCoord, new org.netbeans.lib.awtextra.AbsoluteConstraints(10, 28, 235, 16));
+        jLabelSubDetalle.setFont(new java.awt.Font("Sans Serif Collection", 1, 11)); // NOI18N
+        jLabelSubDetalle.setText("ESPACIO (3 COORDENADAS):");
+        pnlContenido.add(jLabelSubDetalle, new org.netbeans.lib.awtextra.AbsoluteConstraints(15, 38, 215, 18));
 
-        lblDetalleZona.setFont(new java.awt.Font("Segoe UI", 0, 11)); // NOI18N
-        lblDetalleZona.setText("Zona: -");
-        pnlDetalle.add(lblDetalleZona, new org.netbeans.lib.awtextra.AbsoluteConstraints(10, 46, 235, 16));
+        lblCoord.setFont(new java.awt.Font("Sans Serif Collection", 0, 10)); // NOI18N
+        lblCoord.setText("Coords: Seleccione celda");
+        pnlContenido.add(lblCoord, new org.netbeans.lib.awtextra.AbsoluteConstraints(15, 58, 215, 16));
 
-        lblDetalleEstado.setFont(new java.awt.Font("Segoe UI", 0, 11)); // NOI18N
-        lblDetalleEstado.setText("Estado: -");
-        pnlDetalle.add(lblDetalleEstado, new org.netbeans.lib.awtextra.AbsoluteConstraints(10, 64, 235, 16));
+        lblPrioridad.setFont(new java.awt.Font("Sans Serif Collection", 0, 10)); // NOI18N
+        lblPrioridad.setText("Prioridad: -");
+        pnlContenido.add(lblPrioridad, new org.netbeans.lib.awtextra.AbsoluteConstraints(15, 74, 215, 16));
 
-        lblDetalleTractor.setFont(new java.awt.Font("Segoe UI", 0, 11)); // NOI18N
-        lblDetalleTractor.setText("Tractor: -");
-        pnlDetalle.add(lblDetalleTractor, new org.netbeans.lib.awtextra.AbsoluteConstraints(10, 82, 235, 16));
+        lblEstado.setFont(new java.awt.Font("Sans Serif Collection", 0, 10)); // NOI18N
+        lblEstado.setText("Estado: -");
+        pnlContenido.add(lblEstado, new org.netbeans.lib.awtextra.AbsoluteConstraints(15, 90, 215, 16));
 
-        lblDetalleCarreta.setFont(new java.awt.Font("Segoe UI", 0, 11)); // NOI18N
-        lblDetalleCarreta.setText("Carreta: -");
-        pnlDetalle.add(lblDetalleCarreta, new org.netbeans.lib.awtextra.AbsoluteConstraints(10, 100, 235, 16));
+        lblTractor.setFont(new java.awt.Font("Sans Serif Collection", 0, 10)); // NOI18N
+        lblTractor.setText("Tractor: -");
+        pnlContenido.add(lblTractor, new org.netbeans.lib.awtextra.AbsoluteConstraints(15, 106, 215, 16));
 
-        lblDetalleViaje.setFont(new java.awt.Font("Segoe UI", 0, 11)); // NOI18N
-        lblDetalleViaje.setText("Próximo Viaje: -");
-        pnlDetalle.add(lblDetalleViaje, new org.netbeans.lib.awtextra.AbsoluteConstraints(10, 118, 235, 16));
+        lblCarreta.setFont(new java.awt.Font("Sans Serif Collection", 0, 10)); // NOI18N
+        lblCarreta.setText("Carreta: -");
+        pnlContenido.add(lblCarreta, new org.netbeans.lib.awtextra.AbsoluteConstraints(15, 122, 215, 16));
 
-        lblDetalleProximidad.setFont(new java.awt.Font("Segoe UI", 0, 11)); // NOI18N
-        lblDetalleProximidad.setText("Proximidad: -");
-        pnlDetalle.add(lblDetalleProximidad, new org.netbeans.lib.awtextra.AbsoluteConstraints(10, 136, 235, 16));
+        lblViaje.setFont(new java.awt.Font("Sans Serif Collection", 0, 10)); // NOI18N
+        lblViaje.setText("Próximo Viaje: -");
+        pnlContenido.add(lblViaje, new org.netbeans.lib.awtextra.AbsoluteConstraints(15, 138, 215, 16));
 
-        btnDespacharViaje.setBackground(new java.awt.Color(13, 110, 253));
-        btnDespacharViaje.setFont(new java.awt.Font("Segoe UI", 1, 11)); // NOI18N
-        btnDespacharViaje.setForeground(new java.awt.Color(255, 255, 255));
-        btnDespacharViaje.setText("Despachar");
-        btnDespacharViaje.setEnabled(false);
-        btnDespacharViaje.addActionListener(this::btnDespacharViajeActionPerformed);
-        pnlDetalle.add(btnDespacharViaje, new org.netbeans.lib.awtextra.AbsoluteConstraints(10, 165, 110, 32));
+        btnDespachar.setBackground(new java.awt.Color(0, 153, 153));
+        btnDespachar.setFont(new java.awt.Font("Sans Serif Collection", 0, 11)); // NOI18N
+        btnDespachar.setForeground(new java.awt.Color(255, 255, 255));
+        btnDespachar.setText("DESPACHAR A VIAJE");
+        btnDespachar.setBorder(javax.swing.BorderFactory.createBevelBorder(javax.swing.border.BevelBorder.RAISED));
+        btnDespachar.setEnabled(false);
+        btnDespachar.addActionListener(this::btnDespacharActionPerformed);
+        pnlContenido.add(btnDespachar, new org.netbeans.lib.awtextra.AbsoluteConstraints(15, 160, 215, 30));
 
-        btnLiberarEspacio.setBackground(new java.awt.Color(220, 53, 69));
-        btnLiberarEspacio.setFont(new java.awt.Font("Segoe UI", 1, 11)); // NOI18N
-        btnLiberarEspacio.setForeground(new java.awt.Color(255, 255, 255));
-        btnLiberarEspacio.setText("Liberar");
-        btnLiberarEspacio.setEnabled(false);
-        btnLiberarEspacio.addActionListener(this::btnLiberarEspacioActionPerformed);
-        pnlDetalle.add(btnLiberarEspacio, new org.netbeans.lib.awtextra.AbsoluteConstraints(130, 165, 110, 32));
+        btnLiberar.setBackground(new java.awt.Color(255, 51, 51));
+        btnLiberar.setFont(new java.awt.Font("Sans Serif Collection", 0, 11)); // NOI18N
+        btnLiberar.setForeground(new java.awt.Color(255, 255, 255));
+        btnLiberar.setText("LIBERAR ESPACIO");
+        btnLiberar.setBorder(javax.swing.BorderFactory.createBevelBorder(javax.swing.border.BevelBorder.RAISED));
+        btnLiberar.setEnabled(false);
+        btnLiberar.addActionListener(this::btnLiberarActionPerformed);
+        pnlContenido.add(btnLiberar, new org.netbeans.lib.awtextra.AbsoluteConstraints(15, 196, 215, 28));
 
-        add(pnlDetalle, new org.netbeans.lib.awtextra.AbsoluteConstraints(605, 55, 255, 215));
+        jLabelSubLlegada.setFont(new java.awt.Font("Sans Serif Collection", 1, 11)); // NOI18N
+        jLabelSubLlegada.setText("LLEGADA DE UNIDAD:");
+        pnlContenido.add(jLabelSubLlegada, new org.netbeans.lib.awtextra.AbsoluteConstraints(15, 235, 215, 18));
 
-        pnlLlegada.setBackground(new java.awt.Color(248, 250, 252));
-        pnlLlegada.setBorder(javax.swing.BorderFactory.createEtchedBorder());
-        pnlLlegada.setLayout(new org.netbeans.lib.awtextra.AbsoluteLayout());
+        jLabelSelUnidad.setFont(new java.awt.Font("Sans Serif Collection", 0, 10)); // NOI18N
+        jLabelSelUnidad.setText("Unidad fuera de cochera:");
+        pnlContenido.add(jLabelSelUnidad, new org.netbeans.lib.awtextra.AbsoluteConstraints(15, 253, 215, 16));
 
-        lblTituloLlegada.setFont(new java.awt.Font("Segoe UI", 1, 12)); // NOI18N
-        lblTituloLlegada.setForeground(new java.awt.Color(30, 41, 59));
-        lblTituloLlegada.setText("LLEGADA DE UNIDAD (RETORNO)");
-        pnlLlegada.add(lblTituloLlegada, new org.netbeans.lib.awtextra.AbsoluteConstraints(10, 8, 235, 18));
+        cboUnidadLlegada.setBackground(new java.awt.Color(0, 153, 153));
+        cboUnidadLlegada.setBorder(javax.swing.BorderFactory.createBevelBorder(javax.swing.border.BevelBorder.RAISED));
+        pnlContenido.add(cboUnidadLlegada, new org.netbeans.lib.awtextra.AbsoluteConstraints(15, 271, 215, 28));
 
-        lblComboTexto.setFont(new java.awt.Font("Segoe UI", 0, 11)); // NOI18N
-        lblComboTexto.setText("Unidad fuera de cochera:");
-        pnlLlegada.add(lblComboTexto, new org.netbeans.lib.awtextra.AbsoluteConstraints(10, 28, 235, 16));
-
-        cboUnidadesFuera.setFont(new java.awt.Font("Segoe UI", 0, 11)); // NOI18N
-        pnlLlegada.add(cboUnidadesFuera, new org.netbeans.lib.awtextra.AbsoluteConstraints(10, 48, 235, 28));
-
-        btnRegistrarLlegada.setBackground(new java.awt.Color(25, 135, 84));
-        btnRegistrarLlegada.setFont(new java.awt.Font("Segoe UI", 1, 11)); // NOI18N
+        btnRegistrarLlegada.setBackground(new java.awt.Color(0, 153, 153));
+        btnRegistrarLlegada.setFont(new java.awt.Font("Sans Serif Collection", 0, 11)); // NOI18N
         btnRegistrarLlegada.setForeground(new java.awt.Color(255, 255, 255));
-        btnRegistrarLlegada.setText("Registrar Llegada a Cochera");
+        btnRegistrarLlegada.setText("REGISTRAR LLEGADA");
+        btnRegistrarLlegada.setBorder(javax.swing.BorderFactory.createBevelBorder(javax.swing.border.BevelBorder.RAISED));
         btnRegistrarLlegada.addActionListener(this::btnRegistrarLlegadaActionPerformed);
-        pnlLlegada.add(btnRegistrarLlegada, new org.netbeans.lib.awtextra.AbsoluteConstraints(10, 82, 235, 32));
+        pnlContenido.add(btnRegistrarLlegada, new org.netbeans.lib.awtextra.AbsoluteConstraints(15, 306, 215, 32));
 
-        add(pnlLlegada, new org.netbeans.lib.awtextra.AbsoluteConstraints(605, 280, 255, 125));
+        btnReorganizar.setBackground(new java.awt.Color(0, 153, 153));
+        btnReorganizar.setFont(new java.awt.Font("Sans Serif Collection", 0, 11)); // NOI18N
+        btnReorganizar.setForeground(new java.awt.Color(255, 255, 255));
+        btnReorganizar.setText("ORDENAR POR PRIORIDAD");
+        btnReorganizar.setBorder(javax.swing.BorderFactory.createBevelBorder(javax.swing.border.BevelBorder.RAISED));
+        btnReorganizar.addActionListener(this::btnReorganizarActionPerformed);
+        pnlContenido.add(btnReorganizar, new org.netbeans.lib.awtextra.AbsoluteConstraints(15, 350, 215, 32));
 
-        pnlAcciones.setBackground(new java.awt.Color(248, 250, 252));
-        pnlAcciones.setBorder(javax.swing.BorderFactory.createEtchedBorder());
-        pnlAcciones.setLayout(new org.netbeans.lib.awtextra.AbsoluteLayout());
+        jLabelLeyenda.setFont(new java.awt.Font("Sans Serif Collection", 1, 11)); // NOI18N
+        jLabelLeyenda.setText("LEYENDA:");
+        pnlContenido.add(jLabelLeyenda, new org.netbeans.lib.awtextra.AbsoluteConstraints(15, 395, 215, 18));
 
-        lblTituloOptimizacion.setFont(new java.awt.Font("Segoe UI", 1, 12)); // NOI18N
-        lblTituloOptimizacion.setForeground(new java.awt.Color(30, 41, 59));
-        lblTituloOptimizacion.setText("OPTIMIZACIÓN DE PATIO");
-        pnlAcciones.add(lblTituloOptimizacion, new org.netbeans.lib.awtextra.AbsoluteConstraints(10, 6, 235, 18));
+        lblLeyenda1.setFont(new java.awt.Font("Sans Serif Collection", 0, 10)); // NOI18N
+        lblLeyenda1.setForeground(new java.awt.Color(60, 150, 80));
+        lblLeyenda1.setText("Verde: Unidad en cochera");
+        pnlContenido.add(lblLeyenda1, new org.netbeans.lib.awtextra.AbsoluteConstraints(15, 415, 215, 16));
 
-        btnReorganizarProximidad.setBackground(new java.awt.Color(102, 16, 242));
-        btnReorganizarProximidad.setFont(new java.awt.Font("Segoe UI", 1, 11)); // NOI18N
-        btnReorganizarProximidad.setForeground(new java.awt.Color(255, 255, 255));
-        btnReorganizarProximidad.setText("Reorganizar por Proximidad");
-        btnReorganizarProximidad.addActionListener(this::btnReorganizarProximidadActionPerformed);
-        pnlAcciones.add(btnReorganizarProximidad, new org.netbeans.lib.awtextra.AbsoluteConstraints(10, 26, 235, 30));
+        lblLeyenda2.setFont(new java.awt.Font("Sans Serif Collection", 0, 10)); // NOI18N
+        lblLeyenda2.setForeground(new java.awt.Color(102, 102, 102));
+        lblLeyenda2.setText("Gris: Espacio disponible (1, 2, 3)");
+        pnlContenido.add(lblLeyenda2, new org.netbeans.lib.awtextra.AbsoluteConstraints(15, 433, 215, 16));
 
-        add(pnlAcciones, new org.netbeans.lib.awtextra.AbsoluteConstraints(605, 415, 255, 65));
+        lblLeyenda3.setFont(new java.awt.Font("Sans Serif Collection", 0, 10)); // NOI18N
+        lblLeyenda3.setForeground(new java.awt.Color(30, 30, 30));
+        lblLeyenda3.setText("Oscuro: Pasillo de maniobra");
+        pnlContenido.add(lblLeyenda3, new org.netbeans.lib.awtextra.AbsoluteConstraints(15, 451, 215, 16));
 
-        pnlLeyenda.setBackground(new java.awt.Color(255, 255, 255));
-        pnlLeyenda.setBorder(javax.swing.BorderFactory.createEtchedBorder());
-        pnlLeyenda.setLayout(new org.netbeans.lib.awtextra.AbsoluteLayout());
-
-        lblTituloLeyenda.setFont(new java.awt.Font("Segoe UI", 1, 11)); // NOI18N
-        lblTituloLeyenda.setForeground(new java.awt.Color(51, 65, 85));
-        lblTituloLeyenda.setText("LEYENDA DE ZONAS Y PRIORIDAD");
-        pnlLeyenda.add(lblTituloLeyenda, new org.netbeans.lib.awtextra.AbsoluteConstraints(10, 4, 235, 18));
-
-        lblLeyendaOcupado.setFont(new java.awt.Font("Segoe UI", 1, 10)); // NOI18N
-        lblLeyendaOcupado.setForeground(new java.awt.Color(40, 167, 69));
-        lblLeyendaOcupado.setText("■ Ocupado: Unidad en Cochera");
-        pnlLeyenda.add(lblLeyendaOcupado, new org.netbeans.lib.awtextra.AbsoluteConstraints(10, 24, 235, 16));
-
-        lblLeyendaP1.setFont(new java.awt.Font("Segoe UI", 1, 10)); // NOI18N
-        lblLeyendaP1.setForeground(new java.awt.Color(255, 193, 7));
-        lblLeyendaP1.setText("■ P1: Salida Inmediata (Próximo)");
-        pnlLeyenda.add(lblLeyendaP1, new org.netbeans.lib.awtextra.AbsoluteConstraints(10, 42, 235, 16));
-
-        lblLeyendaP2.setFont(new java.awt.Font("Segoe UI", 1, 10)); // NOI18N
-        lblLeyendaP2.setForeground(new java.awt.Color(23, 162, 184));
-        lblLeyendaP2.setText("■ P2: Salida Media (Intermedio)");
-        pnlLeyenda.add(lblLeyendaP2, new org.netbeans.lib.awtextra.AbsoluteConstraints(10, 60, 235, 16));
-
-        lblLeyendaP3.setFont(new java.awt.Font("Segoe UI", 1, 10)); // NOI18N
-        lblLeyendaP3.setForeground(new java.awt.Color(108, 117, 125));
-        lblLeyendaP3.setText("■ P3: Estancia Larga / Sin Viaje");
-        pnlLeyenda.add(lblLeyendaP3, new org.netbeans.lib.awtextra.AbsoluteConstraints(10, 78, 235, 16));
-
-        lblLeyendaPasillo.setFont(new java.awt.Font("Segoe UI", 1, 10)); // NOI18N
-        lblLeyendaPasillo.setForeground(new java.awt.Color(33, 37, 41));
-        lblLeyendaPasillo.setText("■ Vía de Maniobras y Circulación");
-        pnlLeyenda.add(lblLeyendaPasillo, new org.netbeans.lib.awtextra.AbsoluteConstraints(10, 96, 235, 16));
-
-        add(pnlLeyenda, new org.netbeans.lib.awtextra.AbsoluteConstraints(605, 490, 255, 125));
+        add(pnlContenido, new org.netbeans.lib.awtextra.AbsoluteConstraints(605, 80, 245, 540));
     }// </editor-fold>//GEN-END:initComponents
 
-    private void btnDespacharViajeActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnDespacharViajeActionPerformed
-        despacharUnidadSeleccionada();
-    }//GEN-LAST:event_btnDespacharViajeActionPerformed
+    private void btnDespacharActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnDespacharActionPerformed
+        if (celdaSeleccionadaFila == -1 || celdaSeleccionadaCol == -1) return;
+        UnidadTransporte unidad = servicio.getUnidadEn(celdaSeleccionadaFila, celdaSeleccionadaCol);
+        if (unidad == null) return;
 
-    private void btnLiberarEspacioActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnLiberarEspacioActionPerformed
-        liberarEspacioSeleccionado();
-    }//GEN-LAST:event_btnLiberarEspacioActionPerformed
+        int r = JOptionPane.showConfirmDialog(
+                this,
+                "¿Desea despachar la unidad " + unidad.getPlaca() + " a su viaje?\nEl espacio en cochera quedará liberado.",
+                "Despachar Unidad",
+                JOptionPane.YES_NO_OPTION
+        );
+
+        if (r == JOptionPane.YES_OPTION) {
+            boolean exito = servicio.registrarSalida(unidad);
+            if (exito) {
+                JOptionPane.showMessageDialog(this, "Unidad " + unidad.getPlaca() + " despachada a viaje. Espacio liberado.");
+                refrescar();
+            }
+        }
+    }//GEN-LAST:event_btnDespacharActionPerformed
+
+    private void btnLiberarActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnLiberarActionPerformed
+        if (celdaSeleccionadaFila == -1 || celdaSeleccionadaCol == -1) return;
+        UnidadTransporte unidad = servicio.getUnidadEn(celdaSeleccionadaFila, celdaSeleccionadaCol);
+        if (unidad == null) return;
+
+        int r = JOptionPane.showConfirmDialog(
+                this,
+                "¿Está seguro de desalojar la unidad " + unidad.getPlaca() + " de la cochera?",
+                "Liberar Espacio",
+                JOptionPane.YES_NO_OPTION
+        );
+
+        if (r == JOptionPane.YES_OPTION) {
+            servicio.liberarEspacio(unidad);
+            JOptionPane.showMessageDialog(this, "Espacio de cochera liberado correctamente.");
+            refrescar();
+        }
+    }//GEN-LAST:event_btnLiberarActionPerformed
 
     private void btnRegistrarLlegadaActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnRegistrarLlegadaActionPerformed
-        registrarLlegadaDeUnidad();
+        int idx = cboUnidadLlegada.getSelectedIndex();
+        if (idx == -1) {
+            JOptionPane.showMessageDialog(this, "Seleccione una unidad fuera de cochera.", "Aviso", JOptionPane.WARNING_MESSAGE);
+            return;
+        }
+
+        String item = (String) cboUnidadLlegada.getSelectedItem();
+        if (item == null) return;
+        String placa = item.split(" ")[0].trim();
+
+        UnidadTransporte unidad = GestorEquipos.buscarUnidadPorTractor(placa);
+        if (unidad == null) {
+            JOptionPane.showMessageDialog(this, "No se encontró la unidad seleccionada.", "Error", JOptionPane.ERROR_MESSAGE);
+            return;
+        }
+
+        try {
+            boolean ok = servicio.registrarLlegada(unidad);
+            if (ok) {
+                JOptionPane.showMessageDialog(
+                        this,
+                        "Llegada registrada exitosamente.\nUnidad: " + unidad.getPlaca()
+                                + "\nPrioridad asignada por proximidad: P" + unidad.getPrioridadCochera()
+                                + "\nEspacio asignado (3 coordenadas).",
+                        "Llegada Exitosa",
+                        JOptionPane.INFORMATION_MESSAGE
+                );
+                refrescar();
+            }
+        } catch (Exception ex) {
+            JOptionPane.showMessageDialog(this, ex.getMessage(), "Error al Asignar", JOptionPane.ERROR_MESSAGE);
+        }
     }//GEN-LAST:event_btnRegistrarLlegadaActionPerformed
 
-    private void btnReorganizarProximidadActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnReorganizarProximidadActionPerformed
-        reorganizarPorProximidad();
-    }//GEN-LAST:event_btnReorganizarProximidadActionPerformed
+    private void btnReorganizarActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnReorganizarActionPerformed
+        int r = JOptionPane.showConfirmDialog(
+                this,
+                "Se recalcularán las prioridades de todas las unidades estacionadas\n"
+                        + "según la proximidad de viajes en cola y se reubicarán.\n¿Desea continuar?",
+                "Reorganizar Cochera",
+                JOptionPane.YES_NO_OPTION
+        );
+
+        if (r == JOptionPane.YES_OPTION) {
+            servicio.reorganizarSegunProximidadViajes();
+            JOptionPane.showMessageDialog(this, "Cochera reorganizada según proximidad de viajes.");
+            refrescar();
+        }
+    }//GEN-LAST:event_btnReorganizarActionPerformed
 
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
-    private javax.swing.JButton btnDespacharViaje;
-    private javax.swing.JButton btnLiberarEspacio;
+    private javax.swing.JButton btnDespachar;
+    private javax.swing.JButton btnLiberar;
     private javax.swing.JButton btnRegistrarLlegada;
-    private javax.swing.JButton btnReorganizarProximidad;
-    private javax.swing.JComboBox<String> cboUnidadesFuera;
-    private javax.swing.JLabel lblCapacidad;
-    private javax.swing.JLabel lblComboTexto;
-    private javax.swing.JLabel lblDetalleCarreta;
-    private javax.swing.JLabel lblDetalleCoord;
-    private javax.swing.JLabel lblDetalleEstado;
-    private javax.swing.JLabel lblDetalleProximidad;
-    private javax.swing.JLabel lblDetalleTractor;
-    private javax.swing.JLabel lblDetalleViaje;
-    private javax.swing.JLabel lblDetalleZona;
-    private javax.swing.JLabel lblLeyendaOcupado;
-    private javax.swing.JLabel lblLeyendaP1;
-    private javax.swing.JLabel lblLeyendaP2;
-    private javax.swing.JLabel lblLeyendaP3;
-    private javax.swing.JLabel lblLeyendaPasillo;
-    private javax.swing.JLabel lblTitulo;
-    private javax.swing.JLabel lblTituloDetalle;
-    private javax.swing.JLabel lblTituloLeyenda;
-    private javax.swing.JLabel lblTituloLlegada;
-    private javax.swing.JLabel lblTituloOptimizacion;
+    private javax.swing.JButton btnReorganizar;
+    private javax.swing.JComboBox<String> cboUnidadLlegada;
+    private javax.swing.JLabel jLabel1;
+    private javax.swing.JLabel jLabelLeyenda;
+    private javax.swing.JLabel jLabelSelUnidad;
+    private javax.swing.JLabel jLabelSubDetalle;
+    private javax.swing.JLabel jLabelSubLlegada;
+    private javax.swing.JLabel jLabelTitulo;
+    private javax.swing.JLabel lblCarreta;
+    private javax.swing.JLabel lblCoord;
+    private javax.swing.JLabel lblEstado;
+    private javax.swing.JLabel lblLeyenda1;
+    private javax.swing.JLabel lblLeyenda2;
+    private javax.swing.JLabel lblLeyenda3;
+    private javax.swing.JLabel lblPrioridad;
+    private javax.swing.JLabel lblTractor;
+    private javax.swing.JLabel lblViaje;
     private javax.swing.JPanel panelCochera;
-    private javax.swing.JPanel pnlAcciones;
-    private javax.swing.JPanel pnlDetalle;
-    private javax.swing.JPanel pnlLeyenda;
-    private javax.swing.JPanel pnlLlegada;
+    private javax.swing.JPanel pnlContenido;
     // End of variables declaration//GEN-END:variables
 }
