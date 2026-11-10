@@ -351,34 +351,42 @@ public class PanelModuloCochera extends javax.swing.JPanel {
         pnlContenido.setLayout(new org.netbeans.lib.awtextra.AbsoluteLayout());
 
         jLabelTitulo.setFont(new java.awt.Font("Sans Serif Collection", 1, 13)); // NOI18N
+        jLabelTitulo.setForeground(new java.awt.Color(51, 51, 51));
         jLabelTitulo.setText("CONTROL DE COCHERA");
         pnlContenido.add(jLabelTitulo, new org.netbeans.lib.awtextra.AbsoluteConstraints(15, 10, 215, 25));
 
         jLabelSubDetalle.setFont(new java.awt.Font("Sans Serif Collection", 1, 11)); // NOI18N
+        jLabelSubDetalle.setForeground(new java.awt.Color(51, 51, 51));
         jLabelSubDetalle.setText("ESPACIO (3 COORDENADAS):");
         pnlContenido.add(jLabelSubDetalle, new org.netbeans.lib.awtextra.AbsoluteConstraints(15, 38, 215, 18));
 
         lblCoord.setFont(new java.awt.Font("Sans Serif Collection", 0, 10)); // NOI18N
+        lblCoord.setForeground(new java.awt.Color(102, 102, 102));
         lblCoord.setText("Coords: Seleccione celda");
         pnlContenido.add(lblCoord, new org.netbeans.lib.awtextra.AbsoluteConstraints(15, 58, 215, 16));
 
         lblPrioridad.setFont(new java.awt.Font("Sans Serif Collection", 0, 10)); // NOI18N
+        lblPrioridad.setForeground(new java.awt.Color(102, 102, 102));
         lblPrioridad.setText("Prioridad: -");
         pnlContenido.add(lblPrioridad, new org.netbeans.lib.awtextra.AbsoluteConstraints(15, 74, 215, 16));
 
         lblEstado.setFont(new java.awt.Font("Sans Serif Collection", 0, 10)); // NOI18N
+        lblEstado.setForeground(new java.awt.Color(102, 102, 102));
         lblEstado.setText("Estado: -");
         pnlContenido.add(lblEstado, new org.netbeans.lib.awtextra.AbsoluteConstraints(15, 90, 215, 16));
 
         lblTractor.setFont(new java.awt.Font("Sans Serif Collection", 0, 10)); // NOI18N
+        lblTractor.setForeground(new java.awt.Color(102, 102, 102));
         lblTractor.setText("Tractor: -");
         pnlContenido.add(lblTractor, new org.netbeans.lib.awtextra.AbsoluteConstraints(15, 106, 215, 16));
 
         lblCarreta.setFont(new java.awt.Font("Sans Serif Collection", 0, 10)); // NOI18N
+        lblCarreta.setForeground(new java.awt.Color(102, 102, 102));
         lblCarreta.setText("Carreta: -");
         pnlContenido.add(lblCarreta, new org.netbeans.lib.awtextra.AbsoluteConstraints(15, 122, 215, 16));
 
         lblViaje.setFont(new java.awt.Font("Sans Serif Collection", 0, 10)); // NOI18N
+        lblViaje.setForeground(new java.awt.Color(102, 102, 102));
         lblViaje.setText("Próximo Viaje: -");
         pnlContenido.add(lblViaje, new org.netbeans.lib.awtextra.AbsoluteConstraints(15, 138, 215, 16));
 
@@ -401,10 +409,12 @@ public class PanelModuloCochera extends javax.swing.JPanel {
         pnlContenido.add(btnLiberar, new org.netbeans.lib.awtextra.AbsoluteConstraints(15, 196, 215, 28));
 
         jLabelSubLlegada.setFont(new java.awt.Font("Sans Serif Collection", 1, 11)); // NOI18N
+        jLabelSubLlegada.setForeground(new java.awt.Color(51, 51, 51));
         jLabelSubLlegada.setText("LLEGADA DE UNIDAD:");
         pnlContenido.add(jLabelSubLlegada, new org.netbeans.lib.awtextra.AbsoluteConstraints(15, 235, 215, 18));
 
         jLabelSelUnidad.setFont(new java.awt.Font("Sans Serif Collection", 0, 10)); // NOI18N
+        jLabelSelUnidad.setForeground(new java.awt.Color(51, 51, 51));
         jLabelSelUnidad.setText("Unidad fuera de cochera:");
         pnlContenido.add(jLabelSelUnidad, new org.netbeans.lib.awtextra.AbsoluteConstraints(15, 253, 215, 16));
 
@@ -429,6 +439,7 @@ public class PanelModuloCochera extends javax.swing.JPanel {
         pnlContenido.add(btnReorganizar, new org.netbeans.lib.awtextra.AbsoluteConstraints(15, 350, 215, 32));
 
         jLabelLeyenda.setFont(new java.awt.Font("Sans Serif Collection", 1, 11)); // NOI18N
+        jLabelLeyenda.setForeground(new java.awt.Color(51, 51, 51));
         jLabelLeyenda.setText("LEYENDA:");
         pnlContenido.add(jLabelLeyenda, new org.netbeans.lib.awtextra.AbsoluteConstraints(15, 395, 215, 18));
 

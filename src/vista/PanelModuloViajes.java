@@ -131,6 +131,7 @@ public class PanelModuloViajes extends javax.swing.JPanel {
         cboRuta = new javax.swing.JComboBox<>();
         jLabel5 = new javax.swing.JLabel();
         jButton1 = new javax.swing.JButton();
+        btnRegistrarUrgencia = new javax.swing.JButton();
         jLabel6 = new javax.swing.JLabel();
         jLabel7 = new javax.swing.JLabel();
         jLabel8 = new javax.swing.JLabel();
@@ -144,7 +145,6 @@ public class PanelModuloViajes extends javax.swing.JPanel {
         btnEliminar = new javax.swing.JButton();
         btnActualizar = new javax.swing.JButton();
         btnEditar = new javax.swing.JButton();
-        btnRegistrarUrgencia = new javax.swing.JButton();
 
         setBackground(new java.awt.Color(255, 255, 255));
         setPreferredSize(new java.awt.Dimension(880, 680));
@@ -166,7 +166,7 @@ public class PanelModuloViajes extends javax.swing.JPanel {
         cboTerminal.setBorder(javax.swing.BorderFactory.createBevelBorder(javax.swing.border.BevelBorder.RAISED));
 
         jLabel3.setFont(new java.awt.Font("Sans Serif Collection", 1, 12)); // NOI18N
-        jLabel3.setText("Tractor:");
+        jLabel3.setText("Unidad:");
 
         cboCliente.setBackground(new java.awt.Color(0, 153, 153));
         cboCliente.setModel(new javax.swing.DefaultComboBoxModel<>(new String[] { "Item 1", "Item 2", "Item 3", "Item 4" }));
