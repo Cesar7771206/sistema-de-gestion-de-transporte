@@ -3,7 +3,8 @@
  * Click nbfs://nbhost/SystemFileSystem/Templates/Classes/Class.java to edit this template
  */
 package modelo;
-import java.util.ArrayList;
+import estructuras.ColaStringLES;
+import java.util.List;
 
 /**
  *
@@ -13,6 +14,9 @@ public class Terminal {
     private String ruc;
     private String nombre;
     private String direccion;
+
+    
+    private final ColaStringLES contenedoresEnEspera = new ColaStringLES();
 
     public Terminal(String ruc, String nombre, String direccion) {
         setRuc(ruc);
@@ -46,5 +50,34 @@ public class Terminal {
 
     public void setDireccion(String direccion) {
         this.direccion = direccion;
+    }
+
+    public void encolarContenedor(String codigo) {
+        if (codigo == null || codigo.isBlank()) {
+            throw new IllegalArgumentException("El código del contenedor no puede estar vacío");
+        }
+        contenedoresEnEspera.enqueue(codigo.trim());
+    }
+
+    
+    public String atenderContenedor() {
+        if (contenedoresEnEspera.isEmpty()) {
+            return null;
+        }
+        return contenedoresEnEspera.dequeue();
+    }
+
+   
+    public String getProximoContenedor() {
+        return contenedoresEnEspera.peek();
+    }
+
+    public int getCantidadContenedoresEnEspera() {
+        return contenedoresEnEspera.size();
+    }
+
+   
+    public List<String> getContenedoresEnEspera() {
+        return contenedoresEnEspera.getElementos();
     }
 }

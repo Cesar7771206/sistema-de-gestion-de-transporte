@@ -3,7 +3,9 @@
  * Click nbfs://nbhost/SystemFileSystem/Templates/Classes/Class.java to edit this template
  */
 package servicio;
+import estructuras.PilaTerminalLES;
 import java.util.ArrayList;
+import java.util.LinkedList;
 import java.util.List;
 import modelo.Terminal;
 
@@ -13,10 +15,13 @@ import modelo.Terminal;
  */
 public class TerminalServicio {
 
-    private List<Terminal> terminales;
+    private final LinkedList<Terminal> terminales = new LinkedList<>();
+    private int posicion = -1; 
+
+   
+    private final PilaTerminalLES eliminadas = new PilaTerminalLES();
 
     public TerminalServicio() {
-        terminales = new ArrayList<>();
     }
 
     public List<Terminal> getTerminales() {
@@ -65,7 +70,11 @@ public class TerminalServicio {
         if (buscarTerminalPorRuc(ruc.trim())) {
             return false;
         }
-        terminales.add(new Terminal(ruc.trim(), nombre.trim(), direccion.trim()));
+        Terminal nueva = new Terminal(ruc.trim(), nombre.trim(), direccion.trim());
+        terminales.addLast(nueva);
+        if (posicion == -1) {
+            posicion = 0;
+        }
         return true;
     }
 
@@ -86,7 +95,71 @@ public class TerminalServicio {
     
     public boolean eliminarPorRuc(String ruc) {
         Terminal t = obtenerPorRuc(ruc);
-        return t != null && terminales.remove(t);
+        if (t == null) {
+            return false;
+        }
+        int indice = terminales.indexOf(t);
+        terminales.remove(indice);
+        if (terminales.isEmpty()) {
+            posicion = -1;
+        } else if (indice < posicion || posicion >= terminales.size()) {
+            posicion--;
+        }
+        eliminadas.push(t);
+        return true;
+    }
+
+    
+    public Terminal deshacerEliminacion() {
+        if (eliminadas.isEmpty()) {
+            return null;
+        }
+        Terminal t = eliminadas.pop();
+        if (buscarTerminalPorRuc(t.getRuc())) {
+            return null;
+        }
+        terminales.addLast(t);
+        if (posicion == -1) {
+            posicion = 0;
+        }
+        return t;
+    }
+
+    public boolean hayEliminadas() {
+        return !eliminadas.isEmpty();
+    }
+
+    public int getCantidadEliminadas() {
+        return eliminadas.size();
+    }
+
+    
+    public Terminal getTerminalActual() {
+        return posicion == -1 ? null : terminales.get(posicion);
+    }
+
+    public Terminal irPrimera() {
+        posicion = terminales.isEmpty() ? -1 : 0;
+        return getTerminalActual();
+    }
+
+    public Terminal irUltima() {
+        posicion = terminales.size() - 1;
+        return getTerminalActual();
+    }
+
+    public Terminal irSiguiente() {
+        if (posicion != -1 && posicion < terminales.size() - 1) {
+            posicion++;
+        }
+        return getTerminalActual();
+    }
+
+    public Terminal irAnterior() {
+        if (posicion > 0) {
+            posicion--;
+        }
+        return getTerminalActual();
     }
 
     
