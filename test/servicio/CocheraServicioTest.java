@@ -213,4 +213,11 @@ public class CocheraServicioTest {
             cocheraServicio.asignarEspacioEnCochera(uExtra);
         });
     }
+
+    @Test
+    public void testPanelModuloCocheraInstanciacion() {
+        vista.PanelModuloCochera panel = new vista.PanelModuloCochera();
+        assertNotNull(panel);
+        panel.refrescar();
+    }
 }
