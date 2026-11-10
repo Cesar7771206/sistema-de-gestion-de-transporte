@@ -11,7 +11,7 @@ import java.util.List;
  *
  * @author yimmy
  */
-public class ColaStringLES {
+public class ColaStringLES { 
     private LinkedList<String> elementos;
 
     public ColaStringLES() {

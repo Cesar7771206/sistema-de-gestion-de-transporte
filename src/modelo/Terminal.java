@@ -11,7 +11,7 @@ import java.util.List;
  * @author cesar
  */
 public class Terminal {
-    private String ruc;
+    private String ruc; 
     private String nombre;
     private String direccion;
 

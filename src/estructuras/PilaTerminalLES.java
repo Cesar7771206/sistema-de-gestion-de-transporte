@@ -34,7 +34,7 @@ public class PilaTerminalLES {
 
     public Terminal peek() {
         if (elementos.size() > 0) {
-            return elementos.getLast();
+            return elementos.getLast(); 
         } else {
             return null;
         }

@@ -89,7 +89,7 @@ public class TerminalServicio {
         } 
         t.setNombre(nombre.trim());
         t.setDireccion(direccion.trim());
-        return true;
+        return true; 
     }
 
     
