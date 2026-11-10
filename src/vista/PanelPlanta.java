@@ -4,66 +4,133 @@
  */
 package vista;
 
+import java.awt.Color;
+import java.awt.Dimension;
+import java.awt.event.MouseAdapter;
+import java.awt.event.MouseEvent;
 import java.util.ArrayList;
 import java.util.List;
 import javax.swing.JOptionPane;
+import javax.swing.SwingUtilities;
 import javax.swing.table.DefaultTableModel;
 import modelo.Planta;
+import servicio.GestorLogistica;
 import servicio.PlantaServicio;
 
 /**
- *
- * @author GIANCARLO REA
+ * Panel de gestión de Plantas.
+ * Permite registrar, editar, listar y eliminar plantas de carga
+ * manteniendo sincronización con GestorLogistica.
  */
 public class PanelPlanta extends javax.swing.JPanel {
 
-    PlantaServicio plantaServicio;
-    DefaultTableModel modelo; 
-    private String orden;
-    
-    
+    private String opcion;
+    private PlantaServicio plantaServicio;
+    private DefaultTableModel modeloTabla;
+
+    /**
+     * Creates new form PanelPlanta
+     */
     public PanelPlanta() {
         initComponents();
+
         plantaServicio = new PlantaServicio(new ArrayList<>());
-        modelo = (DefaultTableModel) tblPlantas.getModel();
-        orden = "default";
+        modeloTabla = (DefaultTableModel) tblPlantas.getModel();
 
-        actualizarTabla();
-        ocultarEdicion();
-        tblPlantas.setEnabled(false);
+        jSplitPane.setResizeWeight(0);
+        panelFormulario.setMinimumSize(new Dimension(0, 0));
+        panelTabla.setMinimumSize(new Dimension(0, 0));
+        ocultarFormulario();
+
+        tblPlantas.addMouseListener(new MouseAdapter() {
+            @Override
+            public void mouseClicked(MouseEvent e) {
+                int fila = tblPlantas.getSelectedRow();
+                if (fila >= 0) {
+                    String ruc = modeloTabla.getValueAt(fila, 0).toString();
+                    txtRuc.setText(ruc);
+                }
+            }
+        });
+
+        cargarDatos();
     }
-    
-    // Vuelve a llenar la tabla según el orden elegido
-    public void actualizarTabla() {
-        modelo.setRowCount(0);
 
-        List<Planta> lista;
-        switch (orden) {
-            case "ruc":
-                lista = plantaServicio.ordenarPlantaPorRuc();
-                break;
-            case "nombre":
-                lista = plantaServicio.ordenarPlantaPorNombre();
-                break;
-            default:
-                lista = plantaServicio.getPlantas();
-                break;
+    public void cargarDatos() {
+        for (Planta p : GestorLogistica.getPlantas()) {
+            if (plantaServicio.obtenerPlantaPorRuc(p.getRuc()) == null) {
+                plantaServicio.guardarPlanta(p.getRuc(), p.getNombre(), p.getDireccion());
+            }
         }
+        actualizarTabla(plantaServicio.getPlantas());
+    }
 
+    private void actualizarTabla(List<Planta> lista) {
+        modeloTabla.setRowCount(0);
         for (Planta p : lista) {
-            modelo.addRow(new Object[]{p.getRuc(), p.getNombre(), p.getDireccion()});
+            Object[] fila = new Object[]{
+                p.getRuc(),
+                p.getNombre(),
+                p.getDireccion()
+            };
+            modeloTabla.addRow(fila);
         }
     }
 
-    // Esconde la zona de edición hasta que se seleccione una planta
-    private void ocultarEdicion() {
-        txtRucBuscado.setVisible(false);
-        txtNombreBuscado.setVisible(false);
-        txtDireccionBuscada.setVisible(false);
+    private void mostrarFormulario() {
+        jSplitPane.setDividerSize(8);
+        SwingUtilities.invokeLater(() -> {
+            int h = jSplitPane.getHeight();
+            int loc = (h > 0) ? Math.min(220, Math.max(180, h / 3)) : 200;
+            jSplitPane.setDividerLocation(loc);
+        });
+        btnAgregar.setText("Cerrar formulario");
+    }
 
-        btnEliminarPlanta.setVisible(false);
-        btnLimpiarPlanta.setVisible(false);
-        btnEditarPlanta.setVisible(false);
+    private void ocultarFormulario() {
+        jSplitPane.setDividerSize(0);
+        SwingUtilities.invokeLater(() -> jSplitPane.setDividerLocation(0));
+        btnAgregar.setText("Agregar");
+        btnOpcion.setVisible(false);
+    }
+
+    private void mostrarCampos(boolean mostrar) {
+        txtNombre.setVisible(mostrar);
+        txtDireccion.setVisible(mostrar);
+        lblNombre.setVisible(mostrar);
+        lblDireccion.setVisible(mostrar);
+    }
+
+    private void editarCampos(boolean editar) {
+        txtRuc.setEditable(editar);
+        txtNombre.setEditable(editar);
+        txtDireccion.setEditable(editar);
+    }
+
+    private void limpiarCampos() {
+        txtRuc.setText("");
+        txtNombre.setText("");
+        txtDireccion.setText("");
+        editarCampos(true);
+    }
+
+    private void prepararEdicion(Planta p) {
+        mostrarFormulario();
+        mostrarCampos(true);
+        txtRuc.setText(p.getRuc());
+        txtNombre.setText(p.getNombre());
+        txtDireccion.setText(p.getDireccion());
+
+        txtRuc.setEditable(false);
+        lblDetalleAccion.setText("Editar datos de la planta (RUC protegido):");
+
+        opcion = "guardar";
+        btnOpcion.setText("Guardar");
+        btnOpcion.setBackground(new Color(40, 167, 69));
+        btnOpcion.setForeground(Color.WHITE);
+        btnOpcion.setVisible(true);
+
+        txtNombre.requestFocus();
     }
 
     /**
@@ -75,79 +142,141 @@ public class PanelPlanta extends javax.swing.JPanel {
     // <editor-fold defaultstate="collapsed" desc="Generated Code">//GEN-BEGIN:initComponents
     private void initComponents() {
 
-        jLabel1 = new javax.swing.JLabel();
-        jLabel2 = new javax.swing.JLabel();
-        jLabel3 = new javax.swing.JLabel();
-        jLabel4 = new javax.swing.JLabel();
-        txtImputNombre = new javax.swing.JTextField();
-        btnGuardar = new javax.swing.JButton();
-        txtImputDireccion = new javax.swing.JTextField();
-        txtImputRuc = new javax.swing.JTextField();
-        jScrollPane1 = new javax.swing.JScrollPane();
+        panelBarra = new javax.swing.JPanel();
+        lblTitulo = new javax.swing.JLabel();
+        panelBotones = new javax.swing.JPanel();
+        btnAgregar = new javax.swing.JButton();
+        btnEditar = new javax.swing.JButton();
+        btnEliminar = new javax.swing.JButton();
+        jSplitPane = new javax.swing.JSplitPane();
+        panelFormulario = new javax.swing.JPanel();
+        contenidoPanelFormulario = new javax.swing.JPanel();
+        lblRuc = new javax.swing.JLabel();
+        txtRuc = new javax.swing.JTextField();
+        lblNombre = new javax.swing.JLabel();
+        txtNombre = new javax.swing.JTextField();
+        lblDireccion = new javax.swing.JLabel();
+        txtDireccion = new javax.swing.JTextField();
+        lblDetalleAccion = new javax.swing.JLabel();
+        btnOpcion = new javax.swing.JButton();
+        btnCancelar = new javax.swing.JButton();
+        panelTabla = new javax.swing.JPanel();
+        jScrollPane = new javax.swing.JScrollPane();
         tblPlantas = new javax.swing.JTable();
-        jLabel5 = new javax.swing.JLabel();
-        btnOrRuc = new javax.swing.JButton();
-        btnOrNombre = new javax.swing.JButton();
-        btnOrDefault = new javax.swing.JButton();
-        jLabel6 = new javax.swing.JLabel();
-        txtDireccionBuscada = new javax.swing.JTextField();
-        btnEditarPlanta = new javax.swing.JButton();
-        txtPlantaBuscada = new javax.swing.JTextField();
-        txtRucBuscado = new javax.swing.JTextField();
-        txtNombreBuscado = new javax.swing.JTextField();
-        btnSeleccionarPlanta = new javax.swing.JButton();
-        btnEliminarPlanta = new javax.swing.JButton();
-        btnLimpiarPlanta = new javax.swing.JButton();
 
         setBackground(new java.awt.Color(255, 255, 255));
         setMaximumSize(new java.awt.Dimension(810, 540));
         setMinimumSize(new java.awt.Dimension(810, 540));
         setPreferredSize(new java.awt.Dimension(810, 540));
-        setLayout(new org.netbeans.lib.awtextra.AbsoluteLayout());
+        setLayout(new java.awt.BorderLayout());
 
-        jLabel1.setFont(new java.awt.Font("Sans Serif Collection", 1, 14)); // NOI18N
-        jLabel1.setForeground(new java.awt.Color(0, 0, 0));
-        jLabel1.setText("REGISTRAR PLANTA");
-        add(jLabel1, new org.netbeans.lib.awtextra.AbsoluteConstraints(30, 10, 140, 30));
+        panelBarra.setBackground(new java.awt.Color(255, 255, 255));
+        panelBarra.setLayout(new java.awt.BorderLayout());
 
-        jLabel2.setFont(new java.awt.Font("Sans Serif Collection", 1, 14)); // NOI18N
-        jLabel2.setForeground(new java.awt.Color(0, 0, 0));
-        jLabel2.setText("Ruc:");
-        add(jLabel2, new org.netbeans.lib.awtextra.AbsoluteConstraints(30, 60, -1, -1));
+        lblTitulo.setFont(new java.awt.Font("sansserif", 1, 13)); // NOI18N
+        lblTitulo.setText("      PLANTAS");
+        panelBarra.add(lblTitulo, java.awt.BorderLayout.CENTER);
 
-        jLabel3.setFont(new java.awt.Font("Sans Serif Collection", 1, 14)); // NOI18N
-        jLabel3.setForeground(new java.awt.Color(0, 0, 0));
-        jLabel3.setText("Nombre:");
-        add(jLabel3, new org.netbeans.lib.awtextra.AbsoluteConstraints(250, 60, -1, -1));
+        panelBotones.setBackground(new java.awt.Color(255, 255, 255));
 
-        jLabel4.setFont(new java.awt.Font("Sans Serif Collection", 1, 14)); // NOI18N
-        jLabel4.setForeground(new java.awt.Color(0, 0, 0));
-        jLabel4.setText("Dirección:");
-        add(jLabel4, new org.netbeans.lib.awtextra.AbsoluteConstraints(30, 110, -1, -1));
-
-        txtImputNombre.setBackground(new java.awt.Color(255, 255, 255));
-        txtImputNombre.setBorder(javax.swing.BorderFactory.createLineBorder(new java.awt.Color(0, 0, 0)));
-        add(txtImputNombre, new org.netbeans.lib.awtextra.AbsoluteConstraints(320, 50, 420, 30));
-
-        btnGuardar.setBackground(new java.awt.Color(0, 153, 255));
-        btnGuardar.setForeground(new java.awt.Color(255, 255, 255));
-        btnGuardar.setText("Guardar");
-        btnGuardar.addActionListener(new java.awt.event.ActionListener() {
+        btnAgregar.setBackground(new java.awt.Color(51, 153, 255));
+        btnAgregar.setForeground(new java.awt.Color(255, 255, 255));
+        btnAgregar.setText("Agregar");
+        btnAgregar.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
-                btnGuardarActionPerformed(evt);
+                btnAgregarActionPerformed(evt);
             }
         });
-        add(btnGuardar, new org.netbeans.lib.awtextra.AbsoluteConstraints(630, 100, 110, 30));
+        panelBotones.add(btnAgregar);
 
-        txtImputDireccion.setBackground(new java.awt.Color(255, 255, 255));
-        txtImputDireccion.setBorder(javax.swing.BorderFactory.createLineBorder(new java.awt.Color(0, 0, 0)));
-        add(txtImputDireccion, new org.netbeans.lib.awtextra.AbsoluteConstraints(110, 100, 490, 30));
+        btnEditar.setBackground(new java.awt.Color(255, 153, 102));
+        btnEditar.setForeground(new java.awt.Color(255, 255, 255));
+        btnEditar.setText("Editar");
+        btnEditar.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                btnEditarActionPerformed(evt);
+            }
+        });
+        panelBotones.add(btnEditar);
 
-        txtImputRuc.setBackground(new java.awt.Color(255, 255, 255));
-        txtImputRuc.setBorder(javax.swing.BorderFactory.createLineBorder(new java.awt.Color(0, 0, 0)));
-        add(txtImputRuc, new org.netbeans.lib.awtextra.AbsoluteConstraints(70, 50, 150, 30));
+        btnEliminar.setBackground(new java.awt.Color(255, 51, 51));
+        btnEliminar.setForeground(new java.awt.Color(255, 255, 255));
+        btnEliminar.setText("Eliminar");
+        btnEliminar.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                btnEliminarActionPerformed(evt);
+            }
+        });
+        panelBotones.add(btnEliminar);
 
-        tblPlantas.setBackground(new java.awt.Color(255, 255, 255));
+        panelBarra.add(panelBotones, java.awt.BorderLayout.LINE_END);
+
+        add(panelBarra, java.awt.BorderLayout.PAGE_START);
+
+        jSplitPane.setBackground(new java.awt.Color(255, 255, 255));
+        jSplitPane.setDividerLocation(200);
+        jSplitPane.setOrientation(javax.swing.JSplitPane.VERTICAL_SPLIT);
+
+        panelFormulario.setBackground(new java.awt.Color(255, 255, 255));
+        panelFormulario.setMinimumSize(new java.awt.Dimension(100, 100));
+        panelFormulario.setLayout(new org.netbeans.lib.awtextra.AbsoluteLayout());
+
+        contenidoPanelFormulario.setBackground(new java.awt.Color(255, 255, 255));
+        contenidoPanelFormulario.setLayout(new org.netbeans.lib.awtextra.AbsoluteLayout());
+
+        lblRuc.setFont(new java.awt.Font("sansserif", 1, 13)); // NOI18N
+        lblRuc.setText("RUC");
+        contenidoPanelFormulario.add(lblRuc, new org.netbeans.lib.awtextra.AbsoluteConstraints(20, 30, -1, -1));
+
+        txtRuc.setHorizontalAlignment(javax.swing.JTextField.CENTER);
+        contenidoPanelFormulario.add(txtRuc, new org.netbeans.lib.awtextra.AbsoluteConstraints(20, 50, 160, 30));
+
+        lblNombre.setFont(new java.awt.Font("sansserif", 1, 13)); // NOI18N
+        lblNombre.setText("Nombre de la Planta");
+        contenidoPanelFormulario.add(lblNombre, new org.netbeans.lib.awtextra.AbsoluteConstraints(200, 30, -1, -1));
+
+        txtNombre.setHorizontalAlignment(javax.swing.JTextField.CENTER);
+        contenidoPanelFormulario.add(txtNombre, new org.netbeans.lib.awtextra.AbsoluteConstraints(200, 50, 220, 30));
+
+        lblDireccion.setFont(new java.awt.Font("sansserif", 1, 13)); // NOI18N
+        lblDireccion.setText("Dirección");
+        contenidoPanelFormulario.add(lblDireccion, new org.netbeans.lib.awtextra.AbsoluteConstraints(440, 30, -1, -1));
+
+        txtDireccion.setHorizontalAlignment(javax.swing.JTextField.CENTER);
+        contenidoPanelFormulario.add(txtDireccion, new org.netbeans.lib.awtextra.AbsoluteConstraints(440, 50, 340, 30));
+
+        lblDetalleAccion.setFont(new java.awt.Font("sansserif", 1, 13)); // NOI18N
+        lblDetalleAccion.setText("Ingrese los datos de la planta:");
+        contenidoPanelFormulario.add(lblDetalleAccion, new org.netbeans.lib.awtextra.AbsoluteConstraints(20, 90, 460, -1));
+
+        btnOpcion.setForeground(new java.awt.Color(255, 255, 255));
+        btnOpcion.setText("Opcion");
+        btnOpcion.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                btnOpcionActionPerformed(evt);
+            }
+        });
+        contenidoPanelFormulario.add(btnOpcion, new org.netbeans.lib.awtextra.AbsoluteConstraints(200, 120, 130, -1));
+
+        btnCancelar.setBackground(new java.awt.Color(255, 102, 102));
+        btnCancelar.setForeground(new java.awt.Color(255, 255, 255));
+        btnCancelar.setText("Cancelar");
+        btnCancelar.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                btnCancelarActionPerformed(evt);
+            }
+        });
+        contenidoPanelFormulario.add(btnCancelar, new org.netbeans.lib.awtextra.AbsoluteConstraints(350, 120, 120, -1));
+
+        panelFormulario.add(contenidoPanelFormulario, new org.netbeans.lib.awtextra.AbsoluteConstraints(0, 0, 810, 200));
+
+        jSplitPane.setTopComponent(panelFormulario);
+
+        panelTabla.setBackground(new java.awt.Color(255, 255, 255));
+        panelTabla.setLayout(new java.awt.BorderLayout());
+
+        jScrollPane.setBackground(new java.awt.Color(255, 255, 255));
+
         tblPlantas.setModel(new javax.swing.table.DefaultTableModel(
             new Object [][] {
                 {null, null, null},
@@ -156,7 +285,7 @@ public class PanelPlanta extends javax.swing.JPanel {
                 {null, null, null}
             },
             new String [] {
-                "RUC", "Nombre", "Direccion"
+                "RUC", "Nombre", "Dirección"
             }
         ) {
             Class[] types = new Class [] {
@@ -167,249 +296,268 @@ public class PanelPlanta extends javax.swing.JPanel {
                 return types [columnIndex];
             }
         });
-        jScrollPane1.setViewportView(tblPlantas);
+        jScrollPane.setViewportView(tblPlantas);
 
-        add(jScrollPane1, new org.netbeans.lib.awtextra.AbsoluteConstraints(30, 200, 710, 200));
+        panelTabla.add(jScrollPane, java.awt.BorderLayout.CENTER);
 
-        jLabel5.setBackground(new java.awt.Color(255, 255, 255));
-        jLabel5.setForeground(new java.awt.Color(0, 0, 0));
-        jLabel5.setText("Ordenar por:");
-        add(jLabel5, new org.netbeans.lib.awtextra.AbsoluteConstraints(30, 160, 90, 20));
+        jSplitPane.setRightComponent(panelTabla);
 
-        btnOrRuc.setBackground(new java.awt.Color(204, 153, 255));
-        btnOrRuc.setForeground(new java.awt.Color(255, 255, 255));
-        btnOrRuc.setText("RUC");
-        btnOrRuc.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                btnOrRucActionPerformed(evt);
-            }
-        });
-        add(btnOrRuc, new org.netbeans.lib.awtextra.AbsoluteConstraints(130, 160, -1, -1));
-
-        btnOrNombre.setBackground(new java.awt.Color(255, 153, 204));
-        btnOrNombre.setForeground(new java.awt.Color(255, 255, 255));
-        btnOrNombre.setText("Nombre");
-        btnOrNombre.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                btnOrNombreActionPerformed(evt);
-            }
-        });
-        add(btnOrNombre, new org.netbeans.lib.awtextra.AbsoluteConstraints(210, 160, -1, -1));
-
-        btnOrDefault.setBackground(new java.awt.Color(0, 153, 204));
-        btnOrDefault.setForeground(new java.awt.Color(255, 255, 255));
-        btnOrDefault.setText("Default");
-        btnOrDefault.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                btnOrDefaultActionPerformed(evt);
-            }
-        });
-        add(btnOrDefault, new org.netbeans.lib.awtextra.AbsoluteConstraints(670, 160, -1, -1));
-
-        jLabel6.setBackground(new java.awt.Color(255, 255, 255));
-        jLabel6.setForeground(new java.awt.Color(0, 0, 0));
-        jLabel6.setText("Ingresar el RUC de la Planta:");
-        add(jLabel6, new org.netbeans.lib.awtextra.AbsoluteConstraints(30, 410, 190, -1));
-
-        txtDireccionBuscada.setBackground(new java.awt.Color(255, 255, 255));
-        add(txtDireccionBuscada, new org.netbeans.lib.awtextra.AbsoluteConstraints(410, 490, 230, -1));
-
-        btnEditarPlanta.setBackground(new java.awt.Color(255, 153, 0));
-        btnEditarPlanta.setForeground(new java.awt.Color(255, 255, 255));
-        btnEditarPlanta.setText("Editar");
-        btnEditarPlanta.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                btnEditarPlantaActionPerformed(evt);
-            }
-        });
-        add(btnEditarPlanta, new org.netbeans.lib.awtextra.AbsoluteConstraints(670, 460, -1, -1));
-
-        txtPlantaBuscada.setBackground(new java.awt.Color(255, 255, 255));
-        add(txtPlantaBuscada, new org.netbeans.lib.awtextra.AbsoluteConstraints(30, 430, 230, -1));
-
-        txtRucBuscado.setBackground(new java.awt.Color(255, 255, 255));
-        add(txtRucBuscado, new org.netbeans.lib.awtextra.AbsoluteConstraints(410, 430, 230, -1));
-
-        txtNombreBuscado.setBackground(new java.awt.Color(255, 255, 255));
-        add(txtNombreBuscado, new org.netbeans.lib.awtextra.AbsoluteConstraints(410, 460, 230, -1));
-
-        btnSeleccionarPlanta.setBackground(new java.awt.Color(0, 153, 204));
-        btnSeleccionarPlanta.setForeground(new java.awt.Color(255, 255, 255));
-        btnSeleccionarPlanta.setText("Seleccionar");
-        btnSeleccionarPlanta.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                btnSeleccionarPlantaActionPerformed(evt);
-            }
-        });
-        add(btnSeleccionarPlanta, new org.netbeans.lib.awtextra.AbsoluteConstraints(280, 430, -1, -1));
-
-        btnEliminarPlanta.setBackground(new java.awt.Color(255, 51, 51));
-        btnEliminarPlanta.setForeground(new java.awt.Color(255, 255, 255));
-        btnEliminarPlanta.setText("Eliminar");
-        btnEliminarPlanta.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                btnEliminarPlantaActionPerformed(evt);
-            }
-        });
-        add(btnEliminarPlanta, new org.netbeans.lib.awtextra.AbsoluteConstraints(670, 490, -1, -1));
-
-        btnLimpiarPlanta.setBackground(new java.awt.Color(0, 153, 204));
-        btnLimpiarPlanta.setForeground(new java.awt.Color(255, 255, 255));
-        btnLimpiarPlanta.setText("Limpiar");
-        btnLimpiarPlanta.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                btnLimpiarPlantaActionPerformed(evt);
-            }
-        });
-        add(btnLimpiarPlanta, new org.netbeans.lib.awtextra.AbsoluteConstraints(670, 430, -1, -1));
+        add(jSplitPane, java.awt.BorderLayout.CENTER);
     }// </editor-fold>//GEN-END:initComponents
 
-    private void btnGuardarActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnGuardarActionPerformed
-        try {
-            
-            plantaServicio.guardarPlanta(txtImputRuc.getText(),txtImputNombre.getText(),txtImputDireccion.getText());
-
-            actualizarTabla();
-
-            txtImputRuc.setText("");
-            txtImputNombre.setText("");
-            txtImputDireccion.setText("");
-            txtImputRuc.requestFocus();
-
-        } catch (IllegalArgumentException ex) {
-        JOptionPane.showMessageDialog(this, ex.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
-               
-    }
-          
-          
-    }//GEN-LAST:event_btnGuardarActionPerformed
-
-    private void btnSeleccionarPlantaActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnSeleccionarPlantaActionPerformed
-        
-        Planta planta = plantaServicio.obtenerPlantaPorRuc(txtPlantaBuscada.getText());
-
-        if (planta == null) {
-        JOptionPane.showMessageDialog(this, "No existe una planta con ese RUC",
-                "Error", JOptionPane.ERROR_MESSAGE);
-        return;
+    private void btnAgregarActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnAgregarActionPerformed
+        if (btnAgregar.getText().equalsIgnoreCase("Cerrar formulario") && "registrar".equals(opcion)) {
+            ocultarFormulario();
+            limpiarCampos();
+            return;
         }
 
-        txtRucBuscado.setText(planta.getRuc());
-        txtNombreBuscado.setText(planta.getNombre());
-        txtDireccionBuscada.setText(planta.getDireccion());
+        mostrarFormulario();
+        mostrarCampos(true);
+        limpiarCampos();
 
-        txtRucBuscado.setEditable(false);
+        lblDetalleAccion.setText("Ingrese los datos de la nueva planta:");
+        opcion = "registrar";
 
-        txtRucBuscado.setVisible(true);
-        txtNombreBuscado.setVisible(true);
-        txtDireccionBuscada.setVisible(true);
-        btnEliminarPlanta.setVisible(true);
-        btnLimpiarPlanta.setVisible(true);
-        btnEditarPlanta.setVisible(true);
+        btnOpcion.setText("Registrar");
+        btnOpcion.setBackground(new Color(40, 167, 69));
+        btnOpcion.setForeground(Color.WHITE);
+        btnOpcion.setVisible(true);
 
-        txtPlantaBuscada.setEditable(false);
-        btnSeleccionarPlanta.setEnabled(false);
-        
-        
-    }//GEN-LAST:event_btnSeleccionarPlantaActionPerformed
+        txtRuc.requestFocus();
+    }//GEN-LAST:event_btnAgregarActionPerformed
 
-    private void btnLimpiarPlantaActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnLimpiarPlantaActionPerformed
-      
-        limpiarSeleccion();
-        
-     }
-        private void limpiarSeleccion() {
-        txtRucBuscado.setText("");
-        txtNombreBuscado.setText("");
-        txtDireccionBuscada.setText("");
+    private void btnOpcionActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnOpcionActionPerformed
+        switch (opcion) {
+            case "registrar":
+                try {
+                    String ruc = txtRuc.getText().trim();
+                    String nombre = txtNombre.getText().trim();
+                    String direccion = txtDireccion.getText().trim();
 
-        ocultarEdicion();
+                    if (ruc.isEmpty() || nombre.isEmpty() || direccion.isEmpty()) {
+                        JOptionPane.showMessageDialog(this, "Complete todos los campos de la planta.", "Aviso", JOptionPane.WARNING_MESSAGE);
+                        return;
+                    }
 
-        txtPlantaBuscada.setText("");
-        txtPlantaBuscada.setEditable(true);
-        btnSeleccionarPlanta.setEnabled(true);
-        txtPlantaBuscada.requestFocus();
-        
-    }//GEN-LAST:event_btnLimpiarPlantaActionPerformed
+                    if (plantaServicio.obtenerPlantaPorRuc(ruc) != null) {
+                        JOptionPane.showMessageDialog(this, "Ya existe una planta con el RUC " + ruc, "RUC Duplicado", JOptionPane.WARNING_MESSAGE);
+                        return;
+                    }
 
-    private void btnEditarPlantaActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnEditarPlantaActionPerformed
-        
-        try {
-            plantaServicio.editarPlanta(
-                txtRucBuscado.getText(),
-                txtNombreBuscado.getText(),
-                txtDireccionBuscada.getText());
+                    plantaServicio.guardarPlanta(ruc, nombre, direccion);
+                    Planta p = plantaServicio.obtenerPlantaPorRuc(ruc);
+                    GestorLogistica.agregarPlanta(p);
 
-            actualizarTabla();
-            limpiarSeleccion();
+                    JOptionPane.showMessageDialog(this, "Planta " + nombre + " registrada exitosamente.");
+                    actualizarTabla(plantaServicio.getPlantas());
+                    limpiarCampos();
+                    ocultarFormulario();
+                } catch (IllegalArgumentException e) {
+                    JOptionPane.showMessageDialog(this, e.getMessage(), "Error al Registrar", JOptionPane.ERROR_MESSAGE);
+                }
+                break;
 
-            } catch (IllegalArgumentException ex) {
-                        JOptionPane.showMessageDialog(this, ex.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
-            }
+            case "seleccionarGuardar":
+                try {
+                    String ruc = txtRuc.getText().trim();
+                    Planta p = plantaServicio.obtenerPlantaPorRuc(ruc);
+                    if (p == null) {
+                        for (Planta pl : GestorLogistica.getPlantas()) {
+                            if (pl.getRuc().equalsIgnoreCase(ruc)) {
+                                p = pl;
+                                break;
+                            }
+                        }
+                    }
 
-    }//GEN-LAST:event_btnEditarPlantaActionPerformed
+                    if (p == null) {
+                        JOptionPane.showMessageDialog(this, "La planta con RUC " + ruc + " no está registrada.", "No Encontrada", JOptionPane.WARNING_MESSAGE);
+                        txtRuc.setText("");
+                        txtRuc.requestFocus();
+                    } else {
+                        prepararEdicion(p);
+                    }
+                } catch (IllegalArgumentException e) {
+                    JOptionPane.showMessageDialog(this, e.getMessage(), "Aviso", JOptionPane.WARNING_MESSAGE);
+                }
+                break;
 
-    private void btnEliminarPlantaActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnEliminarPlantaActionPerformed
-        String ruc = txtRucBuscado.getText();
+            case "guardar":
+                try {
+                    String ruc = txtRuc.getText().trim();
+                    String nombre = txtNombre.getText().trim();
+                    String direccion = txtDireccion.getText().trim();
 
-        int respuesta = JOptionPane.showConfirmDialog(this,
-            "¿Eliminar la planta " + ruc + "?",
-            "Confirmar", JOptionPane.YES_NO_OPTION);
+                    if (nombre.isEmpty() || direccion.isEmpty()) {
+                        JOptionPane.showMessageDialog(this, "Complete todos los campos a actualizar.", "Aviso", JOptionPane.WARNING_MESSAGE);
+                        return;
+                    }
 
-         if (respuesta != JOptionPane.YES_OPTION) {
+                    plantaServicio.editarPlanta(ruc, nombre, direccion);
+
+                    for (Planta pl : GestorLogistica.getPlantas()) {
+                        if (pl.getRuc().equalsIgnoreCase(ruc)) {
+                            pl.setNombre(nombre);
+                            pl.setDireccion(direccion);
+                            break;
+                        }
+                    }
+
+                    JOptionPane.showMessageDialog(this, "Planta " + nombre + " actualizada correctamente.");
+                    actualizarTabla(plantaServicio.getPlantas());
+                    limpiarCampos();
+                    ocultarFormulario();
+                } catch (IllegalArgumentException e) {
+                    JOptionPane.showMessageDialog(this, e.getMessage(), "Error al Actualizar", JOptionPane.ERROR_MESSAGE);
+                }
+                break;
+
+            case "seleccionarEliminar":
+                try {
+                    String ruc = txtRuc.getText().trim();
+                    Planta p = plantaServicio.obtenerPlantaPorRuc(ruc);
+                    if (p == null) {
+                        for (Planta pl : GestorLogistica.getPlantas()) {
+                            if (pl.getRuc().equalsIgnoreCase(ruc)) {
+                                p = pl;
+                                break;
+                            }
+                        }
+                    }
+
+                    if (p == null) {
+                        JOptionPane.showMessageDialog(this, "La planta con RUC " + ruc + " no está registrada.", "No Encontrada", JOptionPane.WARNING_MESSAGE);
+                        txtRuc.setText("");
+                    } else {
+                        mostrarCampos(true);
+                        txtNombre.setText(p.getNombre());
+                        txtDireccion.setText(p.getDireccion());
+                        editarCampos(false);
+
+                        lblDetalleAccion.setText("¿Desea confirmar la eliminación de la planta " + p.getNombre() + "?");
+                        opcion = "eliminar";
+                        btnOpcion.setText("Confirmar");
+                        btnOpcion.setBackground(new Color(220, 53, 69));
+                        btnOpcion.setForeground(Color.WHITE);
+                        btnOpcion.setVisible(true);
+                    }
+                } catch (IllegalArgumentException e) {
+                    JOptionPane.showMessageDialog(this, e.getMessage(), "Aviso", JOptionPane.WARNING_MESSAGE);
+                }
+                break;
+
+            case "eliminar":
+                try {
+                    String ruc = txtRuc.getText().trim();
+                    plantaServicio.eliminarPlanta(ruc);
+                    GestorLogistica.getPlantas().removeIf(p -> p.getRuc().equalsIgnoreCase(ruc));
+
+                    JOptionPane.showMessageDialog(this, "Planta eliminada correctamente.");
+                    actualizarTabla(plantaServicio.getPlantas());
+                    limpiarCampos();
+                    ocultarFormulario();
+                } catch (IllegalArgumentException e) {
+                    JOptionPane.showMessageDialog(this, e.getMessage(), "Error al Eliminar", JOptionPane.ERROR_MESSAGE);
+                }
+                break;
+
+            default:
+                break;
+        }
+    }//GEN-LAST:event_btnOpcionActionPerformed
+
+    private void btnEditarActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnEditarActionPerformed
+        int fila = tblPlantas.getSelectedRow();
+        String ruc = (fila >= 0) ? modeloTabla.getValueAt(fila, 0).toString() : txtRuc.getText().trim();
+
+        if (!ruc.isEmpty()) {
+            Planta p = plantaServicio.obtenerPlantaPorRuc(ruc);
+            if (p != null) {
+                prepararEdicion(p);
                 return;
+            }
         }
 
-        try {
-            plantaServicio.eliminarPlanta(ruc);
+        mostrarFormulario();
+        mostrarCampos(false);
+        limpiarCampos();
 
-            actualizarTabla();
-            limpiarSeleccion();
+        opcion = "seleccionarGuardar";
+        lblDetalleAccion.setText("Ingrese el RUC de la planta a editar:");
+        btnOpcion.setText("Seleccionar");
+        btnOpcion.setBackground(new Color(255, 193, 7));
+        btnOpcion.setForeground(Color.BLACK);
+        btnOpcion.setVisible(true);
 
-            } catch (IllegalArgumentException ex) {
-                        JOptionPane.showMessageDialog(this, ex.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
+        txtRuc.requestFocus();
+    }//GEN-LAST:event_btnEditarActionPerformed
+
+    private void btnEliminarActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnEliminarActionPerformed
+        int fila = tblPlantas.getSelectedRow();
+        String ruc = (fila >= 0) ? modeloTabla.getValueAt(fila, 0).toString() : txtRuc.getText().trim();
+
+        if (!ruc.isEmpty()) {
+            Planta p = plantaServicio.obtenerPlantaPorRuc(ruc);
+            if (p != null) {
+                int r = JOptionPane.showConfirmDialog(
+                        this,
+                        "¿Está seguro de eliminar la planta " + p.getNombre() + " (RUC: " + ruc + ")?",
+                        "Confirmar Eliminación",
+                        JOptionPane.YES_NO_OPTION
+                );
+                if (r == JOptionPane.YES_OPTION) {
+                    plantaServicio.eliminarPlanta(ruc);
+                    GestorLogistica.getPlantas().removeIf(x -> x.getRuc().equalsIgnoreCase(ruc));
+                    actualizarTabla(plantaServicio.getPlantas());
+                    limpiarCampos();
+                    ocultarFormulario();
+                }
+                return;
             }
-    }//GEN-LAST:event_btnEliminarPlantaActionPerformed
+        }
 
-    private void btnOrRucActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnOrRucActionPerformed
-        orden = "ruc";
-        actualizarTabla();
-    }//GEN-LAST:event_btnOrRucActionPerformed
+        mostrarFormulario();
+        mostrarCampos(false);
+        limpiarCampos();
 
-    private void btnOrNombreActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnOrNombreActionPerformed
-         orden = "nombre";
-         actualizarTabla();
-    }//GEN-LAST:event_btnOrNombreActionPerformed
+        opcion = "seleccionarEliminar";
+        lblDetalleAccion.setText("Ingrese el RUC de la planta a eliminar:");
+        btnOpcion.setText("Seleccionar");
+        btnOpcion.setBackground(new Color(255, 193, 7));
+        btnOpcion.setForeground(Color.BLACK);
+        btnOpcion.setVisible(true);
 
-    private void btnOrDefaultActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnOrDefaultActionPerformed
-         orden = "default";
-         actualizarTabla();
-    }//GEN-LAST:event_btnOrDefaultActionPerformed
+        txtRuc.requestFocus();
+    }//GEN-LAST:event_btnEliminarActionPerformed
+
+    private void btnCancelarActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnCancelarActionPerformed
+        limpiarCampos();
+        ocultarFormulario();
+    }//GEN-LAST:event_btnCancelarActionPerformed
 
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
-    private javax.swing.JButton btnEditarPlanta;
-    private javax.swing.JButton btnEliminarPlanta;
-    private javax.swing.JButton btnGuardar;
-    private javax.swing.JButton btnLimpiarPlanta;
-    private javax.swing.JButton btnOrDefault;
-    private javax.swing.JButton btnOrNombre;
-    private javax.swing.JButton btnOrRuc;
-    private javax.swing.JButton btnSeleccionarPlanta;
-    private javax.swing.JLabel jLabel1;
-    private javax.swing.JLabel jLabel2;
-    private javax.swing.JLabel jLabel3;
-    private javax.swing.JLabel jLabel4;
-    private javax.swing.JLabel jLabel5;
-    private javax.swing.JLabel jLabel6;
-    private javax.swing.JScrollPane jScrollPane1;
+    private javax.swing.JButton btnAgregar;
+    private javax.swing.JButton btnCancelar;
+    private javax.swing.JButton btnEditar;
+    private javax.swing.JButton btnEliminar;
+    private javax.swing.JButton btnOpcion;
+    private javax.swing.JPanel contenidoPanelFormulario;
+    private javax.swing.JScrollPane jScrollPane;
+    private javax.swing.JSplitPane jSplitPane;
+    private javax.swing.JLabel lblDetalleAccion;
+    private javax.swing.JLabel lblDireccion;
+    private javax.swing.JLabel lblNombre;
+    private javax.swing.JLabel lblRuc;
+    private javax.swing.JLabel lblTitulo;
+    private javax.swing.JPanel panelBarra;
+    private javax.swing.JPanel panelBotones;
+    private javax.swing.JPanel panelFormulario;
+    private javax.swing.JPanel panelTabla;
     private javax.swing.JTable tblPlantas;
-    private javax.swing.JTextField txtDireccionBuscada;
-    private javax.swing.JTextField txtImputDireccion;
-    private javax.swing.JTextField txtImputNombre;
-    private javax.swing.JTextField txtImputRuc;
-    private javax.swing.JTextField txtNombreBuscado;
-    private javax.swing.JTextField txtPlantaBuscada;
-    private javax.swing.JTextField txtRucBuscado;
+    private javax.swing.JTextField txtDireccion;
+    private javax.swing.JTextField txtNombre;
+    private javax.swing.JTextField txtRuc;
     // End of variables declaration//GEN-END:variables
 }
