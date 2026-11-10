@@ -216,8 +216,68 @@ public class CocheraServicioTest {
 
     @Test
     public void testPanelModuloCocheraInstanciacion() {
+        GestorEquipos.getUnidades().clear();
         vista.PanelModuloCochera panel = new vista.PanelModuloCochera();
         assertNotNull(panel);
         panel.refrescar();
+        assertEquals(0, panel.getServicio().getCantidadUnidades());
+    }
+
+    @Test
+    public void testEspaciosCompuestosDeTresCoordenadas() {
+        // P1: 2 espacios x 3 coordenadas
+        int[][][] p1 = cocheraServicio.getEspacios(1);
+        assertEquals(2, p1.length);
+        for (int[][] esp : p1) {
+            assertEquals("Cada espacio debe tener exactamente 3 coordenadas", 3, esp.length);
+        }
+
+        // P2: 4 espacios x 3 coordenadas
+        int[][][] p2 = cocheraServicio.getEspacios(2);
+        assertEquals(4, p2.length);
+        for (int[][] esp : p2) {
+            assertEquals("Cada espacio debe tener exactamente 3 coordenadas", 3, esp.length);
+        }
+
+        // P3: 1 espacio x 3 coordenadas
+        int[][][] p3 = cocheraServicio.getEspacios(3);
+        assertEquals(1, p3.length);
+        for (int[][] esp : p3) {
+            assertEquals("Cada espacio debe tener exactamente 3 coordenadas", 3, esp.length);
+        }
+    }
+
+    @Test
+    public void testPanelModuloCocheraBuscarEspacio() {
+        vista.PanelModuloCochera panel = new vista.PanelModuloCochera();
+        // Celda (6, 1) pertenece a espacio P1
+        int[][] espP1 = panel.buscarEspacio(6, 1);
+        assertNotNull("Debe encontrar el espacio de 3 celdas para (6,1)", espP1);
+        assertEquals(3, espP1.length);
+        assertArrayEquals(new int[]{6, 1}, espP1[0]);
+        assertArrayEquals(new int[]{7, 1}, espP1[1]);
+        assertArrayEquals(new int[]{8, 1}, espP1[2]);
+
+        // Celda (0, 0) es pasillo de maniobra
+        int[][] espPasillo = panel.buscarEspacio(0, 0);
+        assertNull("Un pasillo no debe pertenecer a ningún espacio asignable", espPasillo);
+    }
+
+    @Test
+    public void testFallbackPrioridadCuandoZonaLlena() {
+        Carreta c = crearCarreta("CAR500");
+        UnidadTransporte u1 = new UnidadTransporte(crearTractor("P1A"), c, 1);
+        UnidadTransporte u2 = new UnidadTransporte(crearTractor("P1B"), c, 1);
+        UnidadTransporte u3 = new UnidadTransporte(crearTractor("P1C"), c, 1);
+
+        cocheraServicio.asignarEspacioEnCochera(u1);
+        cocheraServicio.asignarEspacioEnCochera(u2);
+        // Zona P1 solo tiene 2 espacios, la 3ra unidad con P1 debe reubicarse en fallback (P2)
+        cocheraServicio.asignarEspacioEnCochera(u3);
+
+        assertTrue(u3.estaEnCochera());
+        int f = u3.getCoordenadasCochera()[0][0];
+        int col = u3.getCoordenadasCochera()[0][1];
+        assertEquals("Debe ubicarse en espacio P2 por fallback", 2, cocheraServicio.getPrioridadDeEspacio(f, col));
     }
 }
