@@ -5,7 +5,6 @@
 package modelo;
 
 import java.time.Year;
-import java.util.Comparator;
 
 /**
  *
@@ -24,11 +23,7 @@ public class Carreta {
     private int anio;
     private String MTC;
 
-    // Comparadores para los botones "Ordenar por"
-    public static final Comparator<Carreta> POR_PLACA = Comparator.comparing(Carreta::getPlaca);
-    public static final Comparator<Carreta> POR_MARCA = Comparator.comparing(Carreta::getMarca);
-
-    //Constructor que usa setters para validacion
+   
     public Carreta(String placa, int ejes, String marca, String modelo, String carroceria, int anio, String MTC) {
         setPlaca(placa);
         setEjes(ejes);
@@ -39,12 +34,10 @@ public class Carreta {
         setMTC(MTC);
     }
 
-    //Getters y Setters
     public String getPlaca() {
         return placa;
     }
 
-    // 
     public void setPlaca(String placa) {
         if (placa == null || placa.trim().isEmpty()) {
             throw new IllegalArgumentException("La placa no puede ser nula ni vacía.");
@@ -61,13 +54,11 @@ public class Carreta {
         return ejes;
     }
 
-    //
     public void setEjes(int ejes) {
         if (ejes < 1 || ejes > 6) {
             throw new IllegalArgumentException("Los ejes deben estar entre 1 y 6");
         }
         this.ejes = ejes;
-
     }
 
     public String getMarca() {
@@ -85,7 +76,7 @@ public class Carreta {
         } else {
             throw new IllegalArgumentException("La marca no puede ser nula.");
         }
-        this.marca = marca;
+        
     }
 
     public String getModelo() {
@@ -149,7 +140,12 @@ public class Carreta {
         } else {
             throw new IllegalArgumentException("El MTC no puede ser nulo.");
         }
-        this.modelo = modelo;
-
     }
+
+    @Override
+    public String toString() {
+        return  placa ;
+    }
+    
+    
 }

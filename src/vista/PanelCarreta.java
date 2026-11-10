@@ -4,12 +4,13 @@
  */
 package vista;
 
+
 import java.util.ArrayList;
-import java.util.List;
 import javax.swing.JOptionPane;
 import javax.swing.table.DefaultTableModel;
 import modelo.Carreta;
 import servicio.CarretaServicio;
+
 
 /**
  *
@@ -17,39 +18,41 @@ import servicio.CarretaServicio;
  */
 public class PanelCarreta extends javax.swing.JPanel {
 
-    private CarretaServicio carretaServicio;
-    private DefaultTableModel modelo;
+    private final CarretaServicio carretaServicio;
+    private final DefaultTableModel modelo;
     private String orden;
-    
+
     public PanelCarreta() {
         initComponents();
         txtPlacaBuscada.setEditable(false);
-        carretaServicio = new CarretaServicio(new ArrayList<>());
+        carretaServicio = new CarretaServicio();
         modelo = (DefaultTableModel) tblCarretas.getModel();
-        orden = "default";
+        orden = "placa";
         actualizarTabla();
-        tblCarretas.setEnabled(false);
+        
     }
-    
-     // Vuelve a llenar la tabla según el orden elegido
+
+    // Vuelve a llenar la tabla según el orden elegido
     public void actualizarTabla() {
         modelo.setRowCount(0);
 
-        List<Carreta> lista;
+        Carreta[] lista;
         switch (orden) {
-            case "placa":
-                lista = carretaServicio.ordenarCarretaPorPlaca();
-                break;
             case "marca":
                 lista = carretaServicio.ordenarCarretaPorMarca();
                 break;
+            case "anio":
+                lista = carretaServicio.ordenarCarretaPorAnio();
+                break;
             default:
-                lista = carretaServicio.getCarretas();
+                lista = carretaServicio.ordenarCarretaPorPlaca();
                 break;
         }
 
-        for (Carreta c : lista) {
+        for (int i=0; i < lista.length; i++) {
+            Carreta c=lista[i];
             modelo.addRow(new Object[]{
+                i,
                 c.getPlaca(),
                 c.getMarca(),
                 c.getModelo(),
@@ -58,9 +61,10 @@ public class PanelCarreta extends javax.swing.JPanel {
                 c.getAnio(),
                 c.getMTC()
             });
-        }
+        
     }
-
+    
+    }
     // Muestra u oculta las cajas y botones de la zona de edición
     private void mostrarEdicion(boolean visible) {
         java.awt.Component[] zona = {
@@ -72,6 +76,7 @@ public class PanelCarreta extends javax.swing.JPanel {
             c.setVisible(visible);
         }
     }
+
     /**
      * This method is called from within the constructor to initialize the form.
      * WARNING: Do NOT modify this code. The content of this method is always
@@ -101,7 +106,6 @@ public class PanelCarreta extends javax.swing.JPanel {
         btnOrPlaca = new javax.swing.JButton();
         btnOrMarca = new javax.swing.JButton();
         btnOrAnio = new javax.swing.JButton();
-        btnOrDefault = new javax.swing.JButton();
         jScrollPane1 = new javax.swing.JScrollPane();
         tblCarretas = new javax.swing.JTable();
         jLabel10 = new javax.swing.JLabel();
@@ -124,6 +128,9 @@ public class PanelCarreta extends javax.swing.JPanel {
         btnLimpiarCarreta = new javax.swing.JButton();
         btnEditarCarreta = new javax.swing.JButton();
         btnEliminarCarreta = new javax.swing.JButton();
+        btnRespaldo = new javax.swing.JButton();
+        btnComparar = new javax.swing.JButton();
+        btnDeshacer = new javax.swing.JButton();
 
         setBackground(new java.awt.Color(255, 255, 255));
         setMaximumSize(new java.awt.Dimension(810, 540));
@@ -228,7 +235,7 @@ public class PanelCarreta extends javax.swing.JPanel {
                 btnOrPlacaActionPerformed(evt);
             }
         });
-        add(btnOrPlaca, new org.netbeans.lib.awtextra.AbsoluteConstraints(120, 160, -1, -1));
+        add(btnOrPlaca, new org.netbeans.lib.awtextra.AbsoluteConstraints(120, 160, 60, -1));
 
         btnOrMarca.setBackground(new java.awt.Color(255, 153, 153));
         btnOrMarca.setForeground(new java.awt.Color(255, 255, 255));
@@ -238,7 +245,7 @@ public class PanelCarreta extends javax.swing.JPanel {
                 btnOrMarcaActionPerformed(evt);
             }
         });
-        add(btnOrMarca, new org.netbeans.lib.awtextra.AbsoluteConstraints(210, 160, -1, -1));
+        add(btnOrMarca, new org.netbeans.lib.awtextra.AbsoluteConstraints(190, 160, 70, -1));
 
         btnOrAnio.setBackground(new java.awt.Color(153, 153, 255));
         btnOrAnio.setForeground(new java.awt.Color(255, 255, 255));
@@ -248,35 +255,24 @@ public class PanelCarreta extends javax.swing.JPanel {
                 btnOrAnioActionPerformed(evt);
             }
         });
-        add(btnOrAnio, new org.netbeans.lib.awtextra.AbsoluteConstraints(300, 160, -1, -1));
-
-        btnOrDefault.setBackground(new java.awt.Color(0, 153, 204));
-        btnOrDefault.setForeground(new java.awt.Color(255, 255, 255));
-        btnOrDefault.setText("Default");
-        btnOrDefault.setToolTipText("");
-        btnOrDefault.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                btnOrDefaultActionPerformed(evt);
-            }
-        });
-        add(btnOrDefault, new org.netbeans.lib.awtextra.AbsoluteConstraints(680, 160, -1, -1));
+        add(btnOrAnio, new org.netbeans.lib.awtextra.AbsoluteConstraints(270, 160, 60, -1));
 
         jScrollPane1.setBackground(new java.awt.Color(255, 255, 255));
 
         tblCarretas.setBackground(new java.awt.Color(255, 255, 255));
         tblCarretas.setModel(new javax.swing.table.DefaultTableModel(
             new Object [][] {
-                {null, null, null, null, null, null, null},
-                {null, null, null, null, null, null, null},
-                {null, null, null, null, null, null, null},
-                {null, null, null, null, null, null, null}
+                {null, null, null, null, null, null, null, null},
+                {null, null, null, null, null, null, null, null},
+                {null, null, null, null, null, null, null, null},
+                {null, null, null, null, null, null, null, null}
             },
             new String [] {
-                "Placa", "Marca", "Modelo", "Ejes", "Carroceria", "Año", "MTC"
+                "Posición", "Placa", "Marca", "Modelo", "Ejes", "Carroceria", "Año", "MTC"
             }
         ) {
             Class[] types = new Class [] {
-                java.lang.String.class, java.lang.String.class, java.lang.String.class, java.lang.Integer.class, java.lang.String.class, java.lang.Integer.class, java.lang.String.class
+                java.lang.Integer.class, java.lang.String.class, java.lang.String.class, java.lang.String.class, java.lang.Integer.class, java.lang.String.class, java.lang.Integer.class, java.lang.String.class
             };
 
             public Class getColumnClass(int columnIndex) {
@@ -297,7 +293,7 @@ public class PanelCarreta extends javax.swing.JPanel {
 
         btnSeleccionarCarreta.setBackground(new java.awt.Color(0, 153, 204));
         btnSeleccionarCarreta.setForeground(new java.awt.Color(255, 255, 255));
-        btnSeleccionarCarreta.setText("Seleccionar");
+        btnSeleccionarCarreta.setText("Buscar");
         btnSeleccionarCarreta.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 btnSeleccionarCarretaActionPerformed(evt);
@@ -391,60 +387,90 @@ public class PanelCarreta extends javax.swing.JPanel {
             }
         });
         add(btnEliminarCarreta, new org.netbeans.lib.awtextra.AbsoluteConstraints(680, 460, -1, -1));
+
+        btnRespaldo.setBackground(new java.awt.Color(204, 0, 204));
+        btnRespaldo.setForeground(new java.awt.Color(255, 255, 255));
+        btnRespaldo.setText("Respaldo");
+        btnRespaldo.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                btnRespaldoActionPerformed(evt);
+            }
+        });
+        add(btnRespaldo, new org.netbeans.lib.awtextra.AbsoluteConstraints(550, 160, 90, -1));
+
+        btnComparar.setBackground(new java.awt.Color(0, 102, 153));
+        btnComparar.setForeground(new java.awt.Color(255, 255, 255));
+        btnComparar.setText("Comparar");
+        btnComparar.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                btnCompararActionPerformed(evt);
+            }
+        });
+        add(btnComparar, new org.netbeans.lib.awtextra.AbsoluteConstraints(650, 160, 110, -1));
+
+        btnDeshacer.setBackground(new java.awt.Color(204, 51, 255));
+        btnDeshacer.setForeground(new java.awt.Color(255, 255, 255));
+        btnDeshacer.setText("Deshacer eliminación");
+        btnDeshacer.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                btnDeshacerActionPerformed(evt);
+            }
+        });
+        add(btnDeshacer, new org.netbeans.lib.awtextra.AbsoluteConstraints(520, 490, 230, -1));
     }// </editor-fold>//GEN-END:initComponents
 
     private void btnGuardarActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnGuardarActionPerformed
         try {
+
+            int ejes = Integer.parseInt(txtInputEjes.getText().trim());
+            int anio = Integer.parseInt(txtInputAnio.getText().trim());
+
+            carretaServicio.guardarCarreta(
+                    txtInputPlaca.getText(),
+                    ejes,
+                    txtInputMarca.getText(),
+                    txtInputModelo.getText(),
+                    txtInputCarroceria.getText(),
+                    anio,
+                    txtInputMTC.getText());
             
-        int ejes = Integer.parseInt(txtInputEjes.getText().trim());
-        int anio = Integer.parseInt(txtInputAnio.getText().trim());
+            actualizarTabla();
 
-        carretaServicio.guardarCarreta(
-                txtInputPlaca.getText(),
-                ejes,
-                txtInputMarca.getText(),
-                txtInputModelo.getText(),
-                txtInputCarroceria.getText(),
-                anio,
-                txtInputMTC.getText());
-
-        actualizarTabla();
-
-        txtInputPlaca.setText("");
-        txtInputEjes.setText("");
-        txtInputMarca.setText("");
-        txtInputModelo.setText("");
-        txtInputCarroceria.setText("");
-        txtInputAnio.setText("");
-        txtInputMTC.setText("");
-        txtInputPlaca.requestFocus();
+            txtInputPlaca.setText("");
+            txtInputEjes.setText("");
+            txtInputMarca.setText("");
+            txtInputModelo.setText("");
+            txtInputCarroceria.setText("");
+            txtInputAnio.setText("");
+            txtInputMTC.setText("");
+            txtInputPlaca.requestFocus();
 
         } catch (NumberFormatException ex) {
-              JOptionPane.showMessageDialog(this, "Ejes y año deben ser números enteros",
-                "Error", JOptionPane.ERROR_MESSAGE);
-                
+            JOptionPane.showMessageDialog(this, "Ejes y año deben ser números enteros",
+                    "Error", JOptionPane.ERROR_MESSAGE);
+
         } catch (IllegalArgumentException ex) {
-        JOptionPane.showMessageDialog(this, ex.getMessage(),
-                "Error", JOptionPane.ERROR_MESSAGE);
-    }
+            JOptionPane.showMessageDialog(this, ex.getMessage(),
+                    "Error", JOptionPane.ERROR_MESSAGE);
+        }
     }//GEN-LAST:event_btnGuardarActionPerformed
 
     private void btnSeleccionarCarretaActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnSeleccionarCarretaActionPerformed
-        
+
         String placa = txtCarretaBuscada.getText().trim();
 
         if (placa.isEmpty()) {
-                JOptionPane.showMessageDialog(this, "Ingresa la placa de la carreta",
-                "Error", JOptionPane.ERROR_MESSAGE);
+            JOptionPane.showMessageDialog(this, "Ingresa la placa de la carreta",
+                    "Error", JOptionPane.ERROR_MESSAGE);
             return;
         }
 
         Carreta c = carretaServicio.obtenerCarretaPorPlaca(placa);
 
         if (c == null) {
-                
-                JOptionPane.showMessageDialog(this, "No existe una carreta con esa placa",
-                "Error", JOptionPane.ERROR_MESSAGE);
+
+            JOptionPane.showMessageDialog(this, "No existe una carreta con esa placa",
+                    "Error", JOptionPane.ERROR_MESSAGE);
             return;
         }
 
@@ -457,11 +483,11 @@ public class PanelCarreta extends javax.swing.JPanel {
         txtMTCBuscado.setText(c.getMTC());
 
         txtPlacaBuscada.setEditable(false);
-        
+
     }//GEN-LAST:event_btnSeleccionarCarretaActionPerformed
 
     private void btnLimpiarCarretaActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnLimpiarCarretaActionPerformed
-        
+
         txtCarretaBuscada.setText("");
 
         txtPlacaBuscada.setText("");
@@ -476,69 +502,69 @@ public class PanelCarreta extends javax.swing.JPanel {
     }//GEN-LAST:event_btnLimpiarCarretaActionPerformed
 
     private void btnEditarCarretaActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnEditarCarretaActionPerformed
-        
+
         if (txtPlacaBuscada.getText().isEmpty()) {
-                JOptionPane.showMessageDialog(this, "Primero selecciona una carreta",
-                "Error", JOptionPane.ERROR_MESSAGE);
+            JOptionPane.showMessageDialog(this, "Primero selecciona una carreta",
+                    "Error", JOptionPane.ERROR_MESSAGE);
             return;
         }
-        
+
         try {
-        int ejes = Integer.parseInt(txtEjesBuscado.getText().trim());
-        int anio = Integer.parseInt(txtAnioBuscado.getText().trim());
+            int ejes = Integer.parseInt(txtEjesBuscado.getText().trim());
+            int anio = Integer.parseInt(txtAnioBuscado.getText().trim());
 
-        carretaServicio.editarCarreta(
-                txtPlacaBuscada.getText(),
-                ejes,
-                txtMarcaBuscada.getText(),
-                txtModeloBuscado.getText(),
-                txtCarroceriaBuscada.getText(),
-                anio,
-                txtMTCBuscado.getText());
+            carretaServicio.editarCarreta(
+                    txtPlacaBuscada.getText(),
+                    ejes,
+                    txtMarcaBuscada.getText(),
+                    txtModeloBuscado.getText(),
+                    txtCarroceriaBuscada.getText(),
+                    anio,
+                    txtMTCBuscado.getText());
 
-        actualizarTabla();
+            actualizarTabla();
 
-        JOptionPane.showMessageDialog(this, "Carreta actualizada correctamente");
+            JOptionPane.showMessageDialog(this, "Carreta actualizada correctamente");
 
-        txtCarretaBuscada.setText("");
-        txtPlacaBuscada.setText("");
-        txtMarcaBuscada.setText("");
-        txtModeloBuscado.setText("");
-        txtEjesBuscado.setText("");
-        txtCarroceriaBuscada.setText("");
-        txtAnioBuscado.setText("");
-        txtMTCBuscado.setText("");
-        txtCarretaBuscada.requestFocus();
+            txtCarretaBuscada.setText("");
+            txtPlacaBuscada.setText("");
+            txtMarcaBuscada.setText("");
+            txtModeloBuscado.setText("");
+            txtEjesBuscado.setText("");
+            txtCarroceriaBuscada.setText("");
+            txtAnioBuscado.setText("");
+            txtMTCBuscado.setText("");
+            txtCarretaBuscada.requestFocus();
 
         } catch (NumberFormatException ex) {
-                JOptionPane.showMessageDialog(this, "Ejes y año deben ser números enteros",
-                "Error", JOptionPane.ERROR_MESSAGE);
+            JOptionPane.showMessageDialog(this, "Ejes y año deben ser números enteros",
+                    "Error", JOptionPane.ERROR_MESSAGE);
         } catch (IllegalArgumentException ex) {
-                JOptionPane.showMessageDialog(this, ex.getMessage(),
-                "Error", JOptionPane.ERROR_MESSAGE);
+            JOptionPane.showMessageDialog(this, ex.getMessage(),
+                    "Error", JOptionPane.ERROR_MESSAGE);
         }
     }//GEN-LAST:event_btnEditarCarretaActionPerformed
 
     private void btnEliminarCarretaActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnEliminarCarretaActionPerformed
-        
+
         if (txtPlacaBuscada.getText().isEmpty()) {
-                JOptionPane.showMessageDialog(this, "Primero selecciona una carreta",
-                "Error", JOptionPane.ERROR_MESSAGE);
+            JOptionPane.showMessageDialog(this, "Primero selecciona una carreta",
+                    "Error", JOptionPane.ERROR_MESSAGE);
             return;
         }
 
         String placa = txtPlacaBuscada.getText();
 
         int respuesta = JOptionPane.showConfirmDialog(this,
-            "¿Seguro que quieres eliminar la carreta " + placa + "?",
-            "Confirmar eliminación", JOptionPane.YES_NO_OPTION);
+                "¿Seguro que quieres eliminar la carreta " + placa + "?",
+                "Confirmar eliminación", JOptionPane.YES_NO_OPTION);
 
         if (respuesta != JOptionPane.YES_OPTION) {
-        return;
+            return;
         }
 
         try {
-        
+
             carretaServicio.eliminarCarreta(placa);
 
             actualizarTabla();
@@ -555,42 +581,69 @@ public class PanelCarreta extends javax.swing.JPanel {
             txtMTCBuscado.setText("");
             txtCarretaBuscada.requestFocus();
 
-            } catch (IllegalArgumentException ex) {
-                    JOptionPane.showMessageDialog(this, ex.getMessage(),
+        } catch (IllegalArgumentException ex) {
+            JOptionPane.showMessageDialog(this, ex.getMessage(),
                     "Error", JOptionPane.ERROR_MESSAGE);
-            }
+        }
     }//GEN-LAST:event_btnEliminarCarretaActionPerformed
 
     private void btnOrPlacaActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnOrPlacaActionPerformed
-            orden = "placa";
-            actualizarTabla();
+        orden = "placa";
+        actualizarTabla();
     }//GEN-LAST:event_btnOrPlacaActionPerformed
 
     private void btnOrMarcaActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnOrMarcaActionPerformed
-            orden = "marca";
-            actualizarTabla();
+        orden = "marca";
+        actualizarTabla();
     }//GEN-LAST:event_btnOrMarcaActionPerformed
 
     private void btnOrAnioActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnOrAnioActionPerformed
-            orden = "anio";
-            actualizarTabla();
+        orden = "anio";
+        actualizarTabla();
     }//GEN-LAST:event_btnOrAnioActionPerformed
 
-    private void btnOrDefaultActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnOrDefaultActionPerformed
-            orden = "default";
+    private void btnRespaldoActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnRespaldoActionPerformed
+        carretaServicio.crearRespaldo(); 
+        JOptionPane.showMessageDialog(this, "Respaldo creado con " + carretaServicio.cantidad() + " carretas");
+    
+    }//GEN-LAST:event_btnRespaldoActionPerformed
+
+    private void btnCompararActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnCompararActionPerformed
+       
+        try {
+            if (carretaServicio.flotaIgualAlRespaldo()) { 
+                JOptionPane.showMessageDialog(this, "IGUALES: la flota no cambió desde el respaldo");
+            } else {
+                JOptionPane.showMessageDialog(this, "DIFERENTES: hubo registros o eliminaciones después del respaldo");
+            }
+        } catch (IllegalStateException ex) {
+            JOptionPane.showMessageDialog(this, ex.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
+        }
+    }//GEN-LAST:event_btnCompararActionPerformed
+
+    private void btnDeshacerActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnDeshacerActionPerformed
+         
+        try {
+            Carreta recuperada = carretaServicio.deshacerEliminacion(); // pop de la pila
             actualizarTabla();
-    }//GEN-LAST:event_btnOrDefaultActionPerformed
+            JOptionPane.showMessageDialog(this, "Se recuperó la carreta " + recuperada.getPlaca());
+        } catch (IllegalStateException | IllegalArgumentException ex) {
+            JOptionPane.showMessageDialog(this, ex.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
+        }
+    }//GEN-LAST:event_btnDeshacerActionPerformed
 
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
+    private javax.swing.JButton btnComparar;
+    private javax.swing.JButton btnDeshacer;
     private javax.swing.JButton btnEditarCarreta;
     private javax.swing.JButton btnEliminarCarreta;
     private javax.swing.JButton btnGuardar;
     private javax.swing.JButton btnLimpiarCarreta;
     private javax.swing.JButton btnOrAnio;
-    private javax.swing.JButton btnOrDefault;
     private javax.swing.JButton btnOrMarca;
     private javax.swing.JButton btnOrPlaca;
+    private javax.swing.JButton btnRespaldo;
     private javax.swing.JButton btnSeleccionarCarreta;
     private javax.swing.JLabel jLabel1;
     private javax.swing.JLabel jLabel10;

@@ -4,7 +4,7 @@
  */
 package servicio;
 
-import java.util.List;
+
 import modelo.Carreta;
 
 /**
@@ -13,27 +13,130 @@ import modelo.Carreta;
  */
 public class CarretaServicio {
     
-    private List<Carreta> carretas;
+    public static final int CAPACIDAD_FLOTA = 50;
+    public static final int CAPACIDAD_PAPELERA = 5; 
+    
+    private final Carreta[] carretas = new Carreta[CAPACIDAD_FLOTA];
+    private int cantidad = 0;
+    
+    private final Carreta[] papelera = new Carreta[CAPACIDAD_PAPELERA];
+    private int tope = -1;
+    
+    private Carreta[] respaldo;      
+    private int cantidadRespaldo;
 
-    // Lista donde se guardaran las carretas
-    public CarretaServicio(List<Carreta> carretas) {
-        this.carretas = carretas;
+    
+    //Consultar
+    public int cantidad(){
+        return cantidad;
     }
     
-    // Devuelve todas las carretas registradas
-    public List<Carreta> getCarretas() {
-        return carretas;
+    public Carreta[] getCarretas(){
+        return copiar(carretas, cantidad);
     }
     
-    // Registra una carreta nueva; falla si los datos son inválidos o la placa ya existe
-    public void guardarCarreta(String placa, int ejes, String marca, String modelo, String carroceria, int anio, String MTC) {
-        Carreta carreta = new Carreta(placa, ejes, marca, modelo, carroceria, anio, MTC);
-        if (existeCarreta(carreta.getPlaca())) {
-            throw new IllegalArgumentException("Ya existe una carreta con esa placa");
+    // pila en papelera
+    public boolean papeleraVacia() {
+        return tope == -1;
+    }
+
+    public boolean papeleraLlena() {
+        return tope == papelera.length - 1;
+    }
+
+    public int cantidadPapelera() {
+        return tope + 1;
+    }
+    
+    //peek
+     public Carreta cimaPapelera() {
+        return papeleraVacia() ? null : papelera[tope];
+    }
+     
+    //Push
+    private void apilar(Carreta c) {
+        if (papeleraLlena()) {
+            for (int i = 0; i < tope; i++) {
+                papelera[i] = papelera[i + 1];
+            }
+            papelera[tope] = null;
+            tope--;
         }
-        carretas.add(carreta);
+        tope++;
+        papelera[tope] = c;
+    } 
+    
+    //Pop
+    private Carreta desapilar() {
+        if (papeleraVacia()) {
+            throw new IllegalStateException("La papelera está vacía");
+        }
+        Carreta c = papelera[tope];
+        papelera[tope] = null;
+        tope--;
+        return c;
+    }
+    
+    
+    //Buscar 
+   
+    private int busquedaBinaria(String placa) {
+        int izquierda = 0;
+        int derecha = cantidad - 1;
+        while (izquierda <= derecha) {
+            int medio = (izquierda + derecha) / 2;
+            int comparacion = carretas[medio].getPlaca().compareTo(placa);
+            if (comparacion == 0) {
+                return medio;
+            } else if (comparacion < 0) {
+                izquierda = medio + 1;  
+            } else {
+                derecha = medio - 1;       
+            }
+        }
+        return -1;
+    } 
+     
+     public Carreta obtenerCarretaPorPlaca(String placa) {
+        if (placa == null) {
+            return null;
+        }
+        int pos = busquedaBinaria(placa.trim().toUpperCase());
+        return pos == -1 ? null : carretas[pos];
+    }
+     
+     public boolean existeCarreta(String placa) {
+        return obtenerCarretaPorPlaca(placa) != null;
+    } 
+     
+    
+    // Registra una carreta nueva
+    public void guardarCarreta(String placa, int ejes, String marca, String modelo, String carroceria, int anio, String MTC) {
+        Carreta nuevaCarreta = new Carreta(placa, ejes, marca, modelo, carroceria, anio, MTC);
+        if (existeCarreta(nuevaCarreta.getPlaca())) {
+            throw new IllegalArgumentException("Ya existe una carreta con esa placa" + nuevaCarreta.getPlaca());
+        }
+    
+        insertarOrdenado(nuevaCarreta);
+              
     }
 
+     private void insertarOrdenado(Carreta nueva) {
+        if (cantidad == carretas.length) {
+            throw new IllegalArgumentException("La flota está completa (" + CAPACIDAD_FLOTA + " carretas)");
+        }
+        int pos = 0;
+        while (pos < cantidad && carretas[pos].getPlaca().compareTo(nueva.getPlaca()) < 0) {
+            pos++;
+        }
+        for (int i = cantidad; i > pos; i--) {
+            carretas[i] = carretas[i - 1];
+        }
+        carretas[pos] = nueva;
+        cantidad++;
+    }
+    
+      
     // Modifica los atributos de una carreta existente, menos la placa
     public void editarCarreta(String placa, int ejes, String marca, String modelo, String carroceria, int anio, String MTC) {
         Carreta carreta = obtenerCarretaPorPlaca(placa);
@@ -53,40 +156,119 @@ public class CarretaServicio {
 
     // Elimina la carreta de la placa ingresada; falla si no existe
     public void eliminarCarreta(String placa) {
-        Carreta carreta = obtenerCarretaPorPlaca(placa);
-        if (carreta == null) {
+       int pos = busquedaBinaria(placa == null ? "" : placa.trim().toUpperCase());
+        if (pos == -1) {
             throw new IllegalArgumentException("La carreta no existe");
         }
-        carretas.remove(carreta);
+        Carreta eliminada = carretas[pos];
+       
+        for (int i = pos; i < cantidad - 1; i++) {
+            carretas[i] = carretas[i + 1];
+        }
+        carretas[cantidad - 1] = null;
+        cantidad--;
+        apilar(eliminada); 
+    }
+    
+    public Carreta deshacerEliminacion() {
+        if (papeleraVacia()) {
+            throw new IllegalStateException("No hay eliminaciones para deshacer");
+        }
+        Carreta ultima = cimaPapelera(); 
+        if (existeCarreta(ultima.getPlaca())) {
+            throw new IllegalStateException("Ya se registró otra carreta con la placa " + ultima.getPlaca());
+        }
+        insertarOrdenado(ultima);
+        desapilar(); 
+        return ultima;
+    }
+    
+    //ordenar por 
+    
+     public Carreta[] ordenarCarretaPorPlaca() {
+        return copiar(carretas, cantidad);
     }
 
-    // Búsqueda por placa: devuelve la carreta o null si no la encuentra
-    public Carreta obtenerCarretaPorPlaca(String placa) {
-        if (placa == null) {
-            throw new IllegalArgumentException("La placa no puede ser nula");
-        }
-        String placaBuscada = placa.trim().toUpperCase();
-        for (Carreta c : carretas) {
-            if (c.getPlaca().equals(placaBuscada)) {
-                return c;
+    // Se ordena una COPIA para que el original siga ordenado por placa
+    public Carreta[] ordenarCarretaPorMarca() {
+        return burbuja(copiar(carretas, cantidad), "marca");
+    }
+
+    public Carreta[] ordenarCarretaPorAnio() {
+        return burbuja(copiar(carretas, cantidad), "anio");
+    }
+    
+    private Carreta[] burbuja(Carreta[] a, String criterio) {
+        for (int pasada = 0; pasada < a.length - 1; pasada++) {
+            boolean huboCambio = false;
+            for (int j = 0; j < a.length - 1 - pasada; j++) {
+                if (vaDespues(a[j], a[j + 1], criterio)) {
+                    Carreta temp = a[j];
+                    a[j] = a[j + 1];
+                    a[j + 1] = temp;
+                    huboCambio = true;
+                }
+            }
+            if (!huboCambio) {
+                break; 
             }
         }
-        return null;
+        return a;
+    }
+    
+    private boolean vaDespues(Carreta x, Carreta y, String criterio) {
+        if (criterio.equals("marca")) {
+            return x.getMarca().compareTo(y.getMarca()) > 0;
+        }
+        return x.getAnio() < y.getAnio();
+    }
+    
+    
+    //copiar
+    
+    private static Carreta[] copiar(Carreta[] origen, int n) {
+        Carreta[] destino = new Carreta[n];
+        for (int i = 0; i < n; i++) {
+            destino[i] = origen[i];
+        }
+        return destino;
+    }
+    
+    //clonacion
+    private static Carreta[] clonar(Carreta[] origen) {
+        return origen.clone();
     }
 
-    // Responde sí/no: ¿existe una carreta con esa placa?
-    public boolean existeCarreta(String placa) {
-        return obtenerCarretaPorPlaca(placa) != null;
+    public void crearRespaldo() {
+        respaldo = clonar(carretas);
+        cantidadRespaldo = cantidad;
     }
 
-    // Devuelve la lista ordenada por placa
-    public List<Carreta> ordenarCarretaPorPlaca() {
-        return carretas.stream().sorted(Carreta.POR_PLACA).toList();
+    public boolean tieneRespaldo() {
+        return respaldo != null;
     }
 
-    // Devuelve la lista ordenada por marca
-    public List<Carreta> ordenarCarretaPorMarca() {
-        return carretas.stream().sorted(Carreta.POR_MARCA).toList();
-    }    
+    public Carreta[] getRespaldo() {
+        return respaldo == null ? new Carreta[0] : copiar(respaldo, cantidadRespaldo);
+    }
+    
+    //comparación
+    public boolean flotaIgualAlRespaldo() {
+        if (respaldo == null) {
+            throw new IllegalStateException("Primero cree un respaldo");
+        }
+        if (cantidad != cantidadRespaldo) {
+            return false;
+        }
+        for (int i = 0; i < cantidad; i++) {
+            if (carretas[i] != respaldo[i]) {
+                return false;
+            }
+        }
+        return true;
+    }
+    
     
 }
+
+   
