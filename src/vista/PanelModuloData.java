@@ -7,11 +7,18 @@ package vista;
 import java.awt.CardLayout;
 
 /**
- *
- * @author cesar
+ * Panel contenedor para la gestión de datos maestros del sistema.
+ * Permite alternar entre Contenedor, Tractor, Carreta, Planta, Terminal, Cliente, Ruta y Unidad.
  */
 public class PanelModuloData extends javax.swing.JPanel {
     private CardLayout cardLayout;
+    private PanelContenedor panelContenedor;
+    private PanelTractor panelTractor;
+    private PanelCarreta panelCarreta;
+    private PanelPlanta panelPlanta;
+    private PanelTerminal panelTerminal;
+    private PanelCliente panelCliente;
+    private PanelRuta panelRuta;
     private PanelUnidad panelUnidad;
 
     /**
@@ -23,14 +30,22 @@ public class PanelModuloData extends javax.swing.JPanel {
         cardLayout = new CardLayout(); 
         pnlContenidoData.setLayout(cardLayout);
         
-        pnlContenidoData.add(new PanelContenedor(), "contenedor");
-        pnlContenidoData.add(new PanelTractor(), "tractor");
-        pnlContenidoData.add(new PanelCarreta(), "carreta");
-        pnlContenidoData.add(new PanelPlanta(), "planta");
-        pnlContenidoData.add(new PanelTerminal(), "terminal");
-        pnlContenidoData.add(new PanelCliente(), "cliente");
-        pnlContenidoData.add(new PanelRuta(), "ruta");
+        panelContenedor = new PanelContenedor();
+        panelTractor = new PanelTractor();
+        panelCarreta = new PanelCarreta();
+        panelPlanta = new PanelPlanta();
+        panelTerminal = new PanelTerminal();
+        panelCliente = new PanelCliente();
+        panelRuta = new PanelRuta();
         panelUnidad = new PanelUnidad();
+
+        pnlContenidoData.add(panelContenedor, "contenedor");
+        pnlContenidoData.add(panelTractor, "tractor");
+        pnlContenidoData.add(panelCarreta, "carreta");
+        pnlContenidoData.add(panelPlanta, "planta");
+        pnlContenidoData.add(panelTerminal, "terminal");
+        pnlContenidoData.add(panelCliente, "cliente");
+        pnlContenidoData.add(panelRuta, "ruta");
         pnlContenidoData.add(panelUnidad, "unidad");
     }
 
@@ -59,7 +74,11 @@ public class PanelModuloData extends javax.swing.JPanel {
         cboOpciones.setBackground(new java.awt.Color(51, 153, 255));
         cboOpciones.setForeground(new java.awt.Color(255, 255, 255));
         cboOpciones.setModel(new javax.swing.DefaultComboBoxModel<>(new String[] { "Contenedor", "Tractor", "Carreta", "Planta", "Terminal", "Cliente", "Ruta", "Unidad" }));
-        cboOpciones.addActionListener(this::cboOpcionesActionPerformed);
+        cboOpciones.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                cboOpcionesActionPerformed(evt);
+            }
+        });
         add(cboOpciones, new org.netbeans.lib.awtextra.AbsoluteConstraints(560, 20, 270, 40));
 
         jLabel2.setForeground(new java.awt.Color(0, 0, 0));
@@ -88,33 +107,39 @@ public class PanelModuloData extends javax.swing.JPanel {
         
         switch (opcion) {
             case "Contenedor":
+                panelContenedor.cargarDatos();
                 cardLayout.show(pnlContenidoData, "contenedor");
                 break;
             case "Tractor":
+                panelTractor.cargarDatos();
                 cardLayout.show(pnlContenidoData, "tractor");
                 break;
             case "Carreta":
+                panelCarreta.cargarDatos();
                 cardLayout.show(pnlContenidoData, "carreta");
                 break;
             case "Planta":
+                panelPlanta.cargarDatos();
                 cardLayout.show(pnlContenidoData, "planta");
                 break;
             case "Terminal":
+                panelTerminal.cargarDatos();
                 cardLayout.show(pnlContenidoData, "terminal");
                 break;
             case "Cliente":
+                panelCliente.cargarDatos();
                 cardLayout.show(pnlContenidoData, "cliente");
                 break;
             case "Ruta":
+                panelRuta.cargarDatos();
                 cardLayout.show(pnlContenidoData, "ruta");
                 break;
             case "Unidad":
-                panelUnidad.cargarCombos();
-                panelUnidad.cargarTabla();
+                panelUnidad.cargarDatos();
                 cardLayout.show(pnlContenidoData, "unidad");
                 break;
             default:
-                throw new AssertionError();
+                break;
         }
     }//GEN-LAST:event_cboOpcionesActionPerformed
 
