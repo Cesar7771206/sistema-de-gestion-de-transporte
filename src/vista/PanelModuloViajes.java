@@ -33,9 +33,24 @@ public class PanelModuloViajes extends javax.swing.JPanel {
      */
     public PanelModuloViajes() {
         initComponents();
+        jLabel3.setText("Unidad:");
+        cboTractor.addActionListener(e -> actualizarCarretaDeUnidad());
         cargarCombos();
         cargarTablaViajes();
+    }
 
+    private void actualizarCarretaDeUnidad() {
+        int idx = cboTractor.getSelectedIndex();
+        cboCarreta.removeAllItems();
+        if (idx != -1 && idx < GestorEquipos.getUnidades().size()) {
+            modelo.UnidadTransporte u = GestorEquipos.getUnidades().get(idx);
+            if (u.getCarreta() != null) {
+                cboCarreta.addItem(u.getCarreta().getPlaca());
+            } else {
+                cboCarreta.addItem("(Sin Carreta)");
+            }
+        }
+        cboCarreta.setEnabled(false);
     }
 
     public void cargarCombos() {
@@ -52,13 +67,11 @@ public class PanelModuloViajes extends javax.swing.JPanel {
             cboContenedor.addItem(contenedor.getCodigo());
         }
 
-        for (Tractor tractor : GestorEquipos.getTractores()) {
-            cboTractor.addItem(tractor.getPlaca());
+        for (modelo.UnidadTransporte unidad : GestorEquipos.getUnidades()) {
+            String carretaInfo = (unidad.getCarreta() != null ? unidad.getCarreta().getPlaca() : "Sin Carreta");
+            cboTractor.addItem(unidad.getPlaca() + " (" + carretaInfo + ")");
         }
-
-        for (Carreta carreta : GestorEquipos.getCarretas()) {
-            cboCarreta.addItem(carreta.getPlaca());
-        }
+        actualizarCarretaDeUnidad();
 
         for (Planta planta : GestorLogistica.getPlantas()) {
             cboPlanta.addItem(planta.getNombre());
@@ -89,8 +102,8 @@ public class PanelModuloViajes extends javax.swing.JPanel {
             Object[] fila = {
                 viaje.getId(),
                 viaje.getContenedor().getCodigo(),
-                viaje.getTractor().getPlaca(),
-                viaje.getCarreta().getPlaca(),
+                viaje.getTractor() != null ? viaje.getTractor().getPlaca() : "-",
+                viaje.getCarreta() != null ? viaje.getCarreta().getPlaca() : "(Sin Carreta)",
                 viaje.getCliente().getNombre(),
                 "Ruta " + viaje.getRuta().getId()
             };
@@ -330,7 +343,6 @@ public class PanelModuloViajes extends javax.swing.JPanel {
     private void jButton1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton1ActionPerformed
         if (cboContenedor.getSelectedIndex() == -1
                 || cboTractor.getSelectedIndex() == -1
-                || cboCarreta.getSelectedIndex() == -1
                 || cboPlanta.getSelectedIndex() == -1
                 || cboTerminal.getSelectedIndex() == -1
                 || cboCliente.getSelectedIndex() == -1
@@ -338,7 +350,7 @@ public class PanelModuloViajes extends javax.swing.JPanel {
 
             JOptionPane.showMessageDialog(
                     this,
-                    "Debe seleccionar todos los datos del viaje."
+                    "Debe seleccionar todos los datos del viaje (asegúrese de haber unido al menos una Unidad en Módulo Data)."
             );
 
             return;
@@ -348,13 +360,9 @@ public class PanelModuloViajes extends javax.swing.JPanel {
                 = GestorEquipos.getContenedores()
                         .get(cboContenedor.getSelectedIndex());
 
-        Tractor tractor
-                = GestorEquipos.getTractores()
+        modelo.UnidadTransporte unidad
+                = GestorEquipos.getUnidades()
                         .get(cboTractor.getSelectedIndex());
-
-        Carreta carreta
-                = GestorEquipos.getCarretas()
-                        .get(cboCarreta.getSelectedIndex());
 
         Planta planta
                 = GestorLogistica.getPlantas()
@@ -377,8 +385,7 @@ public class PanelModuloViajes extends javax.swing.JPanel {
         Viaje nuevoViaje = new Viaje(
                 id,
                 contenedor,
-                tractor,
-                carreta,
+                unidad,
                 planta,
                 terminal,
                 cliente,
@@ -397,7 +404,6 @@ public class PanelModuloViajes extends javax.swing.JPanel {
     private void btnRegistrarUrgenciaActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnRegistrarUrgenciaActionPerformed
         if (cboContenedor.getSelectedIndex() == -1
                 || cboTractor.getSelectedIndex() == -1
-                || cboCarreta.getSelectedIndex() == -1
                 || cboPlanta.getSelectedIndex() == -1
                 || cboTerminal.getSelectedIndex() == -1
                 || cboCliente.getSelectedIndex() == -1
@@ -405,7 +411,7 @@ public class PanelModuloViajes extends javax.swing.JPanel {
 
             JOptionPane.showMessageDialog(
                     this,
-                    "Debe seleccionar todos los datos del viaje."
+                    "Debe seleccionar todos los datos del viaje (asegúrese de haber unido al menos una Unidad en Módulo Data)."
             );
 
             return;
@@ -415,13 +421,9 @@ public class PanelModuloViajes extends javax.swing.JPanel {
                 = GestorEquipos.getContenedores()
                         .get(cboContenedor.getSelectedIndex());
 
-        Tractor tractor
-                = GestorEquipos.getTractores()
+        modelo.UnidadTransporte unidad
+                = GestorEquipos.getUnidades()
                         .get(cboTractor.getSelectedIndex());
-
-        Carreta carreta
-                = GestorEquipos.getCarretas()
-                        .get(cboCarreta.getSelectedIndex());
 
         Planta planta
                 = GestorLogistica.getPlantas()
@@ -444,8 +446,7 @@ public class PanelModuloViajes extends javax.swing.JPanel {
         Viaje nuevoViaje = new Viaje(
                 id,
                 contenedor,
-                tractor,
-                carreta,
+                unidad,
                 planta,
                 terminal,
                 cliente,
@@ -472,7 +473,6 @@ public class PanelModuloViajes extends javax.swing.JPanel {
 
         if (cboContenedor.getSelectedIndex() == -1
                 || cboTractor.getSelectedIndex() == -1
-                || cboCarreta.getSelectedIndex() == -1
                 || cboPlanta.getSelectedIndex() == -1
                 || cboTerminal.getSelectedIndex() == -1
                 || cboCliente.getSelectedIndex() == -1
@@ -506,13 +506,9 @@ public class PanelModuloViajes extends javax.swing.JPanel {
                 = GestorEquipos.getContenedores()
                         .get(cboContenedor.getSelectedIndex());
 
-        Tractor tractor
-                = GestorEquipos.getTractores()
+        modelo.UnidadTransporte unidad
+                = GestorEquipos.getUnidades()
                         .get(cboTractor.getSelectedIndex());
-
-        Carreta carreta
-                = GestorEquipos.getCarretas()
-                        .get(cboCarreta.getSelectedIndex());
 
         Planta planta
                 = GestorLogistica.getPlantas()
@@ -531,8 +527,7 @@ public class PanelModuloViajes extends javax.swing.JPanel {
                         .get(cboRuta.getSelectedIndex());
 
         viajeEditar.setContenedor(contenedor);
-        viajeEditar.setTractor(tractor);
-        viajeEditar.setCarreta(carreta);
+        viajeEditar.setUnidad(unidad);
         viajeEditar.setPlanta(planta);
         viajeEditar.setTerminal(terminal);
         viajeEditar.setCliente(cliente);
@@ -583,13 +578,15 @@ public class PanelModuloViajes extends javax.swing.JPanel {
                 viajeSeleccionado.getContenedor().getCodigo()
         );
 
-        cboTractor.setSelectedItem(
-                viajeSeleccionado.getTractor().getPlaca()
-        );
-
-        cboCarreta.setSelectedItem(
-                viajeSeleccionado.getCarreta().getPlaca()
-        );
+        if (viajeSeleccionado.getUnidad() != null) {
+            String placaTractor = viajeSeleccionado.getUnidad().getPlaca();
+            for (int i = 0; i < GestorEquipos.getUnidades().size(); i++) {
+                if (GestorEquipos.getUnidades().get(i).getPlaca().equalsIgnoreCase(placaTractor)) {
+                    cboTractor.setSelectedIndex(i);
+                    break;
+                }
+            }
+        }
 
         cboPlanta.setSelectedItem(
                 viajeSeleccionado.getPlanta().getNombre()
