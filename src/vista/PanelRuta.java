@@ -219,7 +219,7 @@ public class PanelRuta extends javax.swing.JPanel {
         panelBotones.setBackground(new java.awt.Color(255, 255, 255));
         panelBotones.setLayout(new java.awt.FlowLayout());
 
-        btnAgregar.setBackground(new java.awt.Color(51, 153, 255));
+        btnAgregar.setBackground(new java.awt.Color(0, 153, 255));
         btnAgregar.setForeground(new java.awt.Color(255, 255, 255));
         btnAgregar.setText("Agregar");
         btnAgregar.addActionListener(new java.awt.event.ActionListener() {

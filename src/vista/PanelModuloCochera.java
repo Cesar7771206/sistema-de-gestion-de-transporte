@@ -390,22 +390,28 @@ public class PanelModuloCochera extends javax.swing.JPanel {
         lblViaje.setText("Próximo Viaje: -");
         pnlContenido.add(lblViaje, new org.netbeans.lib.awtextra.AbsoluteConstraints(15, 138, 215, 16));
 
-        btnDespachar.setBackground(new java.awt.Color(0, 153, 153));
-        btnDespachar.setFont(new java.awt.Font("Sans Serif Collection", 0, 11)); // NOI18N
+        btnDespachar.setBackground(new java.awt.Color(0, 153, 255));
+        btnDespachar.setFont(new java.awt.Font("Sans Serif Collection", 1, 11)); // NOI18N
         btnDespachar.setForeground(new java.awt.Color(255, 255, 255));
         btnDespachar.setText("DESPACHAR A VIAJE");
-        btnDespachar.setBorder(javax.swing.BorderFactory.createBevelBorder(javax.swing.border.BevelBorder.RAISED));
         btnDespachar.setEnabled(false);
-        btnDespachar.addActionListener(this::btnDespacharActionPerformed);
+        btnDespachar.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                btnDespacharActionPerformed(evt);
+            }
+        });
         pnlContenido.add(btnDespachar, new org.netbeans.lib.awtextra.AbsoluteConstraints(15, 160, 215, 30));
 
         btnLiberar.setBackground(new java.awt.Color(255, 51, 51));
-        btnLiberar.setFont(new java.awt.Font("Sans Serif Collection", 0, 11)); // NOI18N
+        btnLiberar.setFont(new java.awt.Font("Sans Serif Collection", 1, 11)); // NOI18N
         btnLiberar.setForeground(new java.awt.Color(255, 255, 255));
         btnLiberar.setText("LIBERAR ESPACIO");
-        btnLiberar.setBorder(javax.swing.BorderFactory.createBevelBorder(javax.swing.border.BevelBorder.RAISED));
         btnLiberar.setEnabled(false);
-        btnLiberar.addActionListener(this::btnLiberarActionPerformed);
+        btnLiberar.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                btnLiberarActionPerformed(evt);
+            }
+        });
         pnlContenido.add(btnLiberar, new org.netbeans.lib.awtextra.AbsoluteConstraints(15, 196, 215, 28));
 
         jLabelSubLlegada.setFont(new java.awt.Font("Sans Serif Collection", 1, 11)); // NOI18N
@@ -418,24 +424,29 @@ public class PanelModuloCochera extends javax.swing.JPanel {
         jLabelSelUnidad.setText("Unidad fuera de cochera:");
         pnlContenido.add(jLabelSelUnidad, new org.netbeans.lib.awtextra.AbsoluteConstraints(15, 253, 215, 16));
 
-        cboUnidadLlegada.setBackground(new java.awt.Color(0, 153, 153));
-        cboUnidadLlegada.setBorder(javax.swing.BorderFactory.createBevelBorder(javax.swing.border.BevelBorder.RAISED));
+        cboUnidadLlegada.setBackground(new java.awt.Color(255, 255, 255));
         pnlContenido.add(cboUnidadLlegada, new org.netbeans.lib.awtextra.AbsoluteConstraints(15, 271, 215, 28));
 
-        btnRegistrarLlegada.setBackground(new java.awt.Color(0, 153, 153));
-        btnRegistrarLlegada.setFont(new java.awt.Font("Sans Serif Collection", 0, 11)); // NOI18N
+        btnRegistrarLlegada.setBackground(new java.awt.Color(0, 153, 255));
+        btnRegistrarLlegada.setFont(new java.awt.Font("Sans Serif Collection", 1, 11)); // NOI18N
         btnRegistrarLlegada.setForeground(new java.awt.Color(255, 255, 255));
         btnRegistrarLlegada.setText("REGISTRAR LLEGADA");
-        btnRegistrarLlegada.setBorder(javax.swing.BorderFactory.createBevelBorder(javax.swing.border.BevelBorder.RAISED));
-        btnRegistrarLlegada.addActionListener(this::btnRegistrarLlegadaActionPerformed);
+        btnRegistrarLlegada.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                btnRegistrarLlegadaActionPerformed(evt);
+            }
+        });
         pnlContenido.add(btnRegistrarLlegada, new org.netbeans.lib.awtextra.AbsoluteConstraints(15, 306, 215, 32));
 
-        btnReorganizar.setBackground(new java.awt.Color(0, 153, 153));
-        btnReorganizar.setFont(new java.awt.Font("Sans Serif Collection", 0, 11)); // NOI18N
+        btnReorganizar.setBackground(new java.awt.Color(0, 153, 255));
+        btnReorganizar.setFont(new java.awt.Font("Sans Serif Collection", 1, 11)); // NOI18N
         btnReorganizar.setForeground(new java.awt.Color(255, 255, 255));
         btnReorganizar.setText("ORDENAR POR PRIORIDAD");
-        btnReorganizar.setBorder(javax.swing.BorderFactory.createBevelBorder(javax.swing.border.BevelBorder.RAISED));
-        btnReorganizar.addActionListener(this::btnReorganizarActionPerformed);
+        btnReorganizar.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                btnReorganizarActionPerformed(evt);
+            }
+        });
         pnlContenido.add(btnReorganizar, new org.netbeans.lib.awtextra.AbsoluteConstraints(15, 350, 215, 32));
 
         jLabelLeyenda.setFont(new java.awt.Font("Sans Serif Collection", 1, 11)); // NOI18N

@@ -71,7 +71,7 @@ public class PanelModuloData extends javax.swing.JPanel {
         jLabel1.setText("MODULO DATA");
         add(jLabel1, new org.netbeans.lib.awtextra.AbsoluteConstraints(30, 20, -1, -1));
 
-        cboOpciones.setBackground(new java.awt.Color(51, 153, 255));
+        cboOpciones.setBackground(new java.awt.Color(0, 153, 255));
         cboOpciones.setForeground(new java.awt.Color(255, 255, 255));
         cboOpciones.setModel(new javax.swing.DefaultComboBoxModel<>(new String[] { "Contenedor", "Tractor", "Carreta", "Planta", "Terminal", "Cliente", "Ruta", "Unidad" }));
         cboOpciones.addActionListener(new java.awt.event.ActionListener() {
