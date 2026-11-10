@@ -86,7 +86,7 @@ public class PanelModuloData extends javax.swing.JPanel {
         add(jLabel2, new org.netbeans.lib.awtextra.AbsoluteConstraints(380, 30, -1, -1));
 
         pnlContenidoData.setBackground(new java.awt.Color(255, 255, 255));
-        pnlContenidoData.setBorder(javax.swing.BorderFactory.createLineBorder(new java.awt.Color(0, 0, 0)));
+        pnlContenidoData.setBorder(javax.swing.BorderFactory.createLineBorder(new java.awt.Color(204, 204, 204)));
 
         javax.swing.GroupLayout pnlContenidoDataLayout = new javax.swing.GroupLayout(pnlContenidoData);
         pnlContenidoData.setLayout(pnlContenidoDataLayout);

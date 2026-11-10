@@ -159,7 +159,7 @@ public class PanelRuta extends javax.swing.JPanel {
         lblDetalleAccion.setText("Editar datos de la ruta (ID protegido):");
         opcion = "guardar";
         btnOpcion.setText("Guardar");
-        btnOpcion.setBackground(new Color(40, 167, 69));
+        btnOpcion.setBackground(new Color(255, 153, 102));
         btnOpcion.setForeground(Color.WHITE);
         btnOpcion.setVisible(true);
 
@@ -394,7 +394,7 @@ public class PanelRuta extends javax.swing.JPanel {
         lblDetalleAccion.setText("Registrar nueva ruta:");
         opcion = "registrar";
         btnOpcion.setText("Registrar");
-        btnOpcion.setBackground(new Color(40, 167, 69));
+        btnOpcion.setBackground(new Color(0, 153, 255));
         btnOpcion.setForeground(Color.WHITE);
         btnOpcion.setVisible(true);
 

@@ -226,7 +226,8 @@ public class PanelUnidad extends javax.swing.JPanel {
         lblDetalleAccion.setText("Vincular tractor y carreta para habilitar unidad en la flota:");
         contenidoPanelFormulario.add(lblDetalleAccion, new org.netbeans.lib.awtextra.AbsoluteConstraints(20, 95, 500, -1));
 
-        btnOpcion.setBackground(new java.awt.Color(40, 167, 69));
+        btnOpcion.setBackground(new java.awt.Color(0, 153, 255));
+        btnOpcion.setFont(new java.awt.Font("sansserif", 1, 12)); // NOI18N
         btnOpcion.setForeground(new java.awt.Color(255, 255, 255));
         btnOpcion.setText("Unir Unidad");
         btnOpcion.addActionListener(new java.awt.event.ActionListener() {

@@ -158,7 +158,7 @@ public class PanelTractor extends javax.swing.JPanel {
 
         opcion = "guardar";
         btnOpcion.setText("Guardar");
-        btnOpcion.setBackground(new Color(40, 167, 69));
+        btnOpcion.setBackground(new Color(255, 153, 102));
         btnOpcion.setForeground(Color.WHITE);
         btnOpcion.setVisible(true);
 
@@ -383,7 +383,7 @@ public class PanelTractor extends javax.swing.JPanel {
         opcion = "registrar";
 
         btnOpcion.setText("Registrar");
-        btnOpcion.setBackground(new Color(40, 167, 69));
+        btnOpcion.setBackground(new Color(0, 153, 255));
         btnOpcion.setForeground(Color.WHITE);
         btnOpcion.setVisible(true);
 
