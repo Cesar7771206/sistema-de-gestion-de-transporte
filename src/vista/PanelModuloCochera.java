@@ -335,19 +335,20 @@ public class PanelModuloCochera extends javax.swing.JPanel {
         setLayout(new org.netbeans.lib.awtextra.AbsoluteLayout());
 
         jLabel1.setBackground(new java.awt.Color(255, 255, 255));
-        jLabel1.setFont(new java.awt.Font("Javanese Text", 1, 36)); // NOI18N
+        jLabel1.setFont(new java.awt.Font("JetBrainsMono NF", 1, 36)); // NOI18N
+        jLabel1.setForeground(new java.awt.Color(0, 0, 0));
         jLabel1.setText("MODULO COCHERA");
         add(jLabel1, new org.netbeans.lib.awtextra.AbsoluteConstraints(45, 15, 450, 55));
 
         panelCochera.setBackground(new java.awt.Color(30, 30, 30));
-        panelCochera.setBorder(javax.swing.BorderFactory.createLineBorder(new java.awt.Color(0, 0, 0)));
+        panelCochera.setBorder(javax.swing.BorderFactory.createLineBorder(new java.awt.Color(204, 204, 204)));
         panelCochera.setMaximumSize(new java.awt.Dimension(540, 540));
         panelCochera.setPreferredSize(new java.awt.Dimension(540, 540));
         panelCochera.setLayout(new java.awt.GridLayout(10, 10, 2, 2));
         add(panelCochera, new org.netbeans.lib.awtextra.AbsoluteConstraints(45, 80, 540, 540));
 
-        pnlContenido.setBackground(new java.awt.Color(204, 204, 204));
-        pnlContenido.setBorder(javax.swing.BorderFactory.createEtchedBorder());
+        pnlContenido.setBackground(new java.awt.Color(255, 255, 255));
+        pnlContenido.setBorder(javax.swing.BorderFactory.createLineBorder(new java.awt.Color(204, 204, 204)));
         pnlContenido.setLayout(new org.netbeans.lib.awtextra.AbsoluteLayout());
 
         jLabelTitulo.setFont(new java.awt.Font("Sans Serif Collection", 1, 13)); // NOI18N
