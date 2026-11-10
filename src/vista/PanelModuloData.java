@@ -12,6 +12,7 @@ import java.awt.CardLayout;
  */
 public class PanelModuloData extends javax.swing.JPanel {
     private CardLayout cardLayout;
+    private PanelUnidad panelUnidad;
 
     /**
      * Creates new form PanelModuloData
@@ -29,6 +30,8 @@ public class PanelModuloData extends javax.swing.JPanel {
         pnlContenidoData.add(new PanelTerminal(), "terminal");
         pnlContenidoData.add(new PanelCliente(), "cliente");
         pnlContenidoData.add(new PanelRuta(), "ruta");
+        panelUnidad = new PanelUnidad();
+        pnlContenidoData.add(panelUnidad, "unidad");
     }
 
     /**
@@ -55,7 +58,7 @@ public class PanelModuloData extends javax.swing.JPanel {
 
         cboOpciones.setBackground(new java.awt.Color(51, 153, 255));
         cboOpciones.setForeground(new java.awt.Color(255, 255, 255));
-        cboOpciones.setModel(new javax.swing.DefaultComboBoxModel<>(new String[] { "Contenedor", "Tractor", "Carreta", "Planta", "Terminal", "Cliente", "Ruta" }));
+        cboOpciones.setModel(new javax.swing.DefaultComboBoxModel<>(new String[] { "Contenedor", "Tractor", "Carreta", "Planta", "Terminal", "Cliente", "Ruta", "Unidad" }));
         cboOpciones.addActionListener(this::cboOpcionesActionPerformed);
         add(cboOpciones, new org.netbeans.lib.awtextra.AbsoluteConstraints(560, 20, 270, 40));
 
@@ -104,6 +107,11 @@ public class PanelModuloData extends javax.swing.JPanel {
                 break;
             case "Ruta":
                 cardLayout.show(pnlContenidoData, "ruta");
+                break;
+            case "Unidad":
+                panelUnidad.cargarCombos();
+                panelUnidad.cargarTabla();
+                cardLayout.show(pnlContenidoData, "unidad");
                 break;
             default:
                 throw new AssertionError();
