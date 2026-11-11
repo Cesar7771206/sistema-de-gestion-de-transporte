@@ -180,6 +180,9 @@ public class PanelTractor extends javax.swing.JPanel {
         btnAgregar = new javax.swing.JButton();
         btnEditar = new javax.swing.JButton();
         btnEliminar = new javax.swing.JButton();
+        btnDeshacer = new javax.swing.JButton();
+        btnEncolarPatio = new javax.swing.JButton();
+        btnDespacharPatio = new javax.swing.JButton();
         jSplitPane = new javax.swing.JSplitPane();
         panelFormulario = new javax.swing.JPanel();
         contenidoPanelFormulario = new javax.swing.JPanel();
@@ -247,6 +250,36 @@ public class PanelTractor extends javax.swing.JPanel {
             }
         });
         panelBotones.add(btnEliminar);
+
+        btnDeshacer.setBackground(new java.awt.Color(153, 0, 153));
+        btnDeshacer.setForeground(new java.awt.Color(255, 255, 255));
+        btnDeshacer.setText("Deshacer (Pila)");
+        btnDeshacer.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                btnDeshacerActionPerformed(evt);
+            }
+        });
+        panelBotones.add(btnDeshacer);
+
+        btnEncolarPatio.setBackground(new java.awt.Color(0, 153, 153));
+        btnEncolarPatio.setForeground(new java.awt.Color(255, 255, 255));
+        btnEncolarPatio.setText("Patio Espera (Cola)");
+        btnEncolarPatio.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                btnEncolarPatioActionPerformed(evt);
+            }
+        });
+        panelBotones.add(btnEncolarPatio);
+
+        btnDespacharPatio.setBackground(new java.awt.Color(0, 153, 51));
+        btnDespacharPatio.setForeground(new java.awt.Color(255, 255, 255));
+        btnDespacharPatio.setText("Despachar Patio");
+        btnDespacharPatio.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                btnDespacharPatioActionPerformed(evt);
+            }
+        });
+        panelBotones.add(btnDespacharPatio);
 
         panelBarra.add(panelBotones, java.awt.BorderLayout.LINE_END);
 
@@ -629,12 +662,76 @@ public class PanelTractor extends javax.swing.JPanel {
         ocultarFormulario();
     }//GEN-LAST:event_btnCancelarActionPerformed
 
+    private void btnDeshacerActionPerformed(java.awt.event.ActionEvent evt) {
+        Tractor recuperado = tractorServicio.deshacerEliminacion();
+        if (recuperado != null) {
+            if (GestorEquipos.buscarTractorPorPlaca(recuperado.getPlaca()) == null) {
+                GestorEquipos.agregarTractor(recuperado);
+            }
+            actualizarTabla(tractorServicio.getTractors());
+            JOptionPane.showMessageDialog(this,
+                    "Se recuperó de la Pila (Stack<Tractor> / PilaTractorLES LIFO):\n"
+                    + "Placa: " + recuperado.getPlaca() + "\n"
+                    + "Marca / Modelo: " + recuperado.getMarca() + " " + recuperado.getModelo(),
+                    "Deshacer Eliminación",
+                    JOptionPane.INFORMATION_MESSAGE);
+        } else {
+            JOptionPane.showMessageDialog(this,
+                    "No hay tractores en la pila de eliminados para deshacer.",
+                    "Pila Vacía",
+                    JOptionPane.WARNING_MESSAGE);
+        }
+    }
+
+    private void btnEncolarPatioActionPerformed(java.awt.event.ActionEvent evt) {
+        int fila = tblTractors.getSelectedRow();
+        String placa = (fila >= 0) ? modeloTabla.getValueAt(fila, 0).toString() : txtPlaca.getText().trim();
+        if (placa.isEmpty()) {
+            JOptionPane.showMessageDialog(this,
+                    "Seleccione un tractor de la tabla para encolar en el patio de espera.",
+                    "Aviso",
+                    JOptionPane.WARNING_MESSAGE);
+            return;
+        }
+        try {
+            tractorServicio.encolarPatio(placa);
+            JOptionPane.showMessageDialog(this,
+                    "Tractor " + placa + " agregado a la Cola de Espera en Patio (Queue<Tractor> FIFO).\n"
+                    + "Tractores en espera en patio: " + tractorServicio.getCantidadEnPatio(),
+                    "Cola de Espera",
+                    JOptionPane.INFORMATION_MESSAGE);
+        } catch (IllegalArgumentException | IllegalStateException e) {
+            JOptionPane.showMessageDialog(this, e.getMessage(), "Aviso", JOptionPane.WARNING_MESSAGE);
+        }
+    }
+
+    private void btnDespacharPatioActionPerformed(java.awt.event.ActionEvent evt) {
+        Tractor despachado = tractorServicio.despacharSiguientePatio();
+        if (despachado != null) {
+            JOptionPane.showMessageDialog(this,
+                    "TRACTOR DESPACHADO (Queue<Tractor> FIFO - poll):\n"
+                    + "Placa: " + despachado.getPlaca() + "\n"
+                    + "Marca/Modelo: " + despachado.getMarca() + " " + despachado.getModelo() + "\n\n"
+                    + "Tractores restantes en cola de patio: " + tractorServicio.getCantidadEnPatio(),
+                    "Despacho de Patio",
+                    JOptionPane.INFORMATION_MESSAGE);
+        } else {
+            JOptionPane.showMessageDialog(this,
+                    "No hay tractores esperando en la cola del patio.",
+                    "Cola de Patio Vacía",
+                    JOptionPane.INFORMATION_MESSAGE);
+        }
+    }
+
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JButton btnAgregar;
     private javax.swing.JButton btnCancelar;
+    private javax.swing.JButton btnDeshacer;
+    private javax.swing.JButton btnDespacharPatio;
     private javax.swing.JButton btnEditar;
     private javax.swing.JButton btnEliminar;
+    private javax.swing.JButton btnEncolarPatio;
     private javax.swing.JButton btnOpcion;
     private javax.swing.JPanel contenidoPanelFormulario;
     private javax.swing.JScrollPane jScrollPane;
