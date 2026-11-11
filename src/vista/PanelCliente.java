@@ -4,8 +4,9 @@
  */
 package vista;
 
-import java.util.ArrayList;
+
 import java.util.List;
+import javax.swing.DefaultListModel;
 import javax.swing.JOptionPane;
 import javax.swing.table.DefaultTableModel;
 import modelo.Cliente;
@@ -17,19 +18,22 @@ import servicio.ClienteServicio;
  */
 public class PanelCliente extends javax.swing.JPanel {
 
-    private ClienteServicio clienteServicio;
-    private DefaultTableModel modelo;
+    private final ClienteServicio clienteServicio;
+    private final DefaultTableModel modelo;
+    private final DefaultListModel<String> modeloCola = new DefaultListModel<>();
     private String orden;
 
     private Cliente clienteSeleccionado;
 
     public PanelCliente() {
         initComponents();
-        clienteServicio = new ClienteServicio(new ArrayList<>());
+        clienteServicio = new ClienteServicio();
         modelo = (DefaultTableModel) tblClientes.getModel();
+        lstCola.setModel(modeloCola);
         orden = "default";
 
         actualizarTabla();
+        actualizarCola();
         ocultarEdicion();
         tblClientes.setEnabled(false);
     }
@@ -38,26 +42,28 @@ public class PanelCliente extends javax.swing.JPanel {
         txtRucBuscada.setVisible(false);
         txtNombreBuscado.setVisible(false);
         txtDireccionBuscada.setVisible(false);
-        jLabel8.setVisible(false);
+        jLabel1.setVisible(false);
         jLabel9.setVisible(false);
         jLabel10.setVisible(false);
 
         btnEliminarCliente.setVisible(false);
         btnLimpiarCliente.setVisible(false);
         btnEditarCliente.setVisible(false);
+        btnPedirAtencion.setVisible(false);
     }
 
     private void mostrarEdicion() {
         txtRucBuscada.setVisible(true);
         txtNombreBuscado.setVisible(true);
         txtDireccionBuscada.setVisible(true);
-        jLabel8.setVisible(true);
+        jLabel1.setVisible(true);
         jLabel9.setVisible(true);
         jLabel10.setVisible(true);
 
         btnEliminarCliente.setVisible(true);
         btnLimpiarCliente.setVisible(true);
         btnEditarCliente.setVisible(true);
+        btnPedirAtencion.setVisible(true);
     }
 
     private void limpiarEdicion() {
@@ -89,7 +95,16 @@ public class PanelCliente extends javax.swing.JPanel {
         for (Cliente c : lista) {
             modelo.addRow(new Object[]{c.getRuc(), c.getNombre(), c.getDireccion()});
         }
-
+    }
+        //Mostrar cola de atencion
+        private void actualizarCola() {
+        modeloCola.clear();
+        Cliente[] enEspera = clienteServicio.getCola();
+        for (int i = 0; i < enEspera.length; i++) {
+            String marca = (i == 0) ? "FRENTE -> " : (i + 1) + ". ";
+            modeloCola.addElement(marca + enEspera[i].getNombre());
+        }
+        
     }
 
     /**
@@ -120,7 +135,6 @@ public class PanelCliente extends javax.swing.JPanel {
         jLabel7 = new javax.swing.JLabel();
         txtRucBuscado = new javax.swing.JTextField();
         btnSelecionarCliente = new javax.swing.JButton();
-        jLabel8 = new javax.swing.JLabel();
         jLabel9 = new javax.swing.JLabel();
         jLabel10 = new javax.swing.JLabel();
         txtRucBuscada = new javax.swing.JTextField();
@@ -129,8 +143,15 @@ public class PanelCliente extends javax.swing.JPanel {
         btnEliminarCliente = new javax.swing.JButton();
         btnLimpiarCliente = new javax.swing.JButton();
         btnEditarCliente = new javax.swing.JButton();
+        btnPedirAtencion = new javax.swing.JButton();
+        jLabel11 = new javax.swing.JLabel();
+        btnAtenderSiguiente = new javax.swing.JButton();
+        jLabel8 = new javax.swing.JLabel();
+        jScrollPane2 = new javax.swing.JScrollPane();
+        lstCola = new javax.swing.JList<>();
 
         setBackground(new java.awt.Color(255, 255, 255));
+        setForeground(new java.awt.Color(0, 0, 0));
         setMaximumSize(new java.awt.Dimension(810, 540));
         setMinimumSize(new java.awt.Dimension(810, 540));
         setLayout(new org.netbeans.lib.awtextra.AbsoluteLayout());
@@ -179,7 +200,7 @@ public class PanelCliente extends javax.swing.JPanel {
                 btnGuardarActionPerformed(evt);
             }
         });
-        add(btnGuardar, new org.netbeans.lib.awtextra.AbsoluteConstraints(560, 60, 110, -1));
+        add(btnGuardar, new org.netbeans.lib.awtextra.AbsoluteConstraints(550, 50, 110, -1));
 
         jScrollPane1.setBackground(new java.awt.Color(255, 153, 153));
 
@@ -205,7 +226,7 @@ public class PanelCliente extends javax.swing.JPanel {
         });
         jScrollPane1.setViewportView(tblClientes);
 
-        add(jScrollPane1, new org.netbeans.lib.awtextra.AbsoluteConstraints(30, 150, 640, 160));
+        add(jScrollPane1, new org.netbeans.lib.awtextra.AbsoluteConstraints(30, 150, 500, 160));
 
         jLabel5.setBackground(new java.awt.Color(0, 0, 0));
         jLabel5.setForeground(new java.awt.Color(0, 0, 0));
@@ -240,7 +261,7 @@ public class PanelCliente extends javax.swing.JPanel {
                 btnOrDefaultActionPerformed(evt);
             }
         });
-        add(btnOrDefault, new org.netbeans.lib.awtextra.AbsoluteConstraints(590, 120, -1, -1));
+        add(btnOrDefault, new org.netbeans.lib.awtextra.AbsoluteConstraints(450, 120, -1, -1));
 
         jPanel1.setBackground(new java.awt.Color(255, 255, 255));
         jPanel1.setBorder(javax.swing.BorderFactory.createLineBorder(new java.awt.Color(0, 0, 0)));
@@ -248,7 +269,7 @@ public class PanelCliente extends javax.swing.JPanel {
 
         jLabel6.setForeground(new java.awt.Color(0, 0, 0));
         jLabel6.setText("BUSCAR Y EDITAR");
-        jPanel1.add(jLabel6, new org.netbeans.lib.awtextra.AbsoluteConstraints(20, 10, 100, 20));
+        jPanel1.add(jLabel6, new org.netbeans.lib.awtextra.AbsoluteConstraints(20, 10, 380, 20));
 
         jLabel7.setForeground(new java.awt.Color(0, 0, 0));
         jLabel7.setText("Ruc del Cliente: ");
@@ -268,17 +289,13 @@ public class PanelCliente extends javax.swing.JPanel {
         });
         jPanel1.add(btnSelecionarCliente, new org.netbeans.lib.awtextra.AbsoluteConstraints(210, 50, 100, -1));
 
-        jLabel8.setForeground(new java.awt.Color(0, 0, 0));
-        jLabel8.setText("Ruc");
-        jPanel1.add(jLabel8, new org.netbeans.lib.awtextra.AbsoluteConstraints(20, 90, -1, -1));
-
         jLabel9.setForeground(new java.awt.Color(0, 0, 0));
         jLabel9.setText("Nombre:");
-        jPanel1.add(jLabel9, new org.netbeans.lib.awtextra.AbsoluteConstraints(160, 90, -1, -1));
+        jPanel1.add(jLabel9, new org.netbeans.lib.awtextra.AbsoluteConstraints(160, 90, 90, -1));
 
         jLabel10.setForeground(new java.awt.Color(0, 0, 0));
-        jLabel10.setText("Direccion");
-        jPanel1.add(jLabel10, new org.netbeans.lib.awtextra.AbsoluteConstraints(340, 90, -1, -1));
+        jLabel10.setText("Direccion:");
+        jPanel1.add(jLabel10, new org.netbeans.lib.awtextra.AbsoluteConstraints(410, 90, 120, -1));
 
         txtRucBuscada.setBackground(new java.awt.Color(255, 255, 255));
         txtRucBuscada.setHorizontalAlignment(javax.swing.JTextField.CENTER);
@@ -286,11 +303,11 @@ public class PanelCliente extends javax.swing.JPanel {
 
         txtNombreBuscado.setBackground(new java.awt.Color(255, 255, 255));
         txtNombreBuscado.setHorizontalAlignment(javax.swing.JTextField.CENTER);
-        jPanel1.add(txtNombreBuscado, new org.netbeans.lib.awtextra.AbsoluteConstraints(160, 110, 160, -1));
+        jPanel1.add(txtNombreBuscado, new org.netbeans.lib.awtextra.AbsoluteConstraints(160, 110, 230, -1));
 
         txtDireccionBuscada.setBackground(new java.awt.Color(255, 255, 255));
         txtDireccionBuscada.setHorizontalAlignment(javax.swing.JTextField.CENTER);
-        jPanel1.add(txtDireccionBuscada, new org.netbeans.lib.awtextra.AbsoluteConstraints(340, 110, 260, -1));
+        jPanel1.add(txtDireccionBuscada, new org.netbeans.lib.awtextra.AbsoluteConstraints(410, 110, 320, -1));
 
         btnEliminarCliente.setBackground(new java.awt.Color(255, 51, 51));
         btnEliminarCliente.setText("Eliminar");
@@ -299,7 +316,7 @@ public class PanelCliente extends javax.swing.JPanel {
                 btnEliminarClienteActionPerformed(evt);
             }
         });
-        jPanel1.add(btnEliminarCliente, new org.netbeans.lib.awtextra.AbsoluteConstraints(520, 150, 80, -1));
+        jPanel1.add(btnEliminarCliente, new org.netbeans.lib.awtextra.AbsoluteConstraints(650, 150, 80, -1));
 
         btnLimpiarCliente.setBackground(new java.awt.Color(153, 153, 255));
         btnLimpiarCliente.setForeground(new java.awt.Color(255, 255, 255));
@@ -309,7 +326,7 @@ public class PanelCliente extends javax.swing.JPanel {
                 btnLimpiarClienteActionPerformed(evt);
             }
         });
-        jPanel1.add(btnLimpiarCliente, new org.netbeans.lib.awtextra.AbsoluteConstraints(340, 150, 80, -1));
+        jPanel1.add(btnLimpiarCliente, new org.netbeans.lib.awtextra.AbsoluteConstraints(470, 150, 80, -1));
 
         btnEditarCliente.setBackground(new java.awt.Color(255, 204, 51));
         btnEditarCliente.setForeground(new java.awt.Color(255, 255, 255));
@@ -319,9 +336,42 @@ public class PanelCliente extends javax.swing.JPanel {
                 btnEditarClienteActionPerformed(evt);
             }
         });
-        jPanel1.add(btnEditarCliente, new org.netbeans.lib.awtextra.AbsoluteConstraints(430, 150, 80, -1));
+        jPanel1.add(btnEditarCliente, new org.netbeans.lib.awtextra.AbsoluteConstraints(560, 150, 80, -1));
 
-        add(jPanel1, new org.netbeans.lib.awtextra.AbsoluteConstraints(30, 330, 640, 200));
+        btnPedirAtencion.setBackground(new java.awt.Color(204, 0, 255));
+        btnPedirAtencion.setForeground(new java.awt.Color(255, 255, 255));
+        btnPedirAtencion.setText("Pedir Atención");
+        btnPedirAtencion.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                btnPedirAtencionActionPerformed(evt);
+            }
+        });
+        jPanel1.add(btnPedirAtencion, new org.netbeans.lib.awtextra.AbsoluteConstraints(20, 150, 220, -1));
+
+        jLabel11.setForeground(new java.awt.Color(0, 0, 0));
+        jLabel11.setText("Ruc:");
+        jPanel1.add(jLabel11, new org.netbeans.lib.awtextra.AbsoluteConstraints(20, 90, 50, -1));
+
+        add(jPanel1, new org.netbeans.lib.awtextra.AbsoluteConstraints(30, 330, 760, 200));
+
+        btnAtenderSiguiente.setBackground(new java.awt.Color(0, 204, 204));
+        btnAtenderSiguiente.setForeground(new java.awt.Color(255, 255, 255));
+        btnAtenderSiguiente.setText("Atender Siguiente");
+        btnAtenderSiguiente.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                btnAtenderSiguienteActionPerformed(evt);
+            }
+        });
+        add(btnAtenderSiguiente, new org.netbeans.lib.awtextra.AbsoluteConstraints(570, 280, 200, -1));
+
+        jLabel8.setForeground(new java.awt.Color(0, 0, 0));
+        jLabel8.setText("Clientes en Cola de Atención:");
+        add(jLabel8, new org.netbeans.lib.awtextra.AbsoluteConstraints(550, 120, 240, 20));
+
+        lstCola.setBackground(new java.awt.Color(255, 255, 255));
+        jScrollPane2.setViewportView(lstCola);
+
+        add(jScrollPane2, new org.netbeans.lib.awtextra.AbsoluteConstraints(550, 150, 240, 110));
     }// </editor-fold>//GEN-END:initComponents
 
     private void btnGuardarActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnGuardarActionPerformed
@@ -371,7 +421,7 @@ public class PanelCliente extends javax.swing.JPanel {
         }
 
         txtRucBuscada.setText(clienteSeleccionado.getRuc());
-        txtRucBuscada.setEditable(false); // el RUC es la clave, no se edita
+        txtRucBuscada.setEditable(false); 
         txtNombreBuscado.setText(clienteSeleccionado.getNombre());
         txtDireccionBuscada.setText(clienteSeleccionado.getDireccion());
         mostrarEdicion();
@@ -388,6 +438,7 @@ public class PanelCliente extends javax.swing.JPanel {
                     txtNombreBuscado.getText(),
                     txtDireccionBuscada.getText());
             actualizarTabla();
+            actualizarCola();
             limpiarEdicion();
             JOptionPane.showMessageDialog(this, "Cliente actualizado");
         } catch (IllegalArgumentException ex) {
@@ -406,14 +457,42 @@ public class PanelCliente extends javax.swing.JPanel {
         int op = JOptionPane.showConfirmDialog(this, "¿Eliminar este cliente?",
                 "Confirmar", JOptionPane.YES_NO_OPTION);
         if (op == JOptionPane.YES_OPTION) {
+            try{
             clienteServicio.eliminarCliente(clienteSeleccionado.getRuc());
             actualizarTabla();
             limpiarEdicion();
+        }catch (IllegalArgumentException ex) {
+                JOptionPane.showMessageDialog(this, ex.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
+            }
         }
     }//GEN-LAST:event_btnEliminarClienteActionPerformed
 
+    private void btnPedirAtencionActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnPedirAtencionActionPerformed
+        if (clienteSeleccionado == null){
+            return;
+        }
+        try {
+            clienteServicio.pedirAtencion(clienteSeleccionado.getRuc()); 
+            actualizarCola();
+            JOptionPane.showMessageDialog(this, clienteSeleccionado.getNombre() + " entró a la cola de atención");
+        } catch (IllegalArgumentException ex) {
+            JOptionPane.showMessageDialog(this, ex.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
+        }
+    }//GEN-LAST:event_btnPedirAtencionActionPerformed
+
+    private void btnAtenderSiguienteActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnAtenderSiguienteActionPerformed
+         try {
+            Cliente atendido = clienteServicio.atenderSiguiente(); 
+            actualizarCola();
+            JOptionPane.showMessageDialog(this, "Atendiendo a: " + atendido.getNombre() + "\nRUC: " + atendido.getRuc());
+        } catch (IllegalStateException ex) {
+            JOptionPane.showMessageDialog(this, ex.getMessage(), "Aviso", JOptionPane.WARNING_MESSAGE);
+        }
+    }//GEN-LAST:event_btnAtenderSiguienteActionPerformed
+
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
+    private javax.swing.JButton btnAtenderSiguiente;
     private javax.swing.JButton btnEditarCliente;
     private javax.swing.JButton btnEliminarCliente;
     private javax.swing.JButton btnGuardar;
@@ -421,9 +500,11 @@ public class PanelCliente extends javax.swing.JPanel {
     private javax.swing.JButton btnOrDefault;
     private javax.swing.JButton btnOrNombre;
     private javax.swing.JButton btnOrRuc;
+    private javax.swing.JButton btnPedirAtencion;
     private javax.swing.JButton btnSelecionarCliente;
     private javax.swing.JLabel jLabel1;
     private javax.swing.JLabel jLabel10;
+    private javax.swing.JLabel jLabel11;
     private javax.swing.JLabel jLabel2;
     private javax.swing.JLabel jLabel3;
     private javax.swing.JLabel jLabel4;
@@ -434,6 +515,8 @@ public class PanelCliente extends javax.swing.JPanel {
     private javax.swing.JLabel jLabel9;
     private javax.swing.JPanel jPanel1;
     private javax.swing.JScrollPane jScrollPane1;
+    private javax.swing.JScrollPane jScrollPane2;
+    private javax.swing.JList<String> lstCola;
     private javax.swing.JTable tblClientes;
     private javax.swing.JTextField txtDireccionBuscada;
     private javax.swing.JTextField txtInputDireccion;
