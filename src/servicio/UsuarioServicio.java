@@ -14,38 +14,37 @@ import modelo.Direccion;
 import modelo.Usuario;
 
 /**
+ * Servicio de gestión de Usuarios y Autenticación.
+ * Evidencia el uso de:
+ * - Cola circular sobre arreglo estático (ColaArreglo) para almacenar los últimos accesos exitosos.
+ * - Lista enlazada (LinkedList) como bitácora cronológica de eventos (accesos, fallos y registros).
  *
- * @author yimmy
+ * @author yimmy, cesar
  */
 public class UsuarioServicio {
 
-    
     private static final Pattern PATRON_CORREO =
             Pattern.compile("^[\\w.+-]+@[\\w-]+(\\.[\\w-]+)+$");
     private static final Pattern PATRON_DNI =
             Pattern.compile("^\\d{8}$");
     private static final int LARGO_MIN_CONTRASENIA = 4;
 
-    
     private static final int MAX_ULTIMOS_ACCESOS = 5;
 
     private List<Usuario> usuarios;
 
     private final LinkedList<String> bitacora = new LinkedList<>();
 
-    private final ColaArreglo ultimosAccesos = new ColaArreglo(MAX_ULTIMOS_ACCESOS);
+    private final ColaArreglo<String> ultimosAccesos = new ColaArreglo<>(MAX_ULTIMOS_ACCESOS);
 
-    
     public UsuarioServicio() {
         usuarios = new ArrayList<>();
     }
 
-    
     public List<Usuario> getUsuarios() {
         return usuarios;
     }
 
-    
     public void guardarUsuario(String dni, String nombre, Direccion direccionCochera,
                                String correo, String contrasenia) {
         if (dni == null || dni.isBlank() || nombre == null || nombre.isBlank()
@@ -74,7 +73,6 @@ public class UsuarioServicio {
         bitacora.addLast("REGISTRO: " + correo.trim());
     }
 
-   
     public boolean esDniValido(String dni) {
         return dni != null && PATRON_DNI.matcher(dni.trim()).matches();
     }
@@ -99,7 +97,6 @@ public class UsuarioServicio {
         return false;
     }
 
-    
     public Usuario autenticar(String correo, String contrasenia) {
         if (correo == null || contrasenia == null) {
             return null;
@@ -111,12 +108,10 @@ public class UsuarioServicio {
                 return u;
             }
         }
-       
         bitacora.addFirst("ACCESO FALLIDO: " + correo.trim());
         return null;
     }
 
-    
     private void registrarAcceso(String correo) {
         if (ultimosAccesos.isFull()) {
             ultimosAccesos.dequeue();
@@ -125,7 +120,6 @@ public class UsuarioServicio {
         bitacora.addLast("ACCESO: " + correo);
     }
 
-   
     public List<String> getUltimosAccesos() {
         return ultimosAccesos.getElementos();
     }
@@ -134,7 +128,6 @@ public class UsuarioServicio {
         return new ArrayList<>(bitacora);
     }
 
-   
     public void registrarEventoEn(int indice, String evento) {
         if (indice < 0 || indice > bitacora.size()) {
             throw new IllegalArgumentException("La posición debe estar entre 0 y " + bitacora.size());
@@ -142,12 +135,10 @@ public class UsuarioServicio {
         bitacora.add(indice, evento);
     }
 
-
     public void registrarEventos(Collection<String> eventos) {
         bitacora.addAll(eventos);
     }
 
-    
     public int contarEventos(String inicio) {
         int total = 0;
         for (String evento : bitacora) {
@@ -170,7 +161,6 @@ public class UsuarioServicio {
         return null;
     }
 
-    
     public List<Usuario> ordenarUsuarioPorNombre() {
         return usuarios.stream().sorted(Usuario.POR_NOMBRE).toList();
     }

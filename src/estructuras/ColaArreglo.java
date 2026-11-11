@@ -77,14 +77,14 @@ public class ColaArreglo <T>{
     }
 
     public boolean isFull() {
-        throw new UnsupportedOperationException("Not supported yet."); 
+        return estaLlena();
     }
 
     public void dequeue() {
-        throw new UnsupportedOperationException("Not supported yet."); 
+        desencolar();
     }
 
-    public void enqueue(String correo) {
-        throw new UnsupportedOperationException("Not supported yet."); 
+    public void enqueue(T dato) {
+        encolar(dato);
     }
 }
