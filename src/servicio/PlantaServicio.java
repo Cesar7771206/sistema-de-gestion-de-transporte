@@ -8,12 +8,14 @@ import estructuras.PilaArreglo;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.PriorityQueue;
+import java.util.Stack;
 import modelo.Planta;
 
 /**
  * Servicio de gestión de Plantas.
  * Evidencia el uso de:
  * - Pila con arreglo (PilaArreglo) para el historial de eliminadas y operación deshacer (LIFO).
+ * - Pila estándar (Stack<Planta>) de Java Collections.
  * - Cola con prioridad (PriorityQueue con Comparator POR_CARGA) para atención por carga de trabajo.
  *
  * @author cesar, yimmy
@@ -23,6 +25,7 @@ public class PlantaServicio {
 
     private static final int CAPACIDAD_DESHACER = 50;
     private final PilaArreglo eliminadas = new PilaArreglo(CAPACIDAD_DESHACER);
+    private final Stack<Planta> pilaEliminadasStack = new Stack<>();
 
     // Lista donde se guardaran todas las plantas
     public PlantaServicio(List<Planta> plantas) {
@@ -62,9 +65,13 @@ public class PlantaServicio {
         if (!eliminadas.isFull()) {
             eliminadas.push(planta);
         }
+        pilaEliminadasStack.push(planta);
     }
 
     public Planta deshacerEliminacion() {
+        if (!pilaEliminadasStack.isEmpty()) {
+            pilaEliminadasStack.pop();
+        }
         if (eliminadas.isEmpty()) {
             return null;
         }
@@ -74,6 +81,10 @@ public class PlantaServicio {
         }
         plantas.add(planta);
         return planta;
+    }
+
+    public Stack<Planta> getPilaEliminadasStack() {
+        return pilaEliminadasStack;
     }
 
     public boolean hayEliminadas() {

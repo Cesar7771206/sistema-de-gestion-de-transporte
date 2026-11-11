@@ -5,56 +5,91 @@
 package estructuras;
 
 import java.util.ArrayList;
-import java.util.LinkedList;
 import java.util.List;
 
 /**
+ * Cola implementada con Lista Enlazada Simple (LES) para la gestión
+ * de códigos de contenedores en espera (FIFO).
+ * Todo autocontenido en esta única clase con un nodo estático interno.
  *
- * @author yimmy
+ * @author yimmy, cesar
  */
-public class ColaStringLES { 
-    private LinkedList<String> elementos;
+public class ColaStringLES {
+
+    private static class NodoString {
+        private final String dato;
+        private NodoString siguiente;
+
+        public NodoString(String dato) {
+            this.dato = dato;
+            this.siguiente = null;
+        }
+    }
+
+    private NodoString frente;
+    private NodoString fin;
+    private int tamanio;
 
     public ColaStringLES() {
-        elementos = new LinkedList<>();
+        this.frente = null;
+        this.fin = null;
+        this.tamanio = 0;
     }
 
     public void enqueue(String e) {
-        elementos.addLast(e);
+        if (e == null) {
+            return;
+        }
+        NodoString nuevo = new NodoString(e);
+        if (fin == null) {
+            frente = nuevo;
+            fin = nuevo;
+        } else {
+            fin.siguiente = nuevo;
+            fin = nuevo;
+        }
+        tamanio++;
     }
 
     public String dequeue() {
-        if (elementos.size() > 0) {
-            String e = elementos.getFirst();
-            elementos.remove(0);
-            return e;
-        } else {
+        if (frente == null) {
             System.out.println("La cola esta vacia");
             return null;
         }
+        String e = frente.dato;
+        frente = frente.siguiente;
+        if (frente == null) {
+            fin = null;
+        }
+        tamanio--;
+        return e;
     }
 
     public String peek() {
-        if (elementos.size() > 0) {
-            return elementos.getFirst();
-        } else {
-            return null;
-        }
+        return (frente != null) ? frente.dato : null;
     }
 
     public void clear() {
-        elementos.clear();
+        frente = null;
+        fin = null;
+        tamanio = 0;
     }
 
     public boolean isEmpty() {
-        return elementos.size() == 0;
+        return tamanio == 0;
     }
 
     public int size() {
-        return elementos.size();
+        return tamanio;
     }
 
     public List<String> getElementos() {
-        return new ArrayList<>(elementos);
+        List<String> lista = new ArrayList<>();
+        NodoString actual = frente;
+        while (actual != null) {
+            lista.add(actual.dato);
+            actual = actual.siguiente;
+        }
+        return lista;
     }
 }
