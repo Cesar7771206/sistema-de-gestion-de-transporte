@@ -3,19 +3,21 @@
  * Click nbfs://nbhost/SystemFileSystem/Templates/Classes/Class.java to edit this template
  */
 package modelo;
+
 import estructuras.ColaStringLES;
 import java.util.List;
 
 /**
+ * Entidad Terminal Portuaria / Extraportuaria.
+ * Incluye cola enlazada simple (ColaStringLES) para los contenedores en espera de despacho.
  *
- * @author cesar
+ * @author cesar, yimmy
  */
 public class Terminal {
     private String ruc; 
     private String nombre;
     private String direccion;
 
-    
     private final ColaStringLES contenedoresEnEspera = new ColaStringLES();
 
     public Terminal(String ruc, String nombre, String direccion) {
@@ -29,10 +31,14 @@ public class Terminal {
     }
 
     public void setRuc(String ruc) {
-        if (ruc != null && ruc.matches("\\d+")) {
-            this.ruc = ruc;
+        if (ruc == null) {
+            throw new IllegalArgumentException("El Ruc no puede ser nulo");
+        }
+        String r = ruc.trim();
+        if (r.matches("\\d{11}")) {
+            this.ruc = r;
         } else {
-            throw new IllegalArgumentException("El RUC solo puede estar conformado por números");
+            throw new IllegalArgumentException("El ruc debe tener solo 11 digitos");
         }
     }
 
@@ -59,7 +65,6 @@ public class Terminal {
         contenedoresEnEspera.enqueue(codigo.trim());
     }
 
-    
     public String atenderContenedor() {
         if (contenedoresEnEspera.isEmpty()) {
             return null;
@@ -67,7 +72,6 @@ public class Terminal {
         return contenedoresEnEspera.dequeue();
     }
 
-   
     public String getProximoContenedor() {
         return contenedoresEnEspera.peek();
     }
@@ -76,8 +80,12 @@ public class Terminal {
         return contenedoresEnEspera.size();
     }
 
-   
     public List<String> getContenedoresEnEspera() {
         return contenedoresEnEspera.getElementos();
+    }
+
+    @Override
+    public String toString() {
+        return nombre != null ? nombre : ruc;
     }
 }

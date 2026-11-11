@@ -6,7 +6,10 @@ package estructuras;
 
 import java.util.LinkedList;
 import modelo.Terminal;
+
 /**
+ * Pila implementada con lista enlazada (LES) para gestionar el historial
+ * de terminales eliminadas (LIFO).
  *
  * @author yimmy
  */

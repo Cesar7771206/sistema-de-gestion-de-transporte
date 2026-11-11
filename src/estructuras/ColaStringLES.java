@@ -7,6 +7,7 @@ package estructuras;
 import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
+
 /**
  *
  * @author yimmy
@@ -53,7 +54,6 @@ public class ColaStringLES {
         return elementos.size();
     }
 
-    
     public List<String> getElementos() {
         return new ArrayList<>(elementos);
     }
