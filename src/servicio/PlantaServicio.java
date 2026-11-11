@@ -4,27 +4,35 @@
  */
 package servicio;
 
+import estructuras.PilaArreglo;
+import java.util.ArrayList;
 import java.util.List;
+import java.util.PriorityQueue;
 import modelo.Planta;
 
 /**
+ * Servicio de gestión de Plantas.
+ * Evidencia el uso de:
+ * - Pila con arreglo (PilaArreglo) para el historial de eliminadas y operación deshacer (LIFO).
+ * - Cola con prioridad (PriorityQueue con Comparator POR_CARGA) para atención por carga de trabajo.
  *
- * @author NILENY
+ * @author cesar, yimmy
  */
 public class PlantaServicio {
     private List<Planta> plantas;
-    
-    //Lista donde se guardaran todas las plantas
-    public PlantaServicio(List plantas) {
+
+    private static final int CAPACIDAD_DESHACER = 50;
+    private final PilaArreglo eliminadas = new PilaArreglo(CAPACIDAD_DESHACER);
+
+    // Lista donde se guardaran todas las plantas
+    public PlantaServicio(List<Planta> plantas) {
         this.plantas = plantas;
     }
-    
-    // Devuelve todas las plantas registradas
+
     public List<Planta> getPlantas() {
         return plantas;
     }
-    
-    // Registra una planta nueva 
+
     public void guardarPlanta(String ruc, String nombre, String direccion) {
         Planta planta = new Planta(ruc, nombre, direccion);
         if (existePlanta(planta.getRuc())) {
@@ -32,30 +40,71 @@ public class PlantaServicio {
         }
         plantas.add(planta);
     }
-    
-    // modifica nombre y direccion de una planta existente 
+
     public void editarPlanta(String ruc, String nombre, String direccion) {
         Planta planta = this.obtenerPlantaPorRuc(ruc);
-        
+
         if (planta == null) {
             throw new IllegalArgumentException("La planta no existe");
         }
-        
         new Planta(planta.getRuc(), nombre, direccion);
+
         planta.setNombre(nombre);
         planta.setDireccion(direccion);
     }
 
-    // Elimina la planta con el ruc buscado 
     public void eliminarPlanta(String ruc) {
         Planta planta = this.obtenerPlantaPorRuc(ruc);
         if (planta == null) {
             throw new IllegalArgumentException("La planta no existe");
         }
         plantas.remove(planta);
+        if (!eliminadas.isFull()) {
+            eliminadas.push(planta);
+        }
     }
 
-    //metodo para buscar una planta
+    public Planta deshacerEliminacion() {
+        if (eliminadas.isEmpty()) {
+            return null;
+        }
+        Planta planta = eliminadas.pop();
+        if (existePlanta(planta.getRuc())) {
+            return null;
+        }
+        plantas.add(planta);
+        return planta;
+    }
+
+    public boolean hayEliminadas() {
+        return !eliminadas.isEmpty();
+    }
+
+    public void programarCarga(String ruc, int dia, int turno, int cantidad) {
+        Planta planta = obtenerPlantaPorRuc(ruc);
+        if (planta == null) {
+            throw new IllegalArgumentException("La planta no existe");
+        }
+        planta.setCarga(dia, turno, cantidad);
+    }
+
+    public PriorityQueue<Planta> colaPorCarga() {
+        PriorityQueue<Planta> cola = new PriorityQueue<>(Planta.POR_CARGA);
+        for (Planta p : plantas) {
+            cola.offer(p);
+        }
+        return cola;
+    }
+
+    public List<Planta> plantasPorCarga() {
+        PriorityQueue<Planta> cola = colaPorCarga();
+        List<Planta> ordenadas = new ArrayList<>();
+        while (!cola.isEmpty()) {
+            ordenadas.add(cola.poll());
+        }
+        return ordenadas;
+    }
+
     public Planta obtenerPlantaPorRuc(String ruc) {
         if (ruc == null) {
             throw new IllegalArgumentException("El RUC no puede ser nulo");
@@ -69,23 +118,15 @@ public class PlantaServicio {
         return null;
     }
 
-    //Responde Si/No a ¿Existe una planta con ese RUC?
-    
     public boolean existePlanta(String ruc) {
-    return obtenerPlantaPorRuc(ruc) != null;
+        return obtenerPlantaPorRuc(ruc) != null;
     }
-    
-    // Método ordenar las plantas por RUC
+
     public List<Planta> ordenarPlantaPorRuc() {
         return plantas.stream().sorted(Planta.POR_RUC).toList();
     }
 
-    
-    //Método ordenar las plantas por Nombre
     public List<Planta> ordenarPlantaPorNombre() {
         return plantas.stream().sorted(Planta.POR_NOMBRE).toList();
     }
 }
-    
-    
-

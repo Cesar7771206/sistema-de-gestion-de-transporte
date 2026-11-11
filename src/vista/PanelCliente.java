@@ -4,92 +4,133 @@
  */
 package vista;
 
+import java.awt.Color;
+import java.awt.Dimension;
+import java.awt.event.MouseAdapter;
+import java.awt.event.MouseEvent;
 import java.util.ArrayList;
 import java.util.List;
 import javax.swing.JOptionPane;
+import javax.swing.SwingUtilities;
 import javax.swing.table.DefaultTableModel;
 import modelo.Cliente;
 import servicio.ClienteServicio;
+import servicio.GestorLogistica;
 
 /**
- *
- * @author GIANCARLO REA
+ * Panel de gestión de Clientes.
+ * Permite registrar, editar, listar y eliminar clientes comerciales
+ * manteniendo sincronización con GestorLogistica.
  */
 public class PanelCliente extends javax.swing.JPanel {
 
+    private String opcion;
     private ClienteServicio clienteServicio;
-    private DefaultTableModel modelo;
-    private String orden;
+    private DefaultTableModel modeloTabla;
 
-    private Cliente clienteSeleccionado;
-
+    /**
+     * Creates new form PanelCliente
+     */
     public PanelCliente() {
         initComponents();
+
         clienteServicio = new ClienteServicio(new ArrayList<>());
-        modelo = (DefaultTableModel) tblClientes.getModel();
-        orden = "default";
+        modeloTabla = (DefaultTableModel) tblClientes.getModel();
 
-        actualizarTabla();
-        ocultarEdicion();
-        tblClientes.setEnabled(false);
+        jSplitPane.setResizeWeight(0);
+        panelFormulario.setMinimumSize(new Dimension(0, 0));
+        panelTabla.setMinimumSize(new Dimension(0, 0));
+        ocultarFormulario();
+
+        tblClientes.addMouseListener(new MouseAdapter() {
+            @Override
+            public void mouseClicked(MouseEvent e) {
+                int fila = tblClientes.getSelectedRow();
+                if (fila >= 0) {
+                    String ruc = modeloTabla.getValueAt(fila, 0).toString();
+                    txtRuc.setText(ruc);
+                }
+            }
+        });
+
+        cargarDatos();
     }
 
-    private void ocultarEdicion() {
-        txtRucBuscada.setVisible(false);
-        txtNombreBuscado.setVisible(false);
-        txtDireccionBuscada.setVisible(false);
-        jLabel8.setVisible(false);
-        jLabel9.setVisible(false);
-        jLabel10.setVisible(false);
-
-        btnEliminarCliente.setVisible(false);
-        btnLimpiarCliente.setVisible(false);
-        btnEditarCliente.setVisible(false);
-    }
-
-    private void mostrarEdicion() {
-        txtRucBuscada.setVisible(true);
-        txtNombreBuscado.setVisible(true);
-        txtDireccionBuscada.setVisible(true);
-        jLabel8.setVisible(true);
-        jLabel9.setVisible(true);
-        jLabel10.setVisible(true);
-
-        btnEliminarCliente.setVisible(true);
-        btnLimpiarCliente.setVisible(true);
-        btnEditarCliente.setVisible(true);
-    }
-
-    private void limpiarEdicion() {
-        txtRucBuscado.setText("");
-        txtRucBuscada.setText("");
-        txtNombreBuscado.setText("");
-        txtDireccionBuscada.setText("");
-        clienteSeleccionado = null;
-        ocultarEdicion();
-    }
-
-    // Vuelve a llenar la tabla según el orden elegido
-    public void actualizarTabla() {
-        modelo.setRowCount(0);
-
-        List<Cliente> lista;
-        switch (orden) {
-            case "ruc":
-                lista = clienteServicio.ordenarClientePorRuc();
-                break;
-            case "nombre":
-                lista = clienteServicio.ordenarClientePorNombre();
-                break;
-            default:
-                lista = clienteServicio.getCliente();
-                break;
+    public void cargarDatos() {
+        for (Cliente c : GestorLogistica.getClientes()) {
+            if (clienteServicio.obtenerClientePorRuc(c.getRuc()) == null) {
+                clienteServicio.guardarCliente(c.getRuc(), c.getNombre(), c.getDireccion());
+            }
         }
+        actualizarTabla(clienteServicio.getCliente());
+    }
 
+    private void actualizarTabla(List<Cliente> lista) {
+        modeloTabla.setRowCount(0);
         for (Cliente c : lista) {
-            modelo.addRow(new Object[]{c.getRuc(), c.getNombre(), c.getDireccion()});
+            Object[] fila = new Object[]{
+                c.getRuc(),
+                c.getNombre(),
+                c.getDireccion()
+            };
+            modeloTabla.addRow(fila);
         }
+    }
 
+    private void mostrarFormulario() {
+        jSplitPane.setDividerSize(8);
+        SwingUtilities.invokeLater(() -> {
+            int h = jSplitPane.getHeight();
+            int loc = (h > 0) ? Math.min(220, Math.max(180, h / 3)) : 200;
+            jSplitPane.setDividerLocation(loc);
+        });
+        btnAgregar.setText("Cerrar formulario");
+    }
+
+    private void ocultarFormulario() {
+        jSplitPane.setDividerSize(0);
+        SwingUtilities.invokeLater(() -> jSplitPane.setDividerLocation(0));
+        btnAgregar.setText("Agregar");
+        btnOpcion.setVisible(false);
+    }
+
+    private void mostrarCampos(boolean mostrar) {
+        txtNombre.setVisible(mostrar);
+        txtDireccion.setVisible(mostrar);
+        lblNombre.setVisible(mostrar);
+        lblDireccion.setVisible(mostrar);
+    }
+
+    private void editarCampos(boolean editar) {
+        txtRuc.setEditable(editar);
+        txtNombre.setEditable(editar);
+        txtDireccion.setEditable(editar);
+    }
+
+    private void limpiarCampos() {
+        txtRuc.setText("");
+        txtNombre.setText("");
+        txtDireccion.setText("");
+        editarCampos(true);
+    }
+
+    private void prepararEdicion(Cliente c) {
+        mostrarFormulario();
+        mostrarCampos(true);
+        txtRuc.setText(c.getRuc());
+        txtNombre.setText(c.getNombre());
+        txtDireccion.setText(c.getDireccion());
+
+        txtRuc.setEditable(false);
+        lblDetalleAccion.setText("Editar datos del cliente (RUC protegido):");
+
+        opcion = "guardar";
+        btnOpcion.setText("Guardar");
+        btnOpcion.setBackground(new Color(255, 153, 102));
+        btnOpcion.setForeground(Color.WHITE);
+        btnOpcion.setVisible(true);
+
+        txtNombre.requestFocus();
     }
 
     /**
@@ -101,89 +142,174 @@ public class PanelCliente extends javax.swing.JPanel {
     // <editor-fold defaultstate="collapsed" desc="Generated Code">//GEN-BEGIN:initComponents
     private void initComponents() {
 
-        jLabel1 = new javax.swing.JLabel();
-        jLabel2 = new javax.swing.JLabel();
-        jLabel3 = new javax.swing.JLabel();
-        jLabel4 = new javax.swing.JLabel();
-        txtInputRuc = new javax.swing.JTextField();
-        txtInputNombre = new javax.swing.JTextField();
-        txtInputDireccion = new javax.swing.JTextField();
-        btnGuardar = new javax.swing.JButton();
-        jScrollPane1 = new javax.swing.JScrollPane();
+        panelBarra = new javax.swing.JPanel();
+        lblTitulo = new javax.swing.JLabel();
+        panelBotones = new javax.swing.JPanel();
+        btnAgregar = new javax.swing.JButton();
+        btnEditar = new javax.swing.JButton();
+        btnEliminar = new javax.swing.JButton();
+        btnPedirAtencion = new javax.swing.JButton();
+        btnAtender = new javax.swing.JButton();
+        btnVerCola = new javax.swing.JButton();
+        jSplitPane = new javax.swing.JSplitPane();
+        panelFormulario = new javax.swing.JPanel();
+        contenidoPanelFormulario = new javax.swing.JPanel();
+        lblRuc = new javax.swing.JLabel();
+        txtRuc = new javax.swing.JTextField();
+        lblNombre = new javax.swing.JLabel();
+        txtNombre = new javax.swing.JTextField();
+        lblDireccion = new javax.swing.JLabel();
+        txtDireccion = new javax.swing.JTextField();
+        lblDetalleAccion = new javax.swing.JLabel();
+        btnOpcion = new javax.swing.JButton();
+        btnCancelar = new javax.swing.JButton();
+        panelTabla = new javax.swing.JPanel();
+        jScrollPane = new javax.swing.JScrollPane();
         tblClientes = new javax.swing.JTable();
-        jLabel5 = new javax.swing.JLabel();
-        btnOrRuc = new javax.swing.JButton();
-        btnOrNombre = new javax.swing.JButton();
-        btnOrDefault = new javax.swing.JButton();
-        jPanel1 = new javax.swing.JPanel();
-        jLabel6 = new javax.swing.JLabel();
-        jLabel7 = new javax.swing.JLabel();
-        txtRucBuscado = new javax.swing.JTextField();
-        btnSelecionarCliente = new javax.swing.JButton();
-        jLabel8 = new javax.swing.JLabel();
-        jLabel9 = new javax.swing.JLabel();
-        jLabel10 = new javax.swing.JLabel();
-        txtRucBuscada = new javax.swing.JTextField();
-        txtNombreBuscado = new javax.swing.JTextField();
-        txtDireccionBuscada = new javax.swing.JTextField();
-        btnEliminarCliente = new javax.swing.JButton();
-        btnLimpiarCliente = new javax.swing.JButton();
-        btnEditarCliente = new javax.swing.JButton();
 
         setBackground(new java.awt.Color(255, 255, 255));
         setMaximumSize(new java.awt.Dimension(810, 540));
         setMinimumSize(new java.awt.Dimension(810, 540));
-        setLayout(new org.netbeans.lib.awtextra.AbsoluteLayout());
+        setPreferredSize(new java.awt.Dimension(810, 540));
+        setLayout(new java.awt.BorderLayout());
 
-        jLabel1.setFont(new java.awt.Font("Sans Serif Collection", 1, 14)); // NOI18N
-        jLabel1.setForeground(new java.awt.Color(0, 0, 0));
-        jLabel1.setText("REGISTRAR CLIENTE");
-        add(jLabel1, new org.netbeans.lib.awtextra.AbsoluteConstraints(30, 20, -1, -1));
+        panelBarra.setBackground(new java.awt.Color(255, 255, 255));
+        panelBarra.setLayout(new java.awt.BorderLayout());
 
-        jLabel2.setBackground(new java.awt.Color(0, 0, 0));
-        jLabel2.setFont(new java.awt.Font("Sans Serif Collection", 1, 14)); // NOI18N
-        jLabel2.setForeground(new java.awt.Color(0, 0, 0));
-        jLabel2.setText("Ruc:");
-        add(jLabel2, new org.netbeans.lib.awtextra.AbsoluteConstraints(30, 50, -1, -1));
+        lblTitulo.setFont(new java.awt.Font("sansserif", 1, 13)); // NOI18N
+        lblTitulo.setText("      CLIENTES");
+        panelBarra.add(lblTitulo, java.awt.BorderLayout.CENTER);
 
-        jLabel3.setFont(new java.awt.Font("Sans Serif Collection", 1, 14)); // NOI18N
-        jLabel3.setForeground(new java.awt.Color(0, 0, 0));
-        jLabel3.setText("Nombre:");
-        add(jLabel3, new org.netbeans.lib.awtextra.AbsoluteConstraints(200, 50, -1, -1));
+        panelBotones.setBackground(new java.awt.Color(255, 255, 255));
 
-        jLabel4.setFont(new java.awt.Font("Sans Serif Collection", 1, 14)); // NOI18N
-        jLabel4.setForeground(new java.awt.Color(0, 0, 0));
-        jLabel4.setText("Dirección Fiscal:");
-        add(jLabel4, new org.netbeans.lib.awtextra.AbsoluteConstraints(30, 80, -1, -1));
-
-        txtInputRuc.setBackground(new java.awt.Color(255, 255, 255));
-        txtInputRuc.setHorizontalAlignment(javax.swing.JTextField.CENTER);
-        txtInputRuc.setBorder(javax.swing.BorderFactory.createLineBorder(new java.awt.Color(0, 0, 0)));
-        add(txtInputRuc, new org.netbeans.lib.awtextra.AbsoluteConstraints(70, 50, 119, -1));
-
-        txtInputNombre.setBackground(new java.awt.Color(255, 255, 255));
-        txtInputNombre.setHorizontalAlignment(javax.swing.JTextField.CENTER);
-        txtInputNombre.setBorder(javax.swing.BorderFactory.createLineBorder(new java.awt.Color(0, 0, 0)));
-        add(txtInputNombre, new org.netbeans.lib.awtextra.AbsoluteConstraints(270, 50, 250, -1));
-
-        txtInputDireccion.setBackground(new java.awt.Color(255, 255, 255));
-        txtInputDireccion.setHorizontalAlignment(javax.swing.JTextField.CENTER);
-        txtInputDireccion.setBorder(javax.swing.BorderFactory.createLineBorder(new java.awt.Color(0, 0, 0)));
-        add(txtInputDireccion, new org.netbeans.lib.awtextra.AbsoluteConstraints(150, 80, 370, -1));
-
-        btnGuardar.setBackground(new java.awt.Color(0, 153, 204));
-        btnGuardar.setForeground(new java.awt.Color(255, 255, 255));
-        btnGuardar.setText("Guardar");
-        btnGuardar.addActionListener(new java.awt.event.ActionListener() {
+        btnAgregar.setBackground(new java.awt.Color(0, 153, 255));
+        btnAgregar.setForeground(new java.awt.Color(255, 255, 255));
+        btnAgregar.setText("Agregar");
+        btnAgregar.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
-                btnGuardarActionPerformed(evt);
+                btnAgregarActionPerformed(evt);
             }
         });
-        add(btnGuardar, new org.netbeans.lib.awtextra.AbsoluteConstraints(560, 60, 110, -1));
+        panelBotones.add(btnAgregar);
 
-        jScrollPane1.setBackground(new java.awt.Color(255, 153, 153));
+        btnEditar.setBackground(new java.awt.Color(255, 153, 102));
+        btnEditar.setForeground(new java.awt.Color(255, 255, 255));
+        btnEditar.setText("Editar");
+        btnEditar.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                btnEditarActionPerformed(evt);
+            }
+        });
+        panelBotones.add(btnEditar);
 
-        tblClientes.setBackground(new java.awt.Color(255, 255, 255));
+        btnEliminar.setBackground(new java.awt.Color(255, 51, 51));
+        btnEliminar.setForeground(new java.awt.Color(255, 255, 255));
+        btnEliminar.setText("Eliminar");
+        btnEliminar.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                btnEliminarActionPerformed(evt);
+            }
+        });
+        panelBotones.add(btnEliminar);
+
+        btnPedirAtencion.setBackground(new java.awt.Color(0, 153, 51));
+        btnPedirAtencion.setForeground(new java.awt.Color(255, 255, 255));
+        btnPedirAtencion.setText("Pedir Atención (Cola)");
+        btnPedirAtencion.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                btnPedirAtencionActionPerformed(evt);
+            }
+        });
+        panelBotones.add(btnPedirAtencion);
+
+        btnAtender.setBackground(new java.awt.Color(153, 0, 153));
+        btnAtender.setForeground(new java.awt.Color(255, 255, 255));
+        btnAtender.setText("Atender");
+        btnAtender.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                btnAtenderActionPerformed(evt);
+            }
+        });
+        panelBotones.add(btnAtender);
+
+        btnVerCola.setBackground(new java.awt.Color(0, 102, 204));
+        btnVerCola.setForeground(new java.awt.Color(255, 255, 255));
+        btnVerCola.setText("Ver Cola");
+        btnVerCola.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                btnVerColaActionPerformed(evt);
+            }
+        });
+        panelBotones.add(btnVerCola);
+
+        panelBarra.add(panelBotones, java.awt.BorderLayout.LINE_END);
+
+        add(panelBarra, java.awt.BorderLayout.PAGE_START);
+
+        jSplitPane.setBackground(new java.awt.Color(255, 255, 255));
+        jSplitPane.setDividerLocation(200);
+        jSplitPane.setOrientation(javax.swing.JSplitPane.VERTICAL_SPLIT);
+
+        panelFormulario.setBackground(new java.awt.Color(255, 255, 255));
+        panelFormulario.setMinimumSize(new java.awt.Dimension(100, 100));
+        panelFormulario.setLayout(new org.netbeans.lib.awtextra.AbsoluteLayout());
+
+        contenidoPanelFormulario.setBackground(new java.awt.Color(255, 255, 255));
+        contenidoPanelFormulario.setLayout(new org.netbeans.lib.awtextra.AbsoluteLayout());
+
+        lblRuc.setFont(new java.awt.Font("sansserif", 1, 13)); // NOI18N
+        lblRuc.setText("RUC");
+        contenidoPanelFormulario.add(lblRuc, new org.netbeans.lib.awtextra.AbsoluteConstraints(20, 30, -1, -1));
+
+        txtRuc.setHorizontalAlignment(javax.swing.JTextField.CENTER);
+        contenidoPanelFormulario.add(txtRuc, new org.netbeans.lib.awtextra.AbsoluteConstraints(20, 50, 160, 30));
+
+        lblNombre.setFont(new java.awt.Font("sansserif", 1, 13)); // NOI18N
+        lblNombre.setText("Razón Social / Nombre");
+        contenidoPanelFormulario.add(lblNombre, new org.netbeans.lib.awtextra.AbsoluteConstraints(200, 30, -1, -1));
+
+        txtNombre.setHorizontalAlignment(javax.swing.JTextField.CENTER);
+        contenidoPanelFormulario.add(txtNombre, new org.netbeans.lib.awtextra.AbsoluteConstraints(200, 50, 220, 30));
+
+        lblDireccion.setFont(new java.awt.Font("sansserif", 1, 13)); // NOI18N
+        lblDireccion.setText("Dirección");
+        contenidoPanelFormulario.add(lblDireccion, new org.netbeans.lib.awtextra.AbsoluteConstraints(440, 30, -1, -1));
+
+        txtDireccion.setHorizontalAlignment(javax.swing.JTextField.CENTER);
+        contenidoPanelFormulario.add(txtDireccion, new org.netbeans.lib.awtextra.AbsoluteConstraints(440, 50, 340, 30));
+
+        lblDetalleAccion.setFont(new java.awt.Font("sansserif", 1, 13)); // NOI18N
+        lblDetalleAccion.setText("Ingrese los datos del cliente:");
+        contenidoPanelFormulario.add(lblDetalleAccion, new org.netbeans.lib.awtextra.AbsoluteConstraints(20, 90, 460, -1));
+
+        btnOpcion.setForeground(new java.awt.Color(255, 255, 255));
+        btnOpcion.setText("Opcion");
+        btnOpcion.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                btnOpcionActionPerformed(evt);
+            }
+        });
+        contenidoPanelFormulario.add(btnOpcion, new org.netbeans.lib.awtextra.AbsoluteConstraints(200, 120, 130, -1));
+
+        btnCancelar.setBackground(new java.awt.Color(255, 102, 102));
+        btnCancelar.setForeground(new java.awt.Color(255, 255, 255));
+        btnCancelar.setText("Cancelar");
+        btnCancelar.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                btnCancelarActionPerformed(evt);
+            }
+        });
+        contenidoPanelFormulario.add(btnCancelar, new org.netbeans.lib.awtextra.AbsoluteConstraints(350, 120, 120, -1));
+
+        panelFormulario.add(contenidoPanelFormulario, new org.netbeans.lib.awtextra.AbsoluteConstraints(0, 0, 810, 200));
+
+        jSplitPane.setTopComponent(panelFormulario);
+
+        panelTabla.setBackground(new java.awt.Color(255, 255, 255));
+        panelTabla.setLayout(new java.awt.BorderLayout());
+
+        jScrollPane.setBackground(new java.awt.Color(255, 255, 255));
+
         tblClientes.setModel(new javax.swing.table.DefaultTableModel(
             new Object [][] {
                 {null, null, null},
@@ -192,7 +318,7 @@ public class PanelCliente extends javax.swing.JPanel {
                 {null, null, null}
             },
             new String [] {
-                "RUC", "Nombre", "Direccion Fiscal"
+                "RUC", "Razón Social", "Dirección"
             }
         ) {
             Class[] types = new Class [] {
@@ -203,244 +329,317 @@ public class PanelCliente extends javax.swing.JPanel {
                 return types [columnIndex];
             }
         });
-        jScrollPane1.setViewportView(tblClientes);
+        jScrollPane.setViewportView(tblClientes);
 
-        add(jScrollPane1, new org.netbeans.lib.awtextra.AbsoluteConstraints(30, 150, 640, 160));
+        panelTabla.add(jScrollPane, java.awt.BorderLayout.CENTER);
 
-        jLabel5.setBackground(new java.awt.Color(0, 0, 0));
-        jLabel5.setForeground(new java.awt.Color(0, 0, 0));
-        jLabel5.setText("Ordenar por:");
-        add(jLabel5, new org.netbeans.lib.awtextra.AbsoluteConstraints(30, 120, 90, -1));
+        jSplitPane.setRightComponent(panelTabla);
 
-        btnOrRuc.setBackground(new java.awt.Color(204, 102, 255));
-        btnOrRuc.setForeground(new java.awt.Color(255, 255, 255));
-        btnOrRuc.setText("RUC");
-        btnOrRuc.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                btnOrRucActionPerformed(evt);
-            }
-        });
-        add(btnOrRuc, new org.netbeans.lib.awtextra.AbsoluteConstraints(130, 120, -1, -1));
-
-        btnOrNombre.setBackground(new java.awt.Color(255, 102, 102));
-        btnOrNombre.setForeground(new java.awt.Color(255, 255, 255));
-        btnOrNombre.setText("Nombre");
-        btnOrNombre.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                btnOrNombreActionPerformed(evt);
-            }
-        });
-        add(btnOrNombre, new org.netbeans.lib.awtextra.AbsoluteConstraints(210, 120, -1, -1));
-
-        btnOrDefault.setBackground(new java.awt.Color(0, 102, 204));
-        btnOrDefault.setForeground(new java.awt.Color(255, 255, 255));
-        btnOrDefault.setText("Default");
-        btnOrDefault.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                btnOrDefaultActionPerformed(evt);
-            }
-        });
-        add(btnOrDefault, new org.netbeans.lib.awtextra.AbsoluteConstraints(590, 120, -1, -1));
-
-        jPanel1.setBackground(new java.awt.Color(255, 255, 255));
-        jPanel1.setBorder(javax.swing.BorderFactory.createLineBorder(new java.awt.Color(0, 0, 0)));
-        jPanel1.setLayout(new org.netbeans.lib.awtextra.AbsoluteLayout());
-
-        jLabel6.setForeground(new java.awt.Color(0, 0, 0));
-        jLabel6.setText("BUSCAR Y EDITAR");
-        jPanel1.add(jLabel6, new org.netbeans.lib.awtextra.AbsoluteConstraints(20, 10, 100, 20));
-
-        jLabel7.setForeground(new java.awt.Color(0, 0, 0));
-        jLabel7.setText("Ruc del Cliente: ");
-        jPanel1.add(jLabel7, new org.netbeans.lib.awtextra.AbsoluteConstraints(20, 30, 100, 20));
-
-        txtRucBuscado.setBackground(new java.awt.Color(255, 255, 255));
-        txtRucBuscado.setHorizontalAlignment(javax.swing.JTextField.CENTER);
-        jPanel1.add(txtRucBuscado, new org.netbeans.lib.awtextra.AbsoluteConstraints(20, 50, 180, -1));
-
-        btnSelecionarCliente.setBackground(new java.awt.Color(0, 102, 204));
-        btnSelecionarCliente.setForeground(new java.awt.Color(255, 255, 255));
-        btnSelecionarCliente.setText("Seleccionar");
-        btnSelecionarCliente.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                btnSelecionarClienteActionPerformed(evt);
-            }
-        });
-        jPanel1.add(btnSelecionarCliente, new org.netbeans.lib.awtextra.AbsoluteConstraints(210, 50, 100, -1));
-
-        jLabel8.setForeground(new java.awt.Color(0, 0, 0));
-        jLabel8.setText("Ruc");
-        jPanel1.add(jLabel8, new org.netbeans.lib.awtextra.AbsoluteConstraints(20, 90, -1, -1));
-
-        jLabel9.setForeground(new java.awt.Color(0, 0, 0));
-        jLabel9.setText("Nombre:");
-        jPanel1.add(jLabel9, new org.netbeans.lib.awtextra.AbsoluteConstraints(160, 90, -1, -1));
-
-        jLabel10.setForeground(new java.awt.Color(0, 0, 0));
-        jLabel10.setText("Direccion");
-        jPanel1.add(jLabel10, new org.netbeans.lib.awtextra.AbsoluteConstraints(340, 90, -1, -1));
-
-        txtRucBuscada.setBackground(new java.awt.Color(255, 255, 255));
-        txtRucBuscada.setHorizontalAlignment(javax.swing.JTextField.CENTER);
-        jPanel1.add(txtRucBuscada, new org.netbeans.lib.awtextra.AbsoluteConstraints(20, 110, 120, -1));
-
-        txtNombreBuscado.setBackground(new java.awt.Color(255, 255, 255));
-        txtNombreBuscado.setHorizontalAlignment(javax.swing.JTextField.CENTER);
-        jPanel1.add(txtNombreBuscado, new org.netbeans.lib.awtextra.AbsoluteConstraints(160, 110, 160, -1));
-
-        txtDireccionBuscada.setBackground(new java.awt.Color(255, 255, 255));
-        txtDireccionBuscada.setHorizontalAlignment(javax.swing.JTextField.CENTER);
-        jPanel1.add(txtDireccionBuscada, new org.netbeans.lib.awtextra.AbsoluteConstraints(340, 110, 260, -1));
-
-        btnEliminarCliente.setBackground(new java.awt.Color(255, 51, 51));
-        btnEliminarCliente.setText("Eliminar");
-        btnEliminarCliente.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                btnEliminarClienteActionPerformed(evt);
-            }
-        });
-        jPanel1.add(btnEliminarCliente, new org.netbeans.lib.awtextra.AbsoluteConstraints(520, 150, 80, -1));
-
-        btnLimpiarCliente.setBackground(new java.awt.Color(153, 153, 255));
-        btnLimpiarCliente.setForeground(new java.awt.Color(255, 255, 255));
-        btnLimpiarCliente.setText("Limpiar");
-        btnLimpiarCliente.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                btnLimpiarClienteActionPerformed(evt);
-            }
-        });
-        jPanel1.add(btnLimpiarCliente, new org.netbeans.lib.awtextra.AbsoluteConstraints(340, 150, 80, -1));
-
-        btnEditarCliente.setBackground(new java.awt.Color(255, 204, 51));
-        btnEditarCliente.setForeground(new java.awt.Color(255, 255, 255));
-        btnEditarCliente.setText("Editar");
-        btnEditarCliente.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                btnEditarClienteActionPerformed(evt);
-            }
-        });
-        jPanel1.add(btnEditarCliente, new org.netbeans.lib.awtextra.AbsoluteConstraints(430, 150, 80, -1));
-
-        add(jPanel1, new org.netbeans.lib.awtextra.AbsoluteConstraints(30, 330, 640, 200));
+        add(jSplitPane, java.awt.BorderLayout.CENTER);
     }// </editor-fold>//GEN-END:initComponents
 
-    private void btnGuardarActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnGuardarActionPerformed
+    private void btnAgregarActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnAgregarActionPerformed
+        if (btnAgregar.getText().equalsIgnoreCase("Cerrar formulario") && "registrar".equals(opcion)) {
+            ocultarFormulario();
+            limpiarCampos();
+            return;
+        }
+
+        mostrarFormulario();
+        mostrarCampos(true);
+        limpiarCampos();
+
+        lblDetalleAccion.setText("Ingrese los datos del nuevo cliente:");
+        opcion = "registrar";
+
+        btnOpcion.setText("Registrar");
+        btnOpcion.setBackground(new Color(0, 153, 255));
+        btnOpcion.setForeground(Color.WHITE);
+        btnOpcion.setVisible(true);
+
+        txtRuc.requestFocus();
+    }//GEN-LAST:event_btnAgregarActionPerformed
+
+    private void btnOpcionActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnOpcionActionPerformed
+        switch (opcion) {
+            case "registrar":
+                try {
+                    String ruc = txtRuc.getText().trim();
+                    String nombre = txtNombre.getText().trim();
+                    String direccion = txtDireccion.getText().trim();
+
+                    if (ruc.isEmpty() || nombre.isEmpty() || direccion.isEmpty()) {
+                        JOptionPane.showMessageDialog(this, "Complete todos los campos del cliente.", "Aviso", JOptionPane.WARNING_MESSAGE);
+                        return;
+                    }
+
+                    if (clienteServicio.obtenerClientePorRuc(ruc) != null) {
+                        JOptionPane.showMessageDialog(this, "Ya existe un cliente con el RUC " + ruc, "RUC Duplicado", JOptionPane.WARNING_MESSAGE);
+                        return;
+                    }
+
+                    clienteServicio.guardarCliente(ruc, nombre, direccion);
+                    Cliente c = clienteServicio.obtenerClientePorRuc(ruc);
+                    GestorLogistica.agregarCliente(c);
+
+                    JOptionPane.showMessageDialog(this, "Cliente " + nombre + " registrado exitosamente.");
+                    actualizarTabla(clienteServicio.getCliente());
+                    limpiarCampos();
+                    ocultarFormulario();
+                } catch (IllegalArgumentException e) {
+                    JOptionPane.showMessageDialog(this, e.getMessage(), "Error al Registrar", JOptionPane.ERROR_MESSAGE);
+                }
+                break;
+
+            case "seleccionarGuardar":
+                try {
+                    String ruc = txtRuc.getText().trim();
+                    Cliente c = clienteServicio.obtenerClientePorRuc(ruc);
+                    if (c == null) {
+                        for (Cliente cl : GestorLogistica.getClientes()) {
+                            if (cl.getRuc().equalsIgnoreCase(ruc)) {
+                                c = cl;
+                                break;
+                            }
+                        }
+                    }
+
+                    if (c == null) {
+                        JOptionPane.showMessageDialog(this, "El cliente con RUC " + ruc + " no está registrado.", "No Encontrado", JOptionPane.WARNING_MESSAGE);
+                        txtRuc.setText("");
+                        txtRuc.requestFocus();
+                    } else {
+                        prepararEdicion(c);
+                    }
+                } catch (IllegalArgumentException e) {
+                    JOptionPane.showMessageDialog(this, e.getMessage(), "Aviso", JOptionPane.WARNING_MESSAGE);
+                }
+                break;
+
+            case "guardar":
+                try {
+                    String ruc = txtRuc.getText().trim();
+                    String nombre = txtNombre.getText().trim();
+                    String direccion = txtDireccion.getText().trim();
+
+                    if (nombre.isEmpty() || direccion.isEmpty()) {
+                        JOptionPane.showMessageDialog(this, "Complete todos los campos a actualizar.", "Aviso", JOptionPane.WARNING_MESSAGE);
+                        return;
+                    }
+
+                    clienteServicio.editarCliente(ruc, nombre, direccion);
+
+                    for (Cliente cl : GestorLogistica.getClientes()) {
+                        if (cl.getRuc().equalsIgnoreCase(ruc)) {
+                            cl.setNombre(nombre);
+                            cl.setDireccion(direccion);
+                            break;
+                        }
+                    }
+
+                    JOptionPane.showMessageDialog(this, "Cliente " + nombre + " actualizado correctamente.");
+                    actualizarTabla(clienteServicio.getCliente());
+                    limpiarCampos();
+                    ocultarFormulario();
+                } catch (IllegalArgumentException e) {
+                    JOptionPane.showMessageDialog(this, e.getMessage(), "Error al Actualizar", JOptionPane.ERROR_MESSAGE);
+                }
+                break;
+
+            case "seleccionarEliminar":
+                try {
+                    String ruc = txtRuc.getText().trim();
+                    Cliente c = clienteServicio.obtenerClientePorRuc(ruc);
+                    if (c == null) {
+                        for (Cliente cl : GestorLogistica.getClientes()) {
+                            if (cl.getRuc().equalsIgnoreCase(ruc)) {
+                                c = cl;
+                                break;
+                            }
+                        }
+                    }
+
+                    if (c == null) {
+                        JOptionPane.showMessageDialog(this, "El cliente con RUC " + ruc + " no está registrado.", "No Encontrado", JOptionPane.WARNING_MESSAGE);
+                        txtRuc.setText("");
+                    } else {
+                        mostrarCampos(true);
+                        txtNombre.setText(c.getNombre());
+                        txtDireccion.setText(c.getDireccion());
+                        editarCampos(false);
+
+                        lblDetalleAccion.setText("¿Desea confirmar la eliminación del cliente " + c.getNombre() + "?");
+                        opcion = "eliminar";
+                        btnOpcion.setText("Confirmar");
+                        btnOpcion.setBackground(new Color(220, 53, 69));
+                        btnOpcion.setForeground(Color.WHITE);
+                        btnOpcion.setVisible(true);
+                    }
+                } catch (IllegalArgumentException e) {
+                    JOptionPane.showMessageDialog(this, e.getMessage(), "Aviso", JOptionPane.WARNING_MESSAGE);
+                }
+                break;
+
+            case "eliminar":
+                try {
+                    String ruc = txtRuc.getText().trim();
+                    clienteServicio.eliminarCliente(ruc);
+                    GestorLogistica.getClientes().removeIf(c -> c.getRuc().equalsIgnoreCase(ruc));
+
+                    JOptionPane.showMessageDialog(this, "Cliente eliminado correctamente.");
+                    actualizarTabla(clienteServicio.getCliente());
+                    limpiarCampos();
+                    ocultarFormulario();
+                } catch (IllegalArgumentException e) {
+                    JOptionPane.showMessageDialog(this, e.getMessage(), "Error al Eliminar", JOptionPane.ERROR_MESSAGE);
+                }
+                break;
+
+            default:
+                break;
+        }
+    }//GEN-LAST:event_btnOpcionActionPerformed
+
+    private void btnEditarActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnEditarActionPerformed
+        int fila = tblClientes.getSelectedRow();
+        String ruc = (fila >= 0) ? modeloTabla.getValueAt(fila, 0).toString() : txtRuc.getText().trim();
+
+        if (!ruc.isEmpty()) {
+            Cliente c = clienteServicio.obtenerClientePorRuc(ruc);
+            if (c != null) {
+                prepararEdicion(c);
+                return;
+            }
+        }
+
+        mostrarFormulario();
+        mostrarCampos(false);
+        limpiarCampos();
+
+        opcion = "seleccionarGuardar";
+        lblDetalleAccion.setText("Ingrese el RUC del cliente a editar:");
+        btnOpcion.setText("Seleccionar");
+        btnOpcion.setBackground(new Color(255, 193, 7));
+        btnOpcion.setForeground(Color.BLACK);
+        btnOpcion.setVisible(true);
+
+        txtRuc.requestFocus();
+    }//GEN-LAST:event_btnEditarActionPerformed
+
+    private void btnEliminarActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnEliminarActionPerformed
+        int fila = tblClientes.getSelectedRow();
+        String ruc = (fila >= 0) ? modeloTabla.getValueAt(fila, 0).toString() : txtRuc.getText().trim();
+
+        if (!ruc.isEmpty()) {
+            Cliente c = clienteServicio.obtenerClientePorRuc(ruc);
+            if (c != null) {
+                int r = JOptionPane.showConfirmDialog(
+                        this,
+                        "¿Está seguro de eliminar el cliente " + c.getNombre() + " (RUC: " + ruc + ")?",
+                        "Confirmar Eliminación",
+                        JOptionPane.YES_NO_OPTION
+                );
+                if (r == JOptionPane.YES_OPTION) {
+                    clienteServicio.eliminarCliente(ruc);
+                    GestorLogistica.getClientes().removeIf(x -> x.getRuc().equalsIgnoreCase(ruc));
+                    actualizarTabla(clienteServicio.getCliente());
+                    limpiarCampos();
+                    ocultarFormulario();
+                }
+                return;
+            }
+        }
+
+        mostrarFormulario();
+        mostrarCampos(false);
+        limpiarCampos();
+
+        opcion = "seleccionarEliminar";
+        lblDetalleAccion.setText("Ingrese el RUC del cliente a eliminar:");
+        btnOpcion.setText("Seleccionar");
+        btnOpcion.setBackground(new Color(255, 193, 7));
+        btnOpcion.setForeground(Color.BLACK);
+        btnOpcion.setVisible(true);
+
+        txtRuc.requestFocus();
+    }//GEN-LAST:event_btnEliminarActionPerformed
+
+    private void btnCancelarActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnCancelarActionPerformed
+        limpiarCampos();
+        ocultarFormulario();
+    }//GEN-LAST:event_btnCancelarActionPerformed
+
+    private void btnPedirAtencionActionPerformed(java.awt.event.ActionEvent evt) {
+        int fila = tblClientes.getSelectedRow();
+        String ruc = (fila >= 0) ? modeloTabla.getValueAt(fila, 0).toString() : txtRuc.getText().trim();
+
+        if (ruc.isEmpty()) {
+            JOptionPane.showMessageDialog(this, "Seleccione un cliente de la tabla o ingrese el RUC para pedir atención.", "Aviso", JOptionPane.WARNING_MESSAGE);
+            return;
+        }
 
         try {
-            clienteServicio.guardarCliente(
-                    txtInputRuc.getText(),
-                    txtInputNombre.getText(),
-                    txtInputDireccion.getText());
-
-            actualizarTabla();
-
-            txtInputRuc.setText("");
-            txtInputNombre.setText("");
-            txtInputDireccion.setText("");
-            txtInputRuc.requestFocus();
-
-        } catch (IllegalArgumentException ex) {
-            JOptionPane.showMessageDialog(this, ex.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
+            clienteServicio.pedirAtencion(ruc);
+            Cliente c = clienteServicio.obtenerClientePorRuc(ruc);
+            JOptionPane.showMessageDialog(this, "Cliente ingresado a la cola de atención:\n"
+                    + (c != null ? c.getNombre() : ruc) + "\nPosición en cola: " + clienteServicio.cantidadEnCola(),
+                    "Cola de Atención (Circular)", JOptionPane.INFORMATION_MESSAGE);
+        } catch (IllegalArgumentException | IllegalStateException ex) {
+            JOptionPane.showMessageDialog(this, ex.getMessage(), "Aviso", JOptionPane.WARNING_MESSAGE);
         }
-    }//GEN-LAST:event_btnGuardarActionPerformed
+    }
 
-    private void btnOrRucActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnOrRucActionPerformed
-        orden = "ruc";
-        actualizarTabla();
-    }//GEN-LAST:event_btnOrRucActionPerformed
-
-    private void btnOrNombreActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnOrNombreActionPerformed
-        orden = "nombre";
-        actualizarTabla();
-    }//GEN-LAST:event_btnOrNombreActionPerformed
-
-    private void btnOrDefaultActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnOrDefaultActionPerformed
-        orden = "default";
-        actualizarTabla();
-    }//GEN-LAST:event_btnOrDefaultActionPerformed
-
-    private void btnSelecionarClienteActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnSelecionarClienteActionPerformed
-        String ruc = txtRucBuscado.getText().trim();
-        clienteSeleccionado = clienteServicio.obtenerClientePorRuc(ruc);
-
-        if (clienteSeleccionado == null) {
-            JOptionPane.showMessageDialog(this, "No existe un cliente con ese RUC",
-                    "Aviso", JOptionPane.WARNING_MESSAGE);
-            limpiarEdicion();
-            return;
-        }
-
-        txtRucBuscada.setText(clienteSeleccionado.getRuc());
-        txtRucBuscada.setEditable(false); // el RUC es la clave, no se edita
-        txtNombreBuscado.setText(clienteSeleccionado.getNombre());
-        txtDireccionBuscada.setText(clienteSeleccionado.getDireccion());
-        mostrarEdicion();
-
-    }//GEN-LAST:event_btnSelecionarClienteActionPerformed
-
-    private void btnEditarClienteActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnEditarClienteActionPerformed
-        if (clienteSeleccionado == null) {
-            return;
-        }
+    private void btnAtenderActionPerformed(java.awt.event.ActionEvent evt) {
         try {
-            clienteServicio.editarCliente(
-                    clienteSeleccionado.getRuc(),
-                    txtNombreBuscado.getText(),
-                    txtDireccionBuscada.getText());
-            actualizarTabla();
-            limpiarEdicion();
-            JOptionPane.showMessageDialog(this, "Cliente actualizado");
-        } catch (IllegalArgumentException ex) {
-            JOptionPane.showMessageDialog(this, ex.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
+            Cliente atendido = clienteServicio.atenderSiguiente();
+            JOptionPane.showMessageDialog(this, "Atendiendo cliente:\n"
+                    + "Nombre: " + atendido.getNombre() + "\n"
+                    + "RUC: " + atendido.getRuc() + "\n"
+                    + "Clientes restantes en cola: " + clienteServicio.cantidadEnCola(),
+                    "Cliente Atendido (FIFO)", JOptionPane.INFORMATION_MESSAGE);
+        } catch (IllegalStateException ex) {
+            JOptionPane.showMessageDialog(this, ex.getMessage(), "Cola Vacía", JOptionPane.WARNING_MESSAGE);
         }
-    }//GEN-LAST:event_btnEditarClienteActionPerformed
+    }
 
-    private void btnLimpiarClienteActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnLimpiarClienteActionPerformed
-        limpiarEdicion();
-    }//GEN-LAST:event_btnLimpiarClienteActionPerformed
-
-    private void btnEliminarClienteActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnEliminarClienteActionPerformed
-        if (clienteSeleccionado == null) {
+    private void btnVerColaActionPerformed(java.awt.event.ActionEvent evt) {
+        List<Cliente> enEspera = clienteServicio.obtenerCola();
+        if (enEspera.isEmpty()) {
+            JOptionPane.showMessageDialog(this, "No hay clientes en la cola de atención.", "Cola de Atención", JOptionPane.INFORMATION_MESSAGE);
             return;
         }
-        int op = JOptionPane.showConfirmDialog(this, "¿Eliminar este cliente?",
-                "Confirmar", JOptionPane.YES_NO_OPTION);
-        if (op == JOptionPane.YES_OPTION) {
-            clienteServicio.eliminarCliente(clienteSeleccionado.getRuc());
-            actualizarTabla();
-            limpiarEdicion();
+        StringBuilder sb = new StringBuilder("Clientes en Cola de Atención (Arreglo Circular):\n\n");
+        int turno = 1;
+        for (Cliente c : enEspera) {
+            sb.append(turno++).append(". ").append(c.getNombre()).append(" (RUC: ").append(c.getRuc()).append(")\n");
         }
-    }//GEN-LAST:event_btnEliminarClienteActionPerformed
-
+        JOptionPane.showMessageDialog(this, sb.toString(), "Cola de Atención", JOptionPane.INFORMATION_MESSAGE);
+    }
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
-    private javax.swing.JButton btnEditarCliente;
-    private javax.swing.JButton btnEliminarCliente;
-    private javax.swing.JButton btnGuardar;
-    private javax.swing.JButton btnLimpiarCliente;
-    private javax.swing.JButton btnOrDefault;
-    private javax.swing.JButton btnOrNombre;
-    private javax.swing.JButton btnOrRuc;
-    private javax.swing.JButton btnSelecionarCliente;
-    private javax.swing.JLabel jLabel1;
-    private javax.swing.JLabel jLabel10;
-    private javax.swing.JLabel jLabel2;
-    private javax.swing.JLabel jLabel3;
-    private javax.swing.JLabel jLabel4;
-    private javax.swing.JLabel jLabel5;
-    private javax.swing.JLabel jLabel6;
-    private javax.swing.JLabel jLabel7;
-    private javax.swing.JLabel jLabel8;
-    private javax.swing.JLabel jLabel9;
-    private javax.swing.JPanel jPanel1;
-    private javax.swing.JScrollPane jScrollPane1;
+    private javax.swing.JButton btnAgregar;
+    private javax.swing.JButton btnAtender;
+    private javax.swing.JButton btnCancelar;
+    private javax.swing.JButton btnEditar;
+    private javax.swing.JButton btnEliminar;
+    private javax.swing.JButton btnOpcion;
+    private javax.swing.JButton btnPedirAtencion;
+    private javax.swing.JButton btnVerCola;
+    private javax.swing.JPanel contenidoPanelFormulario;
+    private javax.swing.JScrollPane jScrollPane;
+    private javax.swing.JSplitPane jSplitPane;
+    private javax.swing.JLabel lblDetalleAccion;
+    private javax.swing.JLabel lblDireccion;
+    private javax.swing.JLabel lblNombre;
+    private javax.swing.JLabel lblRuc;
+    private javax.swing.JLabel lblTitulo;
+    private javax.swing.JPanel panelBarra;
+    private javax.swing.JPanel panelBotones;
+    private javax.swing.JPanel panelFormulario;
+    private javax.swing.JPanel panelTabla;
     private javax.swing.JTable tblClientes;
-    private javax.swing.JTextField txtDireccionBuscada;
-    private javax.swing.JTextField txtInputDireccion;
-    private javax.swing.JTextField txtInputNombre;
-    private javax.swing.JTextField txtInputRuc;
-    private javax.swing.JTextField txtNombreBuscado;
-    private javax.swing.JTextField txtRucBuscada;
-    private javax.swing.JTextField txtRucBuscado;
+    private javax.swing.JTextField txtDireccion;
+    private javax.swing.JTextField txtNombre;
+    private javax.swing.JTextField txtRuc;
     // End of variables declaration//GEN-END:variables
 }

@@ -6,23 +6,26 @@ package vista;
 
 import java.awt.Color;
 import java.awt.Dimension;
+import java.awt.event.MouseAdapter;
+import java.awt.event.MouseEvent;
 import java.util.List;
 import javax.swing.JOptionPane;
 import javax.swing.SwingUtilities;
 import javax.swing.table.DefaultTableModel;
+import modelo.Tractor;
 import servicio.GestorEquipos;
 import servicio.TractorServicio;
-import modelo.Tractor;
 
 /**
- *
- * @author GIANCARLO REA
+ * Panel de gestión de Tractores.
+ * Permite registrar, editar, listar y eliminar tractores de la flota
+ * manteniendo sincronización con GestorEquipos.
  */
 public class PanelTractor extends javax.swing.JPanel {
 
     private String opcion;
     private TractorServicio tractorServicio;
-    DefaultTableModel modeloTabla;
+    private DefaultTableModel modeloTabla;
 
     /**
      * Creates new form PanelTractor
@@ -38,8 +41,35 @@ public class PanelTractor extends javax.swing.JPanel {
         panelTabla.setMinimumSize(new Dimension(0, 0));
         ocultarFormulario();
 
-        btnOpcion.setVisible(false);
-        btnOpcion.setVisible(false);
+        tblTractors.addMouseListener(new MouseAdapter() {
+            @Override
+            public void mouseClicked(MouseEvent e) {
+                int fila = tblTractors.getSelectedRow();
+                if (fila >= 0) {
+                    String placa = modeloTabla.getValueAt(fila, 0).toString();
+                    txtPlaca.setText(placa);
+                }
+            }
+        });
+
+        cargarDatos();
+    }
+
+    public void cargarDatos() {
+        for (Tractor t : GestorEquipos.getTractores()) {
+            if (tractorServicio.getTractorByPlaca(t.getPlaca()) == null) {
+                tractorServicio.registrarTractor(
+                        t.getPlaca(),
+                        t.getEjes(),
+                        t.getMarca(),
+                        t.getModelo(),
+                        t.getCarroceria(),
+                        t.getAnio(),
+                        t.getMTC()
+                );
+            }
+        }
+        actualizarTabla(tractorServicio.getTractors());
     }
 
     private void actualizarTabla(List<Tractor> listaTractors) {
@@ -56,13 +86,14 @@ public class PanelTractor extends javax.swing.JPanel {
             };
             modeloTabla.addRow(fila);
         }
-
     }
 
     private void mostrarFormulario() {
         jSplitPane.setDividerSize(8);
         SwingUtilities.invokeLater(() -> {
-            jSplitPane.setDividerLocation(jSplitPane.getHeight() / 3);
+            int h = jSplitPane.getHeight();
+            int loc = (h > 0) ? Math.min(220, Math.max(180, h / 3)) : 200;
+            jSplitPane.setDividerLocation(loc);
         });
         btnAgregar.setText("Cerrar formulario");
     }
@@ -71,9 +102,10 @@ public class PanelTractor extends javax.swing.JPanel {
         jSplitPane.setDividerSize(0);
         SwingUtilities.invokeLater(() -> jSplitPane.setDividerLocation(0));
         btnAgregar.setText("Agregar");
+        btnOpcion.setVisible(false);
     }
 
-    private void mostrarCampos(Boolean mostrar) {
+    private void mostrarCampos(boolean mostrar) {
         txtEjes.setVisible(mostrar);
         txtMarca.setVisible(mostrar);
         txtModelo.setVisible(mostrar);
@@ -89,7 +121,7 @@ public class PanelTractor extends javax.swing.JPanel {
         lblAnio.setVisible(mostrar);
     }
 
-    private void editarCampos(Boolean editar) {
+    private void editarCampos(boolean editar) {
         txtPlaca.setEditable(editar);
         txtEjes.setEditable(editar);
         txtMarca.setEditable(editar);
@@ -107,6 +139,30 @@ public class PanelTractor extends javax.swing.JPanel {
         txtCarroceria.setText("");
         txtAnio.setText("");
         txtMTC.setText("");
+        editarCampos(true);
+    }
+
+    private void prepararEdicionDeTractor(Tractor t) {
+        mostrarFormulario();
+        mostrarCampos(true);
+        txtPlaca.setText(t.getPlaca());
+        txtEjes.setText(String.valueOf(t.getEjes()));
+        txtMarca.setText(t.getMarca());
+        txtModelo.setText(t.getModelo());
+        txtCarroceria.setText(t.getCarroceria());
+        txtAnio.setText(String.valueOf(t.getAnio()));
+        txtMTC.setText(t.getMTC());
+
+        txtPlaca.setEditable(false);
+        lblPlaca.setText("Editar datos del tractor (Placa protegida):");
+
+        opcion = "guardar";
+        btnOpcion.setText("Guardar");
+        btnOpcion.setBackground(new Color(255, 153, 102));
+        btnOpcion.setForeground(Color.WHITE);
+        btnOpcion.setVisible(true);
+
+        txtEjes.requestFocus();
     }
 
     /**
@@ -119,7 +175,7 @@ public class PanelTractor extends javax.swing.JPanel {
     private void initComponents() {
 
         panelBarra = new javax.swing.JPanel();
-        lblTitutlo = new javax.swing.JLabel();
+        lblTitulo = new javax.swing.JLabel();
         panelBotones = new javax.swing.JPanel();
         btnAgregar = new javax.swing.JButton();
         btnEditar = new javax.swing.JButton();
@@ -142,7 +198,6 @@ public class PanelTractor extends javax.swing.JPanel {
         txtEjes = new javax.swing.JTextField();
         lblEjes = new javax.swing.JLabel();
         btnOpcion = new javax.swing.JButton();
-        btnOpcion1 = new javax.swing.JButton();
         btnCancelar = new javax.swing.JButton();
         panelTabla = new javax.swing.JPanel();
         jScrollPane = new javax.swing.JScrollPane();
@@ -157,14 +212,13 @@ public class PanelTractor extends javax.swing.JPanel {
         panelBarra.setBackground(new java.awt.Color(255, 255, 255));
         panelBarra.setLayout(new java.awt.BorderLayout());
 
-        lblTitutlo.setFont(new java.awt.Font("sansserif", 1, 13)); // NOI18N
-        lblTitutlo.setForeground(new java.awt.Color(0, 0, 0));
-        lblTitutlo.setText("      TRACTORS");
-        panelBarra.add(lblTitutlo, java.awt.BorderLayout.CENTER);
+        lblTitulo.setFont(new java.awt.Font("sansserif", 1, 13)); // NOI18N
+        lblTitulo.setText("      TRACTORES");
+        panelBarra.add(lblTitulo, java.awt.BorderLayout.CENTER);
 
         panelBotones.setBackground(new java.awt.Color(255, 255, 255));
 
-        btnAgregar.setBackground(new java.awt.Color(51, 153, 255));
+        btnAgregar.setBackground(new java.awt.Color(0, 153, 255));
         btnAgregar.setForeground(new java.awt.Color(255, 255, 255));
         btnAgregar.setText("Agregar");
         btnAgregar.addActionListener(new java.awt.event.ActionListener() {
@@ -209,73 +263,52 @@ public class PanelTractor extends javax.swing.JPanel {
         contenidoPanelFormulario.setBackground(new java.awt.Color(255, 255, 255));
         contenidoPanelFormulario.setLayout(new org.netbeans.lib.awtextra.AbsoluteLayout());
 
-        txtPlaca.setBackground(new java.awt.Color(255, 255, 255));
-        txtPlaca.setForeground(new java.awt.Color(0, 0, 0));
         txtPlaca.setHorizontalAlignment(javax.swing.JTextField.CENTER);
         contenidoPanelFormulario.add(txtPlaca, new org.netbeans.lib.awtextra.AbsoluteConstraints(20, 110, 190, 30));
 
         lblMarca.setFont(new java.awt.Font("sansserif", 1, 13)); // NOI18N
-        lblMarca.setForeground(new java.awt.Color(0, 0, 0));
         lblMarca.setText("Marca");
         contenidoPanelFormulario.add(lblMarca, new org.netbeans.lib.awtextra.AbsoluteConstraints(110, 30, -1, -1));
 
         lblModelo.setFont(new java.awt.Font("sansserif", 1, 13)); // NOI18N
-        lblModelo.setForeground(new java.awt.Color(0, 0, 0));
         lblModelo.setText("Modelo");
         contenidoPanelFormulario.add(lblModelo, new org.netbeans.lib.awtextra.AbsoluteConstraints(250, 30, -1, -1));
 
         lblPlaca.setFont(new java.awt.Font("sansserif", 1, 13)); // NOI18N
-        lblPlaca.setForeground(new java.awt.Color(0, 0, 0));
         lblPlaca.setText("Placa");
         contenidoPanelFormulario.add(lblPlaca, new org.netbeans.lib.awtextra.AbsoluteConstraints(20, 90, -1, -1));
 
-        txtModelo.setBackground(new java.awt.Color(255, 255, 255));
-        txtModelo.setForeground(new java.awt.Color(0, 0, 0));
         txtModelo.setHorizontalAlignment(javax.swing.JTextField.CENTER);
         contenidoPanelFormulario.add(txtModelo, new org.netbeans.lib.awtextra.AbsoluteConstraints(250, 50, 130, 30));
 
-        txtCarroceria.setBackground(new java.awt.Color(255, 255, 255));
-        txtCarroceria.setForeground(new java.awt.Color(0, 0, 0));
         txtCarroceria.setHorizontalAlignment(javax.swing.JTextField.CENTER);
         contenidoPanelFormulario.add(txtCarroceria, new org.netbeans.lib.awtextra.AbsoluteConstraints(390, 50, 130, 30));
 
-        txtMarca.setBackground(new java.awt.Color(255, 255, 255));
-        txtMarca.setForeground(new java.awt.Color(0, 0, 0));
         txtMarca.setHorizontalAlignment(javax.swing.JTextField.CENTER);
         contenidoPanelFormulario.add(txtMarca, new org.netbeans.lib.awtextra.AbsoluteConstraints(110, 50, 130, 30));
 
         lblCarroceria.setFont(new java.awt.Font("sansserif", 1, 13)); // NOI18N
-        lblCarroceria.setForeground(new java.awt.Color(0, 0, 0));
         lblCarroceria.setText("Carrocería");
         contenidoPanelFormulario.add(lblCarroceria, new org.netbeans.lib.awtextra.AbsoluteConstraints(390, 30, -1, -1));
 
         lblAnio.setFont(new java.awt.Font("sansserif", 1, 13)); // NOI18N
-        lblAnio.setForeground(new java.awt.Color(0, 0, 0));
         lblAnio.setText("Año");
         contenidoPanelFormulario.add(lblAnio, new org.netbeans.lib.awtextra.AbsoluteConstraints(670, 30, -1, -1));
 
-        txtAnio.setBackground(new java.awt.Color(255, 255, 255));
-        txtAnio.setForeground(new java.awt.Color(0, 0, 0));
         txtAnio.setHorizontalAlignment(javax.swing.JTextField.CENTER);
         contenidoPanelFormulario.add(txtAnio, new org.netbeans.lib.awtextra.AbsoluteConstraints(670, 50, 80, 30));
 
         lblMTC.setFont(new java.awt.Font("sansserif", 1, 13)); // NOI18N
-        lblMTC.setForeground(new java.awt.Color(0, 0, 0));
         lblMTC.setText("MTC");
         contenidoPanelFormulario.add(lblMTC, new org.netbeans.lib.awtextra.AbsoluteConstraints(530, 30, -1, -1));
 
-        txtMTC.setBackground(new java.awt.Color(255, 255, 255));
-        txtMTC.setForeground(new java.awt.Color(0, 0, 0));
         txtMTC.setHorizontalAlignment(javax.swing.JTextField.CENTER);
         contenidoPanelFormulario.add(txtMTC, new org.netbeans.lib.awtextra.AbsoluteConstraints(530, 50, 130, 30));
 
-        txtEjes.setBackground(new java.awt.Color(255, 255, 255));
-        txtEjes.setForeground(new java.awt.Color(0, 0, 0));
         txtEjes.setHorizontalAlignment(javax.swing.JTextField.CENTER);
         contenidoPanelFormulario.add(txtEjes, new org.netbeans.lib.awtextra.AbsoluteConstraints(20, 50, 80, 30));
 
         lblEjes.setFont(new java.awt.Font("sansserif", 1, 13)); // NOI18N
-        lblEjes.setForeground(new java.awt.Color(0, 0, 0));
         lblEjes.setText("Ejes");
         contenidoPanelFormulario.add(lblEjes, new org.netbeans.lib.awtextra.AbsoluteConstraints(23, 28, -1, -1));
 
@@ -287,15 +320,6 @@ public class PanelTractor extends javax.swing.JPanel {
             }
         });
         contenidoPanelFormulario.add(btnOpcion, new org.netbeans.lib.awtextra.AbsoluteConstraints(220, 110, 130, -1));
-
-        btnOpcion1.setForeground(new java.awt.Color(255, 255, 255));
-        btnOpcion1.setText("Opcion");
-        btnOpcion1.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                btnOpcion1ActionPerformed(evt);
-            }
-        });
-        contenidoPanelFormulario.add(btnOpcion1, new org.netbeans.lib.awtextra.AbsoluteConstraints(220, 110, 130, -1));
 
         btnCancelar.setBackground(new java.awt.Color(255, 102, 102));
         btnCancelar.setForeground(new java.awt.Color(255, 255, 255));
@@ -316,7 +340,6 @@ public class PanelTractor extends javax.swing.JPanel {
 
         jScrollPane.setBackground(new java.awt.Color(255, 255, 255));
 
-        tblTractors.setBackground(new java.awt.Color(255, 255, 255));
         tblTractors.setModel(new javax.swing.table.DefaultTableModel(
             new Object [][] {
                 {null, null, null, null, null, null, null},
@@ -346,108 +369,126 @@ public class PanelTractor extends javax.swing.JPanel {
     }// </editor-fold>//GEN-END:initComponents
 
     private void btnAgregarActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnAgregarActionPerformed
+        if (btnAgregar.getText().equalsIgnoreCase("Cerrar formulario") && "registrar".equals(opcion)) {
+            ocultarFormulario();
+            limpiarCampos();
+            return;
+        }
+
         mostrarFormulario();
         mostrarCampos(true);
+        limpiarCampos();
 
         lblPlaca.setText("Placa");
         opcion = "registrar";
 
         btnOpcion.setText("Registrar");
-        btnOpcion.setBackground(Color.GREEN);
+        btnOpcion.setBackground(new Color(0, 153, 255));
         btnOpcion.setForeground(Color.WHITE);
         btnOpcion.setVisible(true);
+
+        txtEjes.requestFocus();
     }//GEN-LAST:event_btnAgregarActionPerformed
 
     private void btnOpcionActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnOpcionActionPerformed
         switch (opcion) {
             case "registrar":
                 try {
-                    String placa = txtPlaca.getText();
-                    int ejes = Integer.parseInt(txtEjes.getText());
-                    String marca = txtMarca.getText();
-                    String modelo = txtModelo.getText();
-                    String carroceria = txtCarroceria.getText();
-                    int anio = Integer.parseInt(txtAnio.getText());
-                    String MTC = txtMTC.getText();
+                    String placa = txtPlaca.getText().trim();
+                    String marca = txtMarca.getText().trim();
+                    String modelo = txtModelo.getText().trim();
+                    String carroceria = txtCarroceria.getText().trim();
+                    String MTC = txtMTC.getText().trim();
+
+                    if (placa.isEmpty() || marca.isEmpty() || modelo.isEmpty() || carroceria.isEmpty() || MTC.isEmpty()) {
+                        JOptionPane.showMessageDialog(this, "Complete todos los campos del tractor.", "Aviso", JOptionPane.WARNING_MESSAGE);
+                        return;
+                    }
+
+                    int ejes = Integer.parseInt(txtEjes.getText().trim());
+                    int anio = Integer.parseInt(txtAnio.getText().trim());
 
                     tractorServicio.registrarTractor(placa, ejes, marca, modelo, carroceria, anio, MTC);
-
-                    limpiarCampos();
-                    Tractor tractorRegistrado
-                            = tractorServicio.getTractorByPlaca(placa);
-
+                    Tractor tractorRegistrado = tractorServicio.getTractorByPlaca(placa);
                     GestorEquipos.agregarTractor(tractorRegistrado);
 
+                    JOptionPane.showMessageDialog(this, "Tractor " + placa + " registrado exitosamente.");
+                    limpiarCampos();
                     btnOpcion.setVisible(false);
                     actualizarTabla(tractorServicio.getTractors());
                     ocultarFormulario();
-                } catch (IllegalArgumentException e) {
-                    JOptionPane.showMessageDialog(null, e.getMessage());
+                } catch (NumberFormatException e) {
+                    JOptionPane.showMessageDialog(this, "Ejes y Año deben ser valores numéricos enteros.", "Error de Formato", JOptionPane.ERROR_MESSAGE);
+                } catch (IllegalArgumentException | IllegalStateException e) {
+                    JOptionPane.showMessageDialog(this, e.getMessage(), "Error al Registrar", JOptionPane.ERROR_MESSAGE);
                 }
                 break;
+
             case "seleccionarGuardar":
                 try {
-                    String placa = txtPlaca.getText();
+                    String placa = txtPlaca.getText().trim();
                     Tractor t = tractorServicio.getTractorByPlaca(placa);
                     if (t == null) {
-                        JOptionPane.showMessageDialog(null, "El tractor no esta registrado");
+                        t = GestorEquipos.buscarTractorPorPlaca(placa);
+                    }
+
+                    if (t == null) {
+                        JOptionPane.showMessageDialog(this, "El tractor con placa " + placa + " no está registrado.", "No Encontrado", JOptionPane.WARNING_MESSAGE);
                         txtPlaca.setText("");
-                        ocultarFormulario();
+                        txtPlaca.requestFocus();
                     } else {
-                        mostrarCampos(true);
-                        txtEjes.setText(String.valueOf(t.getEjes()));
-                        txtMarca.setText(t.getMarca());
-                        txtModelo.setText(t.getModelo());
-                        txtCarroceria.setText(t.getCarroceria());
-                        txtAnio.setText(String.valueOf(t.getAnio()));
-                        txtMTC.setText(t.getMTC());
-
-                        txtPlaca.setEditable(false);
-
-                        lblPlaca.setText("El tractor esta registrado, puede editar cualquiera de los campos (Excepto la Placa)");
-
-                        opcion = "guardar";
-
-                        btnOpcion.setText("Guardar");
-                        btnOpcion.setBackground(Color.GREEN);
-                        btnOpcion.setForeground(Color.BLACK);
-                        btnOpcion.setVisible(true);
-
-                        txtEjes.requestFocus();
+                        prepararEdicionDeTractor(t);
                     }
                 } catch (IllegalArgumentException e) {
-                    JOptionPane.showMessageDialog(null, e.getMessage());
+                    JOptionPane.showMessageDialog(this, e.getMessage(), "Aviso", JOptionPane.WARNING_MESSAGE);
                 }
                 break;
+
             case "guardar":
                 try {
-                    String placa = txtPlaca.getText();
-                    int ejes = Integer.parseInt(txtEjes.getText());
-                    String marca = txtMarca.getText();
-                    String modelo = txtModelo.getText();
-                    String carroceria = txtCarroceria.getText();
-                    int anio = Integer.parseInt(txtAnio.getText());
-                    String MTC = txtMTC.getText();
+                    String placa = txtPlaca.getText().trim();
+                    String marca = txtMarca.getText().trim();
+                    String modelo = txtModelo.getText().trim();
+                    String carroceria = txtCarroceria.getText().trim();
+                    String MTC = txtMTC.getText().trim();
+
+                    if (marca.isEmpty() || modelo.isEmpty() || carroceria.isEmpty() || MTC.isEmpty()) {
+                        JOptionPane.showMessageDialog(this, "Complete todos los campos a actualizar.", "Aviso", JOptionPane.WARNING_MESSAGE);
+                        return;
+                    }
+
+                    int ejes = Integer.parseInt(txtEjes.getText().trim());
+                    int anio = Integer.parseInt(txtAnio.getText().trim());
 
                     tractorServicio.actualizarTractor(placa, ejes, marca, modelo, carroceria, anio, MTC);
+
+                    Tractor tGestor = GestorEquipos.buscarTractorPorPlaca(placa);
+                    if (tGestor != null) {
+                        tGestor.ActualizarTodosAtributos(ejes, marca, modelo, carroceria, anio, MTC);
+                    }
+
+                    JOptionPane.showMessageDialog(this, "Tractor " + placa + " actualizado correctamente.");
                     actualizarTabla(tractorServicio.getTractors());
                     limpiarCampos();
                     ocultarFormulario();
-                    editarCampos(true);
-                } catch (IllegalArgumentException e) {
-                    JOptionPane.showMessageDialog(null, e.getMessage());
-                } catch (IllegalStateException e) {
-                    JOptionPane.showMessageDialog(null, e.getMessage());
+                } catch (NumberFormatException e) {
+                    JOptionPane.showMessageDialog(this, "Ejes y Año deben ser valores numéricos enteros.", "Error de Formato", JOptionPane.ERROR_MESSAGE);
+                } catch (IllegalArgumentException | IllegalStateException e) {
+                    JOptionPane.showMessageDialog(this, e.getMessage(), "Error al Actualizar", JOptionPane.ERROR_MESSAGE);
                 }
                 break;
+
             case "seleccionarEliminar":
                 try {
-                    String placa = txtPlaca.getText();
+                    String placa = txtPlaca.getText().trim();
                     Tractor t = tractorServicio.getTractorByPlaca(placa);
                     if (t == null) {
-                        JOptionPane.showMessageDialog(null, "El tractor no esta registrado");
+                        t = GestorEquipos.buscarTractorPorPlaca(placa);
+                    }
+
+                    if (t == null) {
+                        JOptionPane.showMessageDialog(this, "El tractor con placa " + placa + " no está registrado.", "No Encontrado", JOptionPane.WARNING_MESSAGE);
                         txtPlaca.setText("");
-                        ocultarFormulario();
                     } else {
                         mostrarCampos(true);
                         txtEjes.setText(String.valueOf(t.getEjes()));
@@ -458,76 +499,134 @@ public class PanelTractor extends javax.swing.JPanel {
                         txtMTC.setText(t.getMTC());
 
                         editarCampos(false);
-
-                        lblPlaca.setText("El tractor esta registrado, ¿Desea Eliminarlo?");
+                        lblPlaca.setText("¿Desea confirmar la eliminación del tractor " + placa + "?");
 
                         opcion = "eliminar";
-
-                        btnOpcion.setText("Eliminar");
-                        btnOpcion.setBackground(Color.RED);
+                        btnOpcion.setText("Confirmar");
+                        btnOpcion.setBackground(new Color(220, 53, 69));
                         btnOpcion.setForeground(Color.WHITE);
                         btnOpcion.setVisible(true);
-
-                        txtEjes.requestFocus();
                     }
                 } catch (IllegalArgumentException e) {
-                    JOptionPane.showMessageDialog(null, e.getMessage());
+                    JOptionPane.showMessageDialog(this, e.getMessage(), "Aviso", JOptionPane.WARNING_MESSAGE);
                 }
                 break;
+
             case "eliminar":
                 try {
-                    String placa = txtPlaca.getText();
+                    String placa = txtPlaca.getText().trim();
+
+                    if (GestorEquipos.buscarUnidadPorTractor(placa) != null) {
+                        JOptionPane.showMessageDialog(
+                                this,
+                                "No se puede eliminar el tractor " + placa + " porque está vinculado a una Unidad Operativa activa.\n"
+                                        + "Desvincule primero la unidad en el módulo Data -> Unidad.",
+                                "Tractor en Uso",
+                                JOptionPane.WARNING_MESSAGE
+                        );
+                        return;
+                    }
+
                     tractorServicio.eliminarTractor(placa);
+                    GestorEquipos.getTractores().removeIf(t -> t.getPlaca().equalsIgnoreCase(placa));
+
+                    JOptionPane.showMessageDialog(this, "Tractor " + placa + " eliminado correctamente.");
                     actualizarTabla(tractorServicio.getTractors());
                     limpiarCampos();
                     ocultarFormulario();
-                } catch (IllegalArgumentException e) {
-                    JOptionPane.showMessageDialog(null, e.getMessage());
-                } catch (IllegalStateException e) {
-                    JOptionPane.showMessageDialog(null, e.getMessage());
+                } catch (IllegalArgumentException | IllegalStateException e) {
+                    JOptionPane.showMessageDialog(this, e.getMessage(), "Error al Eliminar", JOptionPane.ERROR_MESSAGE);
                 }
                 break;
+
             default:
-                throw new AssertionError();
+                break;
         }
     }//GEN-LAST:event_btnOpcionActionPerformed
 
     private void btnEditarActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnEditarActionPerformed
+        // Si hay una fila seleccionada en la tabla o placa escrita, editar directamente
+        int fila = tblTractors.getSelectedRow();
+        String placa = (fila >= 0) ? modeloTabla.getValueAt(fila, 0).toString() : txtPlaca.getText().trim();
+
+        if (!placa.isEmpty()) {
+            Tractor t = tractorServicio.getTractorByPlaca(placa);
+            if (t == null) {
+                t = GestorEquipos.buscarTractorPorPlaca(placa);
+            }
+            if (t != null) {
+                prepararEdicionDeTractor(t);
+                return;
+            }
+        }
+
         mostrarFormulario();
         mostrarCampos(false);
+        limpiarCampos();
 
         opcion = "seleccionarGuardar";
-
-        lblPlaca.setText("Ingrese la placa del tractor a editar");
-
+        lblPlaca.setText("Ingrese la placa del tractor a editar:");
         btnOpcion.setText("Seleccionar");
-        btnOpcion.setBackground(Color.YELLOW);
+        btnOpcion.setBackground(new Color(255, 193, 7));
         btnOpcion.setForeground(Color.BLACK);
         btnOpcion.setVisible(true);
+
+        txtPlaca.requestFocus();
     }//GEN-LAST:event_btnEditarActionPerformed
 
     private void btnEliminarActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnEliminarActionPerformed
+        int fila = tblTractors.getSelectedRow();
+        String placa = (fila >= 0) ? modeloTabla.getValueAt(fila, 0).toString() : txtPlaca.getText().trim();
+
+        if (!placa.isEmpty()) {
+            Tractor t = tractorServicio.getTractorByPlaca(placa);
+            if (t == null) {
+                t = GestorEquipos.buscarTractorPorPlaca(placa);
+            }
+            if (t != null) {
+                int r = JOptionPane.showConfirmDialog(
+                        this,
+                        "¿Está seguro de eliminar el tractor con placa " + placa + "?",
+                        "Confirmar Eliminación",
+                        JOptionPane.YES_NO_OPTION
+                );
+                if (r == JOptionPane.YES_OPTION) {
+                    if (GestorEquipos.buscarUnidadPorTractor(placa) != null) {
+                        JOptionPane.showMessageDialog(
+                                this,
+                                "No se puede eliminar el tractor " + placa + " porque está vinculado a una Unidad Operativa activa.",
+                                "Tractor en Uso",
+                                JOptionPane.WARNING_MESSAGE
+                        );
+                        return;
+                    }
+                    tractorServicio.eliminarTractor(placa);
+                    GestorEquipos.getTractores().removeIf(x -> x.getPlaca().equalsIgnoreCase(placa));
+                    actualizarTabla(tractorServicio.getTractors());
+                    limpiarCampos();
+                    ocultarFormulario();
+                }
+                return;
+            }
+        }
+
         mostrarFormulario();
         mostrarCampos(false);
+        limpiarCampos();
 
         opcion = "seleccionarEliminar";
-
-        lblPlaca.setText("Ingrese la placa del tractor a editar");
-
+        lblPlaca.setText("Ingrese la placa del tractor a eliminar:");
         btnOpcion.setText("Seleccionar");
-        btnOpcion.setBackground(Color.YELLOW);
+        btnOpcion.setBackground(new Color(255, 193, 7));
         btnOpcion.setForeground(Color.BLACK);
         btnOpcion.setVisible(true);
-    }//GEN-LAST:event_btnEliminarActionPerformed
 
-    private void btnOpcion1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnOpcion1ActionPerformed
-        // TODO add your handling code here:
-    }//GEN-LAST:event_btnOpcion1ActionPerformed
+        txtPlaca.requestFocus();
+    }//GEN-LAST:event_btnEliminarActionPerformed
 
     private void btnCancelarActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnCancelarActionPerformed
         limpiarCampos();
         ocultarFormulario();
-        editarCampos(true);
     }//GEN-LAST:event_btnCancelarActionPerformed
 
 
@@ -537,7 +636,6 @@ public class PanelTractor extends javax.swing.JPanel {
     private javax.swing.JButton btnEditar;
     private javax.swing.JButton btnEliminar;
     private javax.swing.JButton btnOpcion;
-    private javax.swing.JButton btnOpcion1;
     private javax.swing.JPanel contenidoPanelFormulario;
     private javax.swing.JScrollPane jScrollPane;
     private javax.swing.JSplitPane jSplitPane;
@@ -548,7 +646,7 @@ public class PanelTractor extends javax.swing.JPanel {
     private javax.swing.JLabel lblMarca;
     private javax.swing.JLabel lblModelo;
     private javax.swing.JLabel lblPlaca;
-    private javax.swing.JLabel lblTitutlo;
+    private javax.swing.JLabel lblTitulo;
     private javax.swing.JPanel panelBarra;
     private javax.swing.JPanel panelBotones;
     private javax.swing.JPanel panelFormulario;

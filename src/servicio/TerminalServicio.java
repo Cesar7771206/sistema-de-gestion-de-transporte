@@ -3,102 +3,172 @@
  * Click nbfs://nbhost/SystemFileSystem/Templates/Classes/Class.java to edit this template
  */
 package servicio;
+
+import estructuras.PilaTerminalLES;
 import java.util.ArrayList;
+import java.util.LinkedList;
 import java.util.List;
 import modelo.Terminal;
 
 /**
+ * Servicio de gestión de Terminales.
+ * Evidencia el uso de:
+ * - Lista enlazada doble (LinkedList de Terminales con puntero de navegación bidireccional: primera, anterior, siguiente, última).
+ * - Pila enlazada (PilaTerminalLES) para almacenar el historial de terminales eliminadas y permitir deshacer (LIFO).
  *
- * @author cesar
+ * @author cesar, yimmy
  */
 public class TerminalServicio {
 
-    private List<Terminal> terminales;
+    private final LinkedList<Terminal> terminales;
+    private int posicion = -1; 
+
+    private final PilaTerminalLES eliminadas = new PilaTerminalLES();
 
     public TerminalServicio() {
-        terminales = new ArrayList<>();
+        this.terminales = new LinkedList<>();
+    }
+
+    public TerminalServicio(List<Terminal> listaInicial) {
+        this.terminales = new LinkedList<>();
+        if (listaInicial != null) {
+            for (Terminal t : listaInicial) {
+                guardarTerminal(t.getRuc(), t.getNombre(), t.getDireccion());
+            }
+        }
     }
 
     public List<Terminal> getTerminales() {
+        return new ArrayList<>(terminales);
+    }
+
+    public LinkedList<Terminal> getTerminalesLinkedList() {
         return terminales;
     }
 
-    
-    public boolean esRucValido(String ruc) {
-        return ruc != null && ruc.trim().matches("\\d{11}");
-    }
-
-    
-    public boolean buscarTerminalPorRuc(String ruc) {
-        if (ruc == null) {
-            throw new IllegalArgumentException("La ruc no puede ser null");
-        }
+    public Terminal obtenerPorRuc(String ruc) {
         for (Terminal t : terminales) {
             if (t.getRuc().equals(ruc)) {
-                return true;
-            }
-        }
-        return false;
-    }
-
-    public Terminal obtenerPorRuc(String ruc) {
-        if (ruc == null) {
-            return null;
-        }
-        for (Terminal t : terminales) {
-            if (t.getRuc().equals(ruc.trim())) {
                 return t;
             }
         }
         return null;
     }
 
-    
+    public boolean buscarTerminalPorRuc(String ruc) {
+        return obtenerPorRuc(ruc) != null;
+    }
+
     public boolean guardarTerminal(String ruc, String nombre, String direccion) {
-        if (ruc == null || ruc.isBlank() || nombre == null || nombre.isBlank()
-                || direccion == null || direccion.isBlank()) {
-            throw new IllegalArgumentException("Todos los campos son obligatorios");
-        }
-        if (!esRucValido(ruc)) {
-            throw new IllegalArgumentException("El RUC debe tener exactamente 11 dígitos");
+        if (ruc == null || nombre == null || direccion == null) {
+            return false;
         }
         if (buscarTerminalPorRuc(ruc.trim())) {
             return false;
         }
-        terminales.add(new Terminal(ruc.trim(), nombre.trim(), direccion.trim()));
+        Terminal nueva = new Terminal(ruc.trim(), nombre.trim(), direccion.trim());
+        terminales.addLast(nueva);
+        if (posicion == -1) {
+            posicion = 0;
+        }
         return true;
     }
 
-    
-    public boolean modificarTerminal(String ruc, String nombre, String direccion) {
-        if (nombre == null || nombre.isBlank() || direccion == null || direccion.isBlank()) {
-            throw new IllegalArgumentException("Todos los campos son obligatorios");
-        }
+    public boolean editarPorRuc(String ruc, String nombre, String direccion) {
         Terminal t = obtenerPorRuc(ruc);
         if (t == null) {
             return false;
         } 
         t.setNombre(nombre.trim());
         t.setDireccion(direccion.trim());
+        return true; 
+    }
+
+    public boolean modificarTerminal(String ruc, String nombre, String direccion) {
+        return editarPorRuc(ruc, nombre, direccion);
+    }
+
+    public boolean eliminarPorRuc(String ruc) {
+        Terminal t = obtenerPorRuc(ruc);
+        if (t == null) {
+            return false;
+        }
+        int indice = terminales.indexOf(t);
+        terminales.remove(indice);
+        if (terminales.isEmpty()) {
+            posicion = -1;
+        } else if (indice < posicion || posicion >= terminales.size()) {
+            posicion--;
+        }
+        eliminadas.push(t);
         return true;
     }
 
-    
-    public boolean eliminarPorRuc(String ruc) {
-        Terminal t = obtenerPorRuc(ruc);
-        return t != null && terminales.remove(t);
+    public Terminal deshacerEliminacion() {
+        if (eliminadas.isEmpty()) {
+            return null;
+        }
+        Terminal t = eliminadas.pop();
+        if (buscarTerminalPorRuc(t.getRuc())) {
+            return null;
+        }
+        terminales.addLast(t);
+        if (posicion == -1) {
+            posicion = 0;
+        }
+        return t;
     }
 
-    
-    public List<Terminal> filtrar(String texto) {
-        if (texto == null || texto.isBlank()) {
-            return new ArrayList<>(terminales);
+    public boolean hayEliminadas() {
+        return !eliminadas.isEmpty();
+    }
+
+    public int getCantidadEliminadas() {
+        return eliminadas.size();
+    }
+
+    // Navegación interactiva de Lista Enlazada Doble (LED)
+    public Terminal getTerminalActual() {
+        return (posicion < 0 || posicion >= terminales.size()) ? null : terminales.get(posicion);
+    }
+
+    public int getPosicionActual() {
+        return posicion;
+    }
+
+    public Terminal irPrimera() {
+        posicion = terminales.isEmpty() ? -1 : 0;
+        return getTerminalActual();
+    }
+
+    public Terminal irUltima() {
+        posicion = terminales.size() - 1;
+        return getTerminalActual();
+    }
+
+    public Terminal irSiguiente() {
+        if (posicion != -1 && posicion < terminales.size() - 1) {
+            posicion++;
         }
-        String buscado = texto.trim().toLowerCase();
+        return getTerminalActual();
+    }
+
+    public Terminal irAnterior() {
+        if (posicion > 0) {
+            posicion--;
+        }
+        return getTerminalActual();
+    }
+
+    public List<Terminal> buscarPorNombre(String texto) {
         List<Terminal> resultado = new ArrayList<>();
-        for (Terminal x : terminales) {
-            if (x.getRuc().contains(buscado) || x.getNombre().toLowerCase().contains(buscado)) {
-                resultado.add(x);
+        if (texto == null || texto.isBlank()) {
+            return resultado;
+        }
+        String buscado = texto.toLowerCase().trim();
+        for (Terminal t : terminales) {
+            if (t.getNombre().toLowerCase().contains(buscado)) {
+                resultado.add(t);
             }
         }
         return resultado;
