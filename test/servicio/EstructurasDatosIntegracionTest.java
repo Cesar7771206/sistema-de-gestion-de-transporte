@@ -4,6 +4,7 @@ import estructuras.ColaArreglo;
 import estructuras.ColaStringLES;
 import estructuras.PilaArreglo;
 import estructuras.PilaTerminalLES;
+import estructuras.PilaTractorLES;
 import java.util.List;
 import java.util.PriorityQueue;
 import java.util.Queue;
@@ -156,6 +157,21 @@ public class EstructurasDatosIntegracionTest {
         assertTrue("Pila de viajes eliminados debe tener al menos 1 elemento", GestorViajes.hayViajesEliminados());
         Viaje vRecuperado = GestorViajes.recuperarViaje();
         assertEquals("El viaje recuperado de la pila debe tener ID 99", 99, vRecuperado.getId());
+
+        // Pila en TractorServicio (Stack<Tractor> y PilaTractorLES)
+        TractorServicio tractorServicio = new TractorServicio();
+        tractorServicio.registrarTractor("TRA001", 3, "SCANIA", "R450", "TRACTO", 2021, "MTC001");
+        tractorServicio.registrarTractor("TRA002", 3, "VOLVO", "FH", "TRACTO", 2022, "MTC002");
+
+        tractorServicio.eliminarTractor("TRA001");
+        assertTrue("Debe registrar eliminación en la pila de tractores", tractorServicio.hayEliminados());
+        assertEquals("Pila estándar debe tener tamaño 1", 1, tractorServicio.getPilaEliminados().size());
+        assertEquals("PilaTractorLES debe tener tamaño 1", 1, tractorServicio.getPilaTractorLES().size());
+
+        Tractor tractorRecuperado = tractorServicio.deshacerEliminacion();
+        assertNotNull("Debe recuperar el tractor desapilado", tractorRecuperado);
+        assertEquals("TRA001", tractorRecuperado.getPlaca());
+        assertNotNull(tractorServicio.getTractorByPlaca("TRA001"));
     }
 
     // -------------------------------------------------------------
@@ -178,6 +194,19 @@ public class EstructurasDatosIntegracionTest {
         assertEquals("Cliente A debe ser el primero atendido (FIFO)", "20111111111", atendido1.getRuc());
         Cliente atendido2 = clienteServicio.atenderSiguiente();
         assertEquals("Cliente B debe ser el segundo atendido", "20222222222", atendido2.getRuc());
+
+        // Cola de despacho en patio de tractores (Queue<Tractor> con LinkedList FIFO)
+        TractorServicio tractorServicio = new TractorServicio();
+        tractorServicio.registrarTractor("TR-101", 3, "SCANIA", "P360", "TRACTO", 2020, "MTC101");
+        tractorServicio.registrarTractor("TR-102", 3, "MACK", "ANTHEM", "TRACTO", 2021, "MTC102");
+        tractorServicio.encolarPatio("TR-101");
+        tractorServicio.encolarPatio("TR-102");
+        assertEquals(2, tractorServicio.getCantidadEnPatio());
+        Tractor primerTractor = tractorServicio.despacharSiguientePatio();
+        assertEquals("TR-101", primerTractor.getPlaca());
+        Tractor segundoTractor = tractorServicio.despacharSiguientePatio();
+        assertEquals("TR-102", segundoTractor.getPlaca());
+        assertEquals(0, tractorServicio.getCantidadEnPatio());
 
         // Cola circular en UsuarioServicio (ColaArreglo)
         UsuarioServicio userServicio = new UsuarioServicio();

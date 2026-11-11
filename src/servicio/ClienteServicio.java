@@ -5,14 +5,17 @@
 package servicio;
 
 import java.util.ArrayList;
+import java.util.LinkedList;
 import java.util.List;
+import java.util.Queue;
 import modelo.Cliente;
 
 /**
  * Servicio de gestión de Clientes.
  * Evidencia el uso de:
- * - ArrayLists para la colección dinámica de clientes y búsquedas secuenciales.
+ * - ArrayLists (ArrayList<Cliente>) para la colección dinámica de clientes y búsquedas secuenciales.
  * - Cola circular implementada sobre un arreglo estático (Cliente[]) para los turnos de atención al cliente (FIFO).
+ * - Cola estándar de Java (Queue<Cliente> implementada con LinkedList).
  *
  * @author NILENY, cesar
  */
@@ -24,13 +27,13 @@ public class ClienteServicio {
     private final ArrayList<Cliente> clientes;
 
     // Cola circular con arreglo: turnos de atención
-    //   frente = posición del que se atiende primero
-    //   fin    = posición del último que llegó
-    //   enCola = cuántos clientes están esperando actualmente
     private final Cliente[] cola = new Cliente[CAPACIDAD_COLA];
     private int frente = 0;
     private int fin = -1;
     private int enCola = 0;
+
+    // Cola estándar de Java Collections: Queue<Cliente>
+    private final Queue<Cliente> colaEstandar = new LinkedList<>();
 
     public ClienteServicio() {
         this.clientes = new ArrayList<>();
@@ -144,6 +147,7 @@ public class ClienteServicio {
         fin = (fin + 1) % CAPACIDAD_COLA;
         cola[fin] = c;
         enCola++;
+        colaEstandar.offer(c);
     }
 
     public Cliente atenderSiguiente() {
@@ -154,11 +158,16 @@ public class ClienteServicio {
         cola[frente] = null;
         frente = (frente + 1) % CAPACIDAD_COLA;
         enCola--;
+        colaEstandar.poll();
         return atendido;
     }
 
     public Cliente proximoEnCola() {
         return colaVacia() ? null : cola[frente];
+    }
+
+    public Queue<Cliente> getColaEstandar() {
+        return colaEstandar;
     }
 
     public boolean estaEnCola(Cliente c) {
