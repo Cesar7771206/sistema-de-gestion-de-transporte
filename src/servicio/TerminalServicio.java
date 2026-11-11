@@ -8,6 +8,7 @@ import estructuras.PilaTerminalLES;
 import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Stack;
 import modelo.Terminal;
 
 /**
@@ -15,6 +16,7 @@ import modelo.Terminal;
  * Evidencia el uso de:
  * - Lista enlazada doble (LinkedList de Terminales con puntero de navegación bidireccional: primera, anterior, siguiente, última).
  * - Pila enlazada (PilaTerminalLES) para almacenar el historial de terminales eliminadas y permitir deshacer (LIFO).
+ * - Pila estándar de Java (Stack<Terminal>).
  *
  * @author cesar, yimmy
  */
@@ -24,6 +26,7 @@ public class TerminalServicio {
     private int posicion = -1; 
 
     private final PilaTerminalLES eliminadas = new PilaTerminalLES();
+    private final Stack<Terminal> pilaEliminadasStack = new Stack<>();
 
     public TerminalServicio() {
         this.terminales = new LinkedList<>();
@@ -101,10 +104,14 @@ public class TerminalServicio {
             posicion--;
         }
         eliminadas.push(t);
+        pilaEliminadasStack.push(t);
         return true;
     }
 
     public Terminal deshacerEliminacion() {
+        if (!pilaEliminadasStack.isEmpty()) {
+            pilaEliminadasStack.pop();
+        }
         if (eliminadas.isEmpty()) {
             return null;
         }
@@ -117,6 +124,10 @@ public class TerminalServicio {
             posicion = 0;
         }
         return t;
+    }
+
+    public Stack<Terminal> getPilaEliminadasStack() {
+        return pilaEliminadasStack;
     }
 
     public boolean hayEliminadas() {

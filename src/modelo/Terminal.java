@@ -5,7 +5,9 @@
 package modelo;
 
 import estructuras.ColaStringLES;
+import java.util.LinkedList;
 import java.util.List;
+import java.util.Queue;
 
 /**
  * Entidad Terminal Portuaria / Extraportuaria.
@@ -19,6 +21,7 @@ public class Terminal {
     private String direccion;
 
     private final ColaStringLES contenedoresEnEspera = new ColaStringLES();
+    private final Queue<String> colaContenedoresQueue = new LinkedList<>();
 
     public Terminal(String ruc, String nombre, String direccion) {
         setRuc(ruc);
@@ -62,13 +65,16 @@ public class Terminal {
         if (codigo == null || codigo.isBlank()) {
             throw new IllegalArgumentException("El código del contenedor no puede estar vacío");
         }
-        contenedoresEnEspera.enqueue(codigo.trim());
+        String cod = codigo.trim();
+        contenedoresEnEspera.enqueue(cod);
+        colaContenedoresQueue.offer(cod);
     }
 
     public String atenderContenedor() {
         if (contenedoresEnEspera.isEmpty()) {
             return null;
         }
+        colaContenedoresQueue.poll();
         return contenedoresEnEspera.dequeue();
     }
 
@@ -82,6 +88,10 @@ public class Terminal {
 
     public List<String> getContenedoresEnEspera() {
         return contenedoresEnEspera.getElementos();
+    }
+
+    public Queue<String> getColaContenedoresQueue() {
+        return colaContenedoresQueue;
     }
 
     @Override
