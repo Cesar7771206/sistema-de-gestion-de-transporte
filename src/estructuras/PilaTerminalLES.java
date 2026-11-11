@@ -4,54 +4,83 @@
  */
 package estructuras;
 
-import java.util.LinkedList;
+import java.util.ArrayList;
+import java.util.List;
 import modelo.Terminal;
 
 /**
- * Pila implementada con lista enlazada (LES) para gestionar el historial
+ * Pila implementada con Lista Enlazada Simple (LES) para gestionar el historial
  * de terminales eliminadas (LIFO).
+ * Todo autocontenido en esta única clase con un nodo estático interno.
  *
- * @author yimmy
+ * @author yimmy, cesar
  */
 public class PilaTerminalLES {
-    private LinkedList<Terminal> elementos;
 
-    public PilaTerminalLES() {
-        elementos = new LinkedList<>();
-    }
+    private static class NodoTerminal {
+        private final Terminal dato;
+        private NodoTerminal siguiente;
 
-    public void push(Terminal e) {
-        elementos.addLast(e);
-    }
-
-    public Terminal pop() {
-        if (elementos.size() > 0) {
-            Terminal e = elementos.getLast();
-            elementos.remove(elementos.size() - 1);
-            return e;
-        } else {
-            System.out.println("La pila esta vacia");
-            return null;
+        public NodoTerminal(Terminal dato, NodoTerminal siguiente) {
+            this.dato = dato;
+            this.siguiente = siguiente;
         }
     }
 
+    private NodoTerminal cima;
+    private int tamanio;
+
+    public PilaTerminalLES() {
+        this.cima = null;
+        this.tamanio = 0;
+    }
+
+    public void push(Terminal e) {
+        if (e != null) {
+            cima = new NodoTerminal(e, cima);
+            tamanio++;
+        }
+    }
+
+    public Terminal pop() {
+        if (cima == null) {
+            System.out.println("La pila esta vacia");
+            return null;
+        }
+        Terminal e = cima.dato;
+        cima = cima.siguiente;
+        tamanio--;
+        return e;
+    }
+
     public Terminal peek() {
-        if (elementos.size() > 0) {
-            return elementos.getLast(); 
+        if (cima != null) {
+            return cima.dato;
         } else {
             return null;
         }
     }
 
     public void clear() {
-        elementos.clear();
+        cima = null;
+        tamanio = 0;
     }
 
     public boolean isEmpty() {
-        return elementos.size() == 0;
+        return cima == null;
     }
 
     public int size() {
-        return elementos.size();
+        return tamanio;
+    }
+
+    public List<Terminal> getElementos() {
+        List<Terminal> lista = new ArrayList<>();
+        NodoTerminal actual = cima;
+        while (actual != null) {
+            lista.add(actual.dato);
+            actual = actual.siguiente;
+        }
+        return lista;
     }
 }
