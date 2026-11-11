@@ -5,6 +5,7 @@
 package estructuras;
 
 import modelo.Planta;
+
 /**
  *
  * @author yimmy
@@ -68,7 +69,6 @@ public class PilaArreglo {
         top = -1;
     }
 
-    
     public int getCapacidad() {
         return elementos.length;
     }

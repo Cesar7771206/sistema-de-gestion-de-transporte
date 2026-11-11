@@ -11,27 +11,28 @@ import java.util.PriorityQueue;
 import modelo.Planta;
 
 /**
+ * Servicio de gestión de Plantas.
+ * Evidencia el uso de:
+ * - Pila con arreglo (PilaArreglo) para el historial de eliminadas y operación deshacer (LIFO).
+ * - Cola con prioridad (PriorityQueue con Comparator POR_CARGA) para atención por carga de trabajo.
  *
- * @author NILENY
+ * @author cesar, yimmy
  */
 public class PlantaServicio {
     private List<Planta> plantas;
 
-   
     private static final int CAPACIDAD_DESHACER = 50;
     private final PilaArreglo eliminadas = new PilaArreglo(CAPACIDAD_DESHACER);
-    
-   
+
+    // Lista donde se guardaran todas las plantas
     public PlantaServicio(List<Planta> plantas) {
         this.plantas = plantas;
     }
-    
-  
+
     public List<Planta> getPlantas() {
         return plantas;
     }
-    
- 
+
     public void guardarPlanta(String ruc, String nombre, String direccion) {
         Planta planta = new Planta(ruc, nombre, direccion);
         if (existePlanta(planta.getRuc())) {
@@ -39,21 +40,19 @@ public class PlantaServicio {
         }
         plantas.add(planta);
     }
-    
-    
+
     public void editarPlanta(String ruc, String nombre, String direccion) {
         Planta planta = this.obtenerPlantaPorRuc(ruc);
-        
+
         if (planta == null) {
             throw new IllegalArgumentException("La planta no existe");
         }
-        
         new Planta(planta.getRuc(), nombre, direccion);
+
         planta.setNombre(nombre);
         planta.setDireccion(direccion);
     }
 
-     
     public void eliminarPlanta(String ruc) {
         Planta planta = this.obtenerPlantaPorRuc(ruc);
         if (planta == null) {
@@ -65,7 +64,6 @@ public class PlantaServicio {
         }
     }
 
-   
     public Planta deshacerEliminacion() {
         if (eliminadas.isEmpty()) {
             return null;
@@ -82,7 +80,6 @@ public class PlantaServicio {
         return !eliminadas.isEmpty();
     }
 
-    
     public void programarCarga(String ruc, int dia, int turno, int cantidad) {
         Planta planta = obtenerPlantaPorRuc(ruc);
         if (planta == null) {
@@ -91,7 +88,6 @@ public class PlantaServicio {
         planta.setCarga(dia, turno, cantidad);
     }
 
-    
     public PriorityQueue<Planta> colaPorCarga() {
         PriorityQueue<Planta> cola = new PriorityQueue<>(Planta.POR_CARGA);
         for (Planta p : plantas) {
@@ -100,7 +96,6 @@ public class PlantaServicio {
         return cola;
     }
 
-    
     public List<Planta> plantasPorCarga() {
         PriorityQueue<Planta> cola = colaPorCarga();
         List<Planta> ordenadas = new ArrayList<>();
@@ -109,7 +104,6 @@ public class PlantaServicio {
         }
         return ordenadas;
     }
-
 
     public Planta obtenerPlantaPorRuc(String ruc) {
         if (ruc == null) {
@@ -123,22 +117,16 @@ public class PlantaServicio {
         }
         return null;
     }
-    
+
     public boolean existePlanta(String ruc) {
-    return obtenerPlantaPorRuc(ruc) != null;
+        return obtenerPlantaPorRuc(ruc) != null;
     }
-    
-    
+
     public List<Planta> ordenarPlantaPorRuc() {
         return plantas.stream().sorted(Planta.POR_RUC).toList();
     }
 
-    
-    
     public List<Planta> ordenarPlantaPorNombre() {
         return plantas.stream().sorted(Planta.POR_NOMBRE).toList();
     }
 }
-    
-    
-

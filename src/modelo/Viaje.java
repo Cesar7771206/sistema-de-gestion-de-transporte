@@ -1,29 +1,33 @@
-
 package modelo;
 
 public class Viaje {
     
     private int id;
     private Contenedor contenedor;
-    private Tractor tractor;
-    private Carreta carreta;
+    private UnidadTransporte unidad;
     private Planta planta;
     private Terminal terminal;
     private Cliente cliente;
     private Ruta ruta;
 
-    public Viaje(int id, Contenedor contenedor, Tractor tractor,
-                 Carreta carreta, Planta planta, Terminal terminal,
+    public Viaje(int id, Contenedor contenedor, UnidadTransporte unidad,
+                 Planta planta, Terminal terminal,
                  Cliente cliente, Ruta ruta) {
 
         this.id = id;
         this.contenedor = contenedor;
-        this.tractor = tractor;
-        this.carreta = carreta;
+        this.unidad = unidad;
         this.planta = planta;
         this.terminal = terminal;
         this.cliente = cliente;
         this.ruta = ruta;
+    }
+
+    public Viaje(int id, Contenedor contenedor, Tractor tractor,
+                 Carreta carreta, Planta planta, Terminal terminal,
+                 Cliente cliente, Ruta ruta) {
+
+        this(id, contenedor, new UnidadTransporte(tractor, carreta), planta, terminal, cliente, ruta);
     }
 
     public int getId() {
@@ -42,20 +46,34 @@ public class Viaje {
         this.contenedor = contenedor;
     }
 
+    public UnidadTransporte getUnidad() {
+        return unidad;
+    }
+
+    public void setUnidad(UnidadTransporte unidad) {
+        this.unidad = unidad;
+    }
+
     public Tractor getTractor() {
-        return tractor;
+        return unidad != null ? unidad.getTractor() : null;
     }
 
     public void setTractor(Tractor tractor) {
-        this.tractor = tractor;
+        if (this.unidad == null) {
+            this.unidad = new UnidadTransporte(tractor);
+        } else {
+            this.unidad.setTractor(tractor);
+        }
     }
 
     public Carreta getCarreta() {
-        return carreta;
+        return unidad != null ? unidad.getCarreta() : null;
     }
 
     public void setCarreta(Carreta carreta) {
-        this.carreta = carreta;
+        if (this.unidad != null) {
+            this.unidad.setCarreta(carreta);
+        }
     }
 
     public Planta getPlanta() {

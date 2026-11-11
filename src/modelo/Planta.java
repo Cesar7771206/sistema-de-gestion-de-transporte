@@ -8,8 +8,11 @@ import java.util.Arrays;
 import java.util.Comparator;
 
 /**
+ * Entidad Planta.
+ * Incluye matriz bidimensional de programación semanal de carga (7 días x 3 turnos),
+ * y comparadores para ordenamiento y cola con prioridad.
  *
- * @author cesar
+ * @author cesar, yimmy
  */
 public class Planta {
     
@@ -20,7 +23,6 @@ public class Planta {
     public static final Comparator<Planta> POR_RUC = Comparator.comparing(Planta::getRuc);
     public static final Comparator<Planta> POR_NOMBRE = Comparator.comparing(Planta::getNombre);
 
-    
     public static final int DIAS = 7;
     public static final int TURNOS = 3;
     private final int[][] programacion = new int[DIAS][TURNOS];
@@ -28,11 +30,9 @@ public class Planta {
     private static final String[] NOMBRES_DIAS =
         {"Lunes", "Martes", "Miércoles", "Jueves", "Viernes", "Sábado", "Domingo"};
 
-    
     public static final Comparator<Planta> POR_CARGA_TOTAL =
             Comparator.comparingInt(Planta::getCargaTotal);
 
-   
     public static final Comparator<Planta> POR_CARGA =
             POR_CARGA_TOTAL.reversed().thenComparing(POR_NOMBRE).thenComparing(POR_RUC);
 
@@ -48,14 +48,14 @@ public class Planta {
 
     public void setRuc(String ruc) {
         if (ruc == null){
-        throw new IllegalArgumentException("El RUC no puede ser nulo");
-            }
-        String r =ruc.trim();
-        if(ruc.matches("\\d{11}")){
-            this.ruc=ruc;
-            }else {
-                     throw new IllegalArgumentException("El ruc debe tener solo 11 digitos");
-                  }
+            throw new IllegalArgumentException("El RUC no puede ser nulo");
+        }
+        String r = ruc.trim();
+        if (r.matches("\\d{11}")){
+            this.ruc = r;
+        } else {
+            throw new IllegalArgumentException("El ruc debe tener solo 11 digitos");
+        }
     }
 
     public String getNombre() {
@@ -72,6 +72,7 @@ public class Planta {
         }
         this.nombre = n;
     }
+
     public String getDireccion() {
         return direccion;
     }
@@ -87,7 +88,6 @@ public class Planta {
         this.direccion = d;
     }
 
-    
     public void setCarga(int dia, int turno, int cantidad) {
         if (dia < 0 || dia >= DIAS) {
             throw new IllegalArgumentException("El día debe estar entre 0 y " + (DIAS - 1));
@@ -105,7 +105,6 @@ public class Planta {
         return programacion[dia][turno];
     }
 
-    
     public int[][] getProgramacion() {
         int[][] copia = new int[DIAS][TURNOS];
         for (int d = 0; d < DIAS; d++) {
@@ -114,7 +113,6 @@ public class Planta {
         return copia;
     }
 
-    
     public void setProgramacion(int[][] nueva) {
         if (nueva == null || nueva.length != DIAS) {
             throw new IllegalArgumentException("La programación debe tener " + DIAS + " días");
@@ -125,7 +123,7 @@ public class Planta {
             }
             for (int cantidad : fila) {
                 if (cantidad < 0) {
-                    throw new IllegalArgumentException("La cantidad no puede ser negativa");
+                    throw new IllegalArgumentException("Las cantidades no pueden ser negativas");
                 }
             }
         }
@@ -134,61 +132,47 @@ public class Planta {
         }
     }
 
-    
     public int getCargaTotal() {
         int total = 0;
         for (int[] fila : programacion) {
-            for (int celda : fila) {
-                total += celda;
+            for (int cantidad : fila) {
+                total += cantidad;
             }
         }
         return total;
     }
 
-    
     public int[] getTotalPorDia() {
         int[] totales = new int[DIAS];
         for (int d = 0; d < DIAS; d++) {
+            int suma = 0;
             for (int t = 0; t < TURNOS; t++) {
-                totales[d] += programacion[d][t];
+                suma += programacion[d][t];
             }
+            totales[d] = suma;
         }
         return totales;
     }
 
-    
     public int[] getTotalPorTurno() {
         int[] totales = new int[TURNOS];
         for (int t = 0; t < TURNOS; t++) {
+            int suma = 0;
             for (int d = 0; d < DIAS; d++) {
-                totales[t] += programacion[d][t];
+                suma += programacion[d][t];
             }
+            totales[t] = suma;
         }
         return totales;
     }
 
-    
-    public int getDiaMayorCarga() {
-        int[] totales = getTotalPorDia();
-        int mayor = 0;
-        for (int d = 1; d < DIAS; d++) {
-            if (totales[d] > totales[mayor]) {
-                mayor = d;
-            }
-        }
-        return mayor;
-    }
-
-    
-    public boolean tieneMismaProgramacion(Planta otra) {
-        return otra != null && Arrays.deepEquals(programacion, otra.programacion);
-    }
-
-    
-    public String getReporteCargas() {
+    public String generarReporte() {
         StringBuilder reporte = new StringBuilder();
-        reporte.append(String.format("Cargas programadas - %s%n", nombre));
-        reporte.append(String.format("%-10s %7s %7s %7s %7s%n", "Día", "Mañana", "Tarde", "Noche", "Total"));
+        reporte.append(String.format("Reporte de programación - %s (RUC: %s)%n", nombre, ruc));
+        reporte.append(String.format("%-10s %7s %7s %7s %7s%n",
+                "Día", "Turno 1", "Turno 2", "Turno 3", "Total"));
+        reporte.append("-".repeat(45)).append(System.lineSeparator());
+
         int[] totalDia = getTotalPorDia();
         for (int d = 0; d < DIAS; d++) {
             reporte.append(String.format("%-10s", NOMBRES_DIAS[d]));
@@ -208,5 +192,5 @@ public class Planta {
     @Override
     public String toString() {
         return "Planta{" + "ruc=" + ruc + ", nombre=" + nombre + ", direccion=" + direccion + '}';
-    }  
+    }
 }
