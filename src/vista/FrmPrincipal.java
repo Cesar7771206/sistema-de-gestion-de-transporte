@@ -3,37 +3,43 @@
  * Click nbfs://nbhost/SystemFileSystem/Templates/GUIForms/JFrame.java to edit this template
  */
 package vista;
+
 /**
  *
  * @author cesar
  */
 public class FrmPrincipal extends javax.swing.JFrame {
-    
+
     private static final java.util.logging.Logger logger = java.util.logging.Logger.getLogger(FrmPrincipal.class.getName());
 
     private java.awt.CardLayout vistaCards;
-    
+    private PanelModuloViajes panelViajes;
+    private PanelModuloCochera panelCochera;
+
     /**
      * Creates new form FrmPrincipal
      */
     public FrmPrincipal() {
         initComponents();
-        
+
         vistaCards = (java.awt.CardLayout) panelContenido.getLayout();
-        
+
         panelContenido.add(new PanelModuloInicio(), "MODULO_INICIO");
         panelContenido.add(new PanelModuloData(), "MODULO_DATA");
-        
+        panelViajes = new PanelModuloViajes();
+        panelContenido.add(panelViajes, "MODULO_VIAJES");
+        panelCochera = new PanelModuloCochera();
+        panelContenido.add(panelCochera, "MODULO_COCHERA");
         vistaCards.show(panelContenido, "MODULO_INICIO");
-        
+
         PanelUserSidebar sidebar = new PanelUserSidebar(this);
         panelSidebarContenedor.setLayout(new java.awt.BorderLayout());
         panelSidebarContenedor.add(sidebar, java.awt.BorderLayout.CENTER);
-        
+
         this.setPreferredSize(new java.awt.Dimension(1100, 700));
         this.setSize(1100, 700);
         this.setLocationRelativeTo(null);
-        
+
         panelSidebarContenedor.revalidate();
         panelSidebarContenedor.repaint();
     }
@@ -88,9 +94,14 @@ public class FrmPrincipal extends javax.swing.JFrame {
         /* Create and display the form */
         java.awt.EventQueue.invokeLater(() -> new FrmPrincipal().setVisible(true));
     }
-    
-    public void navegar(String nombreCard){
-        if (vistaCards != null){
+
+    public void navegar(String nombreCard) {
+        if (vistaCards != null) {
+            if (nombreCard.equals("MODULO_VIAJES")) {
+                panelViajes.cargarDatos();
+            } else if (nombreCard.equals("MODULO_COCHERA")) {
+                panelCochera.refrescar();
+            }
             vistaCards.show(panelContenido, nombreCard);
         }
     }

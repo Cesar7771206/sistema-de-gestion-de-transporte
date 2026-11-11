@@ -4,17 +4,132 @@
  */
 package vista;
 
+import java.awt.Color;
+import java.awt.Dimension;
+import java.awt.event.MouseAdapter;
+import java.awt.event.MouseEvent;
+import java.util.List;
+import javax.swing.JOptionPane;
+import javax.swing.SwingUtilities;
+import javax.swing.table.DefaultTableModel;
+import modelo.Terminal;
+import servicio.GestorLogistica;
+import servicio.TerminalServicio;
+
 /**
- *
- * @author GIANCARLO REA
+ * Panel de gestión de Terminales Portuarios/Extraportuarios.
+ * Permite registrar, editar, listar y eliminar terminales
+ * manteniendo sincronización con GestorLogistica.
  */
 public class PanelTerminal extends javax.swing.JPanel {
+
+    private String opcion;
+    private TerminalServicio terminalServicio;
+    private DefaultTableModel modeloTabla;
 
     /**
      * Creates new form PanelTerminal
      */
     public PanelTerminal() {
         initComponents();
+
+        terminalServicio = new TerminalServicio();
+        modeloTabla = (DefaultTableModel) tblTerminales.getModel();
+
+        jSplitPane.setResizeWeight(0);
+        panelFormulario.setMinimumSize(new Dimension(0, 0));
+        panelTabla.setMinimumSize(new Dimension(0, 0));
+        ocultarFormulario();
+
+        tblTerminales.addMouseListener(new MouseAdapter() {
+            @Override
+            public void mouseClicked(MouseEvent e) {
+                int fila = tblTerminales.getSelectedRow();
+                if (fila >= 0) {
+                    String ruc = modeloTabla.getValueAt(fila, 0).toString();
+                    txtRuc.setText(ruc);
+                }
+            }
+        });
+
+        cargarDatos();
+    }
+
+    public void cargarDatos() {
+        for (Terminal t : GestorLogistica.getTerminales()) {
+            if (terminalServicio.obtenerPorRuc(t.getRuc()) == null) {
+                terminalServicio.guardarTerminal(t.getRuc(), t.getNombre(), t.getDireccion());
+            }
+        }
+        actualizarTabla(terminalServicio.getTerminales());
+    }
+
+    private void actualizarTabla(List<Terminal> lista) {
+        modeloTabla.setRowCount(0);
+        for (Terminal t : lista) {
+            Object[] fila = new Object[]{
+                t.getRuc(),
+                t.getNombre(),
+                t.getDireccion()
+            };
+            modeloTabla.addRow(fila);
+        }
+    }
+
+    private void mostrarFormulario() {
+        jSplitPane.setDividerSize(8);
+        SwingUtilities.invokeLater(() -> {
+            int h = jSplitPane.getHeight();
+            int loc = (h > 0) ? Math.min(220, Math.max(180, h / 3)) : 200;
+            jSplitPane.setDividerLocation(loc);
+        });
+        btnAgregar.setText("Cerrar formulario");
+    }
+
+    private void ocultarFormulario() {
+        jSplitPane.setDividerSize(0);
+        SwingUtilities.invokeLater(() -> jSplitPane.setDividerLocation(0));
+        btnAgregar.setText("Agregar");
+        btnOpcion.setVisible(false);
+    }
+
+    private void mostrarCampos(boolean mostrar) {
+        txtNombre.setVisible(mostrar);
+        txtDireccion.setVisible(mostrar);
+        lblNombre.setVisible(mostrar);
+        lblDireccion.setVisible(mostrar);
+    }
+
+    private void editarCampos(boolean editar) {
+        txtRuc.setEditable(editar);
+        txtNombre.setEditable(editar);
+        txtDireccion.setEditable(editar);
+    }
+
+    private void limpiarCampos() {
+        txtRuc.setText("");
+        txtNombre.setText("");
+        txtDireccion.setText("");
+        editarCampos(true);
+    }
+
+    private void prepararEdicion(Terminal t) {
+        mostrarFormulario();
+        mostrarCampos(true);
+        txtRuc.setText(t.getRuc());
+        txtNombre.setText(t.getNombre());
+        txtDireccion.setText(t.getDireccion());
+
+        txtRuc.setEditable(false);
+        lblDetalleAccion.setText("Editar datos del terminal (RUC protegido):");
+
+        opcion = "guardar";
+        btnOpcion.setText("Guardar");
+        btnOpcion.setBackground(new Color(255, 153, 102));
+        btnOpcion.setForeground(Color.WHITE);
+        btnOpcion.setVisible(true);
+
+        txtNombre.requestFocus();
     }
 
     /**
@@ -26,100 +141,567 @@ public class PanelTerminal extends javax.swing.JPanel {
     // <editor-fold defaultstate="collapsed" desc="Generated Code">//GEN-BEGIN:initComponents
     private void initComponents() {
 
-        jLabel1 = new javax.swing.JLabel();
-        jLabel2 = new javax.swing.JLabel();
-        jLabel3 = new javax.swing.JLabel();
-        jLabel4 = new javax.swing.JLabel();
-        jTextField1 = new javax.swing.JTextField();
-        jTextField2 = new javax.swing.JTextField();
-        jTextField3 = new javax.swing.JTextField();
-        jButton1 = new javax.swing.JButton();
+        panelBarra = new javax.swing.JPanel();
+        lblTitulo = new javax.swing.JLabel();
+        panelBotones = new javax.swing.JPanel();
+        btnAgregar = new javax.swing.JButton();
+        btnEditar = new javax.swing.JButton();
+        btnEliminar = new javax.swing.JButton();
+        btnDeshacer = new javax.swing.JButton();
+        btnAnterior = new javax.swing.JButton();
+        btnSiguiente = new javax.swing.JButton();
+        btnEncolar = new javax.swing.JButton();
+        jSplitPane = new javax.swing.JSplitPane();
+        panelFormulario = new javax.swing.JPanel();
+        contenidoPanelFormulario = new javax.swing.JPanel();
+        lblRuc = new javax.swing.JLabel();
+        txtRuc = new javax.swing.JTextField();
+        lblNombre = new javax.swing.JLabel();
+        txtNombre = new javax.swing.JTextField();
+        lblDireccion = new javax.swing.JLabel();
+        txtDireccion = new javax.swing.JTextField();
+        lblDetalleAccion = new javax.swing.JLabel();
+        btnOpcion = new javax.swing.JButton();
+        btnCancelar = new javax.swing.JButton();
+        panelTabla = new javax.swing.JPanel();
+        jScrollPane = new javax.swing.JScrollPane();
+        tblTerminales = new javax.swing.JTable();
 
+        setBackground(new java.awt.Color(255, 255, 255));
         setMaximumSize(new java.awt.Dimension(810, 540));
         setMinimumSize(new java.awt.Dimension(810, 540));
+        setPreferredSize(new java.awt.Dimension(810, 540));
+        setLayout(new java.awt.BorderLayout());
 
-        jLabel1.setFont(new java.awt.Font("Sans Serif Collection", 1, 14)); // NOI18N
-        jLabel1.setText("REGISTRAR TERMINAL");
+        panelBarra.setBackground(new java.awt.Color(255, 255, 255));
+        panelBarra.setLayout(new java.awt.BorderLayout());
 
-        jLabel2.setFont(new java.awt.Font("Sans Serif Collection", 1, 14)); // NOI18N
-        jLabel2.setText("Ruc:");
+        lblTitulo.setFont(new java.awt.Font("sansserif", 1, 13)); // NOI18N
+        lblTitulo.setText("      TERMINALES");
+        panelBarra.add(lblTitulo, java.awt.BorderLayout.CENTER);
 
-        jLabel3.setFont(new java.awt.Font("Sans Serif Collection", 1, 14)); // NOI18N
-        jLabel3.setText("Nombre:");
+        panelBotones.setBackground(new java.awt.Color(255, 255, 255));
 
-        jLabel4.setFont(new java.awt.Font("Sans Serif Collection", 1, 14)); // NOI18N
-        jLabel4.setText("Dirección: ");
+        btnAgregar.setBackground(new java.awt.Color(0, 153, 255));
+        btnAgregar.setForeground(new java.awt.Color(255, 255, 255));
+        btnAgregar.setText("Agregar");
+        btnAgregar.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                btnAgregarActionPerformed(evt);
+            }
+        });
+        panelBotones.add(btnAgregar);
 
-        jTextField1.setBorder(javax.swing.BorderFactory.createLineBorder(new java.awt.Color(0, 0, 0)));
+        btnEditar.setBackground(new java.awt.Color(255, 153, 102));
+        btnEditar.setForeground(new java.awt.Color(255, 255, 255));
+        btnEditar.setText("Editar");
+        btnEditar.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                btnEditarActionPerformed(evt);
+            }
+        });
+        panelBotones.add(btnEditar);
 
-        jTextField2.setBorder(javax.swing.BorderFactory.createLineBorder(new java.awt.Color(0, 0, 0)));
+        btnEliminar.setBackground(new java.awt.Color(255, 51, 51));
+        btnEliminar.setForeground(new java.awt.Color(255, 255, 255));
+        btnEliminar.setText("Eliminar");
+        btnEliminar.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                btnEliminarActionPerformed(evt);
+            }
+        });
+        panelBotones.add(btnEliminar);
 
-        jTextField3.setBorder(javax.swing.BorderFactory.createLineBorder(new java.awt.Color(0, 0, 0)));
+        btnDeshacer.setBackground(new java.awt.Color(153, 0, 153));
+        btnDeshacer.setForeground(new java.awt.Color(255, 255, 255));
+        btnDeshacer.setText("Deshacer (Pila)");
+        btnDeshacer.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                btnDeshacerActionPerformed(evt);
+            }
+        });
+        panelBotones.add(btnDeshacer);
 
-        jButton1.setText("Guardar");
+        btnAnterior.setBackground(new java.awt.Color(0, 102, 204));
+        btnAnterior.setForeground(new java.awt.Color(255, 255, 255));
+        btnAnterior.setText("◀ Anterior (LED)");
+        btnAnterior.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                btnAnteriorActionPerformed(evt);
+            }
+        });
+        panelBotones.add(btnAnterior);
 
-        javax.swing.GroupLayout layout = new javax.swing.GroupLayout(this);
-        this.setLayout(layout);
-        layout.setHorizontalGroup(
-            layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(layout.createSequentialGroup()
-                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addGroup(layout.createSequentialGroup()
-                        .addGap(26, 26, 26)
-                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
-                            .addGroup(layout.createSequentialGroup()
-                                .addComponent(jLabel3)
-                                .addGap(31, 31, 31)
-                                .addComponent(jTextField2, javax.swing.GroupLayout.PREFERRED_SIZE, 120, javax.swing.GroupLayout.PREFERRED_SIZE))
-                            .addGroup(layout.createSequentialGroup()
-                                .addComponent(jLabel4)
-                                .addGap(18, 18, 18)
-                                .addComponent(jTextField3))
-                            .addGroup(layout.createSequentialGroup()
-                                .addComponent(jLabel2)
-                                .addGap(62, 62, 62)
-                                .addComponent(jTextField1, javax.swing.GroupLayout.PREFERRED_SIZE, 120, javax.swing.GroupLayout.PREFERRED_SIZE))))
-                    .addGroup(layout.createSequentialGroup()
-                        .addGap(41, 41, 41)
-                        .addComponent(jLabel1)))
-                .addContainerGap(572, Short.MAX_VALUE))
-            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
-                .addGap(0, 0, Short.MAX_VALUE)
-                .addComponent(jButton1, javax.swing.GroupLayout.PREFERRED_SIZE, 131, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addGap(250, 250, 250))
-        );
-        layout.setVerticalGroup(
-            layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(layout.createSequentialGroup()
-                .addGap(16, 16, 16)
-                .addComponent(jLabel1)
-                .addGap(18, 18, 18)
-                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                    .addComponent(jLabel2)
-                    .addComponent(jTextField1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
-                .addGap(18, 18, 18)
-                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                    .addComponent(jTextField2, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addComponent(jLabel3))
-                .addGap(18, 18, 18)
-                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                    .addComponent(jLabel4)
-                    .addComponent(jTextField3, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
-                .addGap(98, 98, 98)
-                .addComponent(jButton1)
-                .addContainerGap(264, Short.MAX_VALUE))
-        );
+        btnSiguiente.setBackground(new java.awt.Color(0, 102, 204));
+        btnSiguiente.setForeground(new java.awt.Color(255, 255, 255));
+        btnSiguiente.setText("Siguiente ▶ (LED)");
+        btnSiguiente.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                btnSiguienteActionPerformed(evt);
+            }
+        });
+        panelBotones.add(btnSiguiente);
+
+        btnEncolar.setBackground(new java.awt.Color(0, 153, 51));
+        btnEncolar.setForeground(new java.awt.Color(255, 255, 255));
+        btnEncolar.setText("Cola Espera");
+        btnEncolar.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                btnEncolarActionPerformed(evt);
+            }
+        });
+        panelBotones.add(btnEncolar);
+
+        panelBarra.add(panelBotones, java.awt.BorderLayout.LINE_END);
+
+        add(panelBarra, java.awt.BorderLayout.PAGE_START);
+
+        jSplitPane.setBackground(new java.awt.Color(255, 255, 255));
+        jSplitPane.setDividerLocation(200);
+        jSplitPane.setOrientation(javax.swing.JSplitPane.VERTICAL_SPLIT);
+
+        panelFormulario.setBackground(new java.awt.Color(255, 255, 255));
+        panelFormulario.setMinimumSize(new java.awt.Dimension(100, 100));
+        panelFormulario.setLayout(new org.netbeans.lib.awtextra.AbsoluteLayout());
+
+        contenidoPanelFormulario.setBackground(new java.awt.Color(255, 255, 255));
+        contenidoPanelFormulario.setLayout(new org.netbeans.lib.awtextra.AbsoluteLayout());
+
+        lblRuc.setFont(new java.awt.Font("sansserif", 1, 13)); // NOI18N
+        lblRuc.setText("RUC");
+        contenidoPanelFormulario.add(lblRuc, new org.netbeans.lib.awtextra.AbsoluteConstraints(20, 30, -1, -1));
+
+        txtRuc.setHorizontalAlignment(javax.swing.JTextField.CENTER);
+        contenidoPanelFormulario.add(txtRuc, new org.netbeans.lib.awtextra.AbsoluteConstraints(20, 50, 160, 30));
+
+        lblNombre.setFont(new java.awt.Font("sansserif", 1, 13)); // NOI18N
+        lblNombre.setText("Nombre del Terminal");
+        contenidoPanelFormulario.add(lblNombre, new org.netbeans.lib.awtextra.AbsoluteConstraints(200, 30, -1, -1));
+
+        txtNombre.setHorizontalAlignment(javax.swing.JTextField.CENTER);
+        contenidoPanelFormulario.add(txtNombre, new org.netbeans.lib.awtextra.AbsoluteConstraints(200, 50, 220, 30));
+
+        lblDireccion.setFont(new java.awt.Font("sansserif", 1, 13)); // NOI18N
+        lblDireccion.setText("Dirección");
+        contenidoPanelFormulario.add(lblDireccion, new org.netbeans.lib.awtextra.AbsoluteConstraints(440, 30, -1, -1));
+
+        txtDireccion.setHorizontalAlignment(javax.swing.JTextField.CENTER);
+        contenidoPanelFormulario.add(txtDireccion, new org.netbeans.lib.awtextra.AbsoluteConstraints(440, 50, 340, 30));
+
+        lblDetalleAccion.setFont(new java.awt.Font("sansserif", 1, 13)); // NOI18N
+        lblDetalleAccion.setText("Ingrese los datos del terminal:");
+        contenidoPanelFormulario.add(lblDetalleAccion, new org.netbeans.lib.awtextra.AbsoluteConstraints(20, 90, 460, -1));
+
+        btnOpcion.setForeground(new java.awt.Color(255, 255, 255));
+        btnOpcion.setText("Opcion");
+        btnOpcion.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                btnOpcionActionPerformed(evt);
+            }
+        });
+        contenidoPanelFormulario.add(btnOpcion, new org.netbeans.lib.awtextra.AbsoluteConstraints(200, 120, 130, -1));
+
+        btnCancelar.setBackground(new java.awt.Color(255, 102, 102));
+        btnCancelar.setForeground(new java.awt.Color(255, 255, 255));
+        btnCancelar.setText("Cancelar");
+        btnCancelar.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                btnCancelarActionPerformed(evt);
+            }
+        });
+        contenidoPanelFormulario.add(btnCancelar, new org.netbeans.lib.awtextra.AbsoluteConstraints(350, 120, 120, -1));
+
+        panelFormulario.add(contenidoPanelFormulario, new org.netbeans.lib.awtextra.AbsoluteConstraints(0, 0, 810, 200));
+
+        jSplitPane.setTopComponent(panelFormulario);
+
+        panelTabla.setBackground(new java.awt.Color(255, 255, 255));
+        panelTabla.setLayout(new java.awt.BorderLayout());
+
+        jScrollPane.setBackground(new java.awt.Color(255, 255, 255));
+
+        tblTerminales.setModel(new javax.swing.table.DefaultTableModel(
+            new Object [][] {
+                {null, null, null},
+                {null, null, null},
+                {null, null, null},
+                {null, null, null}
+            },
+            new String [] {
+                "RUC", "Nombre", "Dirección"
+            }
+        ) {
+            Class[] types = new Class [] {
+                java.lang.String.class, java.lang.String.class, java.lang.String.class
+            };
+
+            public Class getColumnClass(int columnIndex) {
+                return types [columnIndex];
+            }
+        });
+        jScrollPane.setViewportView(tblTerminales);
+
+        panelTabla.add(jScrollPane, java.awt.BorderLayout.CENTER);
+
+        jSplitPane.setRightComponent(panelTabla);
+
+        add(jSplitPane, java.awt.BorderLayout.CENTER);
     }// </editor-fold>//GEN-END:initComponents
 
+    private void btnAgregarActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnAgregarActionPerformed
+        if (btnAgregar.getText().equalsIgnoreCase("Cerrar formulario") && "registrar".equals(opcion)) {
+            ocultarFormulario();
+            limpiarCampos();
+            return;
+        }
+
+        mostrarFormulario();
+        mostrarCampos(true);
+        limpiarCampos();
+
+        lblDetalleAccion.setText("Ingrese los datos del nuevo terminal:");
+        opcion = "registrar";
+
+        btnOpcion.setText("Registrar");
+        btnOpcion.setBackground(new Color(0, 153, 255));
+        btnOpcion.setForeground(Color.WHITE);
+        btnOpcion.setVisible(true);
+
+        txtRuc.requestFocus();
+    }//GEN-LAST:event_btnAgregarActionPerformed
+
+    private void btnOpcionActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnOpcionActionPerformed
+        switch (opcion) {
+            case "registrar":
+                try {
+                    String ruc = txtRuc.getText().trim();
+                    String nombre = txtNombre.getText().trim();
+                    String direccion = txtDireccion.getText().trim();
+
+                    if (ruc.isEmpty() || nombre.isEmpty() || direccion.isEmpty()) {
+                        JOptionPane.showMessageDialog(this, "Complete todos los campos del terminal.", "Aviso", JOptionPane.WARNING_MESSAGE);
+                        return;
+                    }
+
+                    boolean ok = terminalServicio.guardarTerminal(ruc, nombre, direccion);
+                    if (!ok) {
+                        JOptionPane.showMessageDialog(this, "Ya existe un terminal con el RUC " + ruc, "RUC Duplicado", JOptionPane.WARNING_MESSAGE);
+                        return;
+                    }
+
+                    Terminal t = terminalServicio.obtenerPorRuc(ruc);
+                    GestorLogistica.agregarTerminal(t);
+
+                    JOptionPane.showMessageDialog(this, "Terminal " + nombre + " registrado exitosamente.");
+                    actualizarTabla(terminalServicio.getTerminales());
+                    limpiarCampos();
+                    ocultarFormulario();
+                } catch (IllegalArgumentException e) {
+                    JOptionPane.showMessageDialog(this, e.getMessage(), "Error al Registrar", JOptionPane.ERROR_MESSAGE);
+                }
+                break;
+
+            case "seleccionarGuardar":
+                try {
+                    String ruc = txtRuc.getText().trim();
+                    Terminal t = terminalServicio.obtenerPorRuc(ruc);
+                    if (t == null) {
+                        for (Terminal term : GestorLogistica.getTerminales()) {
+                            if (term.getRuc().equalsIgnoreCase(ruc)) {
+                                t = term;
+                                break;
+                            }
+                        }
+                    }
+
+                    if (t == null) {
+                        JOptionPane.showMessageDialog(this, "El terminal con RUC " + ruc + " no está registrado.", "No Encontrado", JOptionPane.WARNING_MESSAGE);
+                        txtRuc.setText("");
+                        txtRuc.requestFocus();
+                    } else {
+                        prepararEdicion(t);
+                    }
+                } catch (IllegalArgumentException e) {
+                    JOptionPane.showMessageDialog(this, e.getMessage(), "Aviso", JOptionPane.WARNING_MESSAGE);
+                }
+                break;
+
+            case "guardar":
+                try {
+                    String ruc = txtRuc.getText().trim();
+                    String nombre = txtNombre.getText().trim();
+                    String direccion = txtDireccion.getText().trim();
+
+                    if (nombre.isEmpty() || direccion.isEmpty()) {
+                        JOptionPane.showMessageDialog(this, "Complete todos los campos a actualizar.", "Aviso", JOptionPane.WARNING_MESSAGE);
+                        return;
+                    }
+
+                    boolean modificado = terminalServicio.modificarTerminal(ruc, nombre, direccion);
+                    if (modificado) {
+                        for (Terminal term : GestorLogistica.getTerminales()) {
+                            if (term.getRuc().equalsIgnoreCase(ruc)) {
+                                term.setNombre(nombre);
+                                term.setDireccion(direccion);
+                                break;
+                            }
+                        }
+                    }
+
+                    JOptionPane.showMessageDialog(this, "Terminal " + nombre + " actualizado correctamente.");
+                    actualizarTabla(terminalServicio.getTerminales());
+                    limpiarCampos();
+                    ocultarFormulario();
+                } catch (IllegalArgumentException e) {
+                    JOptionPane.showMessageDialog(this, e.getMessage(), "Error al Actualizar", JOptionPane.ERROR_MESSAGE);
+                }
+                break;
+
+            case "seleccionarEliminar":
+                try {
+                    String ruc = txtRuc.getText().trim();
+                    Terminal t = terminalServicio.obtenerPorRuc(ruc);
+                    if (t == null) {
+                        for (Terminal term : GestorLogistica.getTerminales()) {
+                            if (term.getRuc().equalsIgnoreCase(ruc)) {
+                                t = term;
+                                break;
+                            }
+                        }
+                    }
+
+                    if (t == null) {
+                        JOptionPane.showMessageDialog(this, "El terminal con RUC " + ruc + " no está registrado.", "No Encontrado", JOptionPane.WARNING_MESSAGE);
+                        txtRuc.setText("");
+                    } else {
+                        mostrarCampos(true);
+                        txtNombre.setText(t.getNombre());
+                        txtDireccion.setText(t.getDireccion());
+                        editarCampos(false);
+
+                        lblDetalleAccion.setText("¿Desea confirmar la eliminación del terminal " + t.getNombre() + "?");
+                        opcion = "eliminar";
+                        btnOpcion.setText("Confirmar");
+                        btnOpcion.setBackground(new Color(220, 53, 69));
+                        btnOpcion.setForeground(Color.WHITE);
+                        btnOpcion.setVisible(true);
+                    }
+                } catch (IllegalArgumentException e) {
+                    JOptionPane.showMessageDialog(this, e.getMessage(), "Aviso", JOptionPane.WARNING_MESSAGE);
+                }
+                break;
+
+            case "eliminar":
+                try {
+                    String ruc = txtRuc.getText().trim();
+                    terminalServicio.eliminarPorRuc(ruc);
+                    GestorLogistica.getTerminales().removeIf(t -> t.getRuc().equalsIgnoreCase(ruc));
+
+                    JOptionPane.showMessageDialog(this, "Terminal eliminado correctamente.");
+                    actualizarTabla(terminalServicio.getTerminales());
+                    limpiarCampos();
+                    ocultarFormulario();
+                } catch (IllegalArgumentException e) {
+                    JOptionPane.showMessageDialog(this, e.getMessage(), "Error al Eliminar", JOptionPane.ERROR_MESSAGE);
+                }
+                break;
+
+            default:
+                break;
+        }
+    }//GEN-LAST:event_btnOpcionActionPerformed
+
+    private void btnEditarActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnEditarActionPerformed
+        int fila = tblTerminales.getSelectedRow();
+        String ruc = (fila >= 0) ? modeloTabla.getValueAt(fila, 0).toString() : txtRuc.getText().trim();
+
+        if (!ruc.isEmpty()) {
+            Terminal t = terminalServicio.obtenerPorRuc(ruc);
+            if (t != null) {
+                prepararEdicion(t);
+                return;
+            }
+        }
+
+        mostrarFormulario();
+        mostrarCampos(false);
+        limpiarCampos();
+
+        opcion = "seleccionarGuardar";
+        lblDetalleAccion.setText("Ingrese el RUC del terminal a editar:");
+        btnOpcion.setText("Seleccionar");
+        btnOpcion.setBackground(new Color(255, 193, 7));
+        btnOpcion.setForeground(Color.BLACK);
+        btnOpcion.setVisible(true);
+
+        txtRuc.requestFocus();
+    }//GEN-LAST:event_btnEditarActionPerformed
+
+    private void btnEliminarActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnEliminarActionPerformed
+        int fila = tblTerminales.getSelectedRow();
+        String ruc = (fila >= 0) ? modeloTabla.getValueAt(fila, 0).toString() : txtRuc.getText().trim();
+
+        if (!ruc.isEmpty()) {
+            Terminal t = terminalServicio.obtenerPorRuc(ruc);
+            if (t != null) {
+                int r = JOptionPane.showConfirmDialog(
+                        this,
+                        "¿Está seguro de eliminar el terminal " + t.getNombre() + " (RUC: " + ruc + ")?",
+                        "Confirmar Eliminación",
+                        JOptionPane.YES_NO_OPTION
+                );
+                if (r == JOptionPane.YES_OPTION) {
+                    terminalServicio.eliminarPorRuc(ruc);
+                    GestorLogistica.getTerminales().removeIf(x -> x.getRuc().equalsIgnoreCase(ruc));
+                    actualizarTabla(terminalServicio.getTerminales());
+                    limpiarCampos();
+                    ocultarFormulario();
+                }
+                return;
+            }
+        }
+
+        mostrarFormulario();
+        mostrarCampos(false);
+        limpiarCampos();
+
+        opcion = "seleccionarEliminar";
+        lblDetalleAccion.setText("Ingrese el RUC del terminal a eliminar:");
+        btnOpcion.setText("Seleccionar");
+        btnOpcion.setBackground(new Color(255, 193, 7));
+        btnOpcion.setForeground(Color.BLACK);
+        btnOpcion.setVisible(true);
+
+        txtRuc.requestFocus();
+    }//GEN-LAST:event_btnEliminarActionPerformed
+
+    private void btnCancelarActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnCancelarActionPerformed
+        limpiarCampos();
+        ocultarFormulario();
+    }//GEN-LAST:event_btnCancelarActionPerformed
+
+    private void btnDeshacerActionPerformed(java.awt.event.ActionEvent evt) {
+        Terminal recuperada = terminalServicio.deshacerEliminacion();
+        if (recuperada != null) {
+            if (GestorLogistica.buscarTerminalPorRuc(recuperada.getRuc()) == null) {
+                GestorLogistica.agregarTerminal(recuperada);
+            }
+            actualizarTabla(terminalServicio.getTerminales());
+            JOptionPane.showMessageDialog(this, "Se recuperó de la pila (PilaTerminalLES LIFO) el terminal:\n"
+                    + recuperada.getNombre() + " (RUC: " + recuperada.getRuc() + ")", "Deshacer Eliminación", JOptionPane.INFORMATION_MESSAGE);
+        } else {
+            JOptionPane.showMessageDialog(this, "No hay terminales en la pila de eliminadas para deshacer.", "Pila Vacía", JOptionPane.WARNING_MESSAGE);
+        }
+    }
+
+    private void btnAnteriorActionPerformed(java.awt.event.ActionEvent evt) {
+        Terminal anterior = terminalServicio.irAnterior();
+        if (anterior != null) {
+            seleccionarTerminalEnTabla(anterior.getRuc());
+            JOptionPane.showMessageDialog(this, "Puntero de Lista Doble movido al nodo anterior:\n"
+                    + anterior.getNombre() + " (RUC: " + anterior.getRuc() + ")\nPosición: "
+                    + (terminalServicio.getPosicionActual() + 1) + " de " + terminalServicio.getTerminales().size(),
+                    "Navegación Lista Doble (LED)", JOptionPane.INFORMATION_MESSAGE);
+        } else {
+            JOptionPane.showMessageDialog(this, "Ya se encuentra en el primer nodo de la lista doble.", "Inicio de Lista", JOptionPane.WARNING_MESSAGE);
+        }
+    }
+
+    private void btnSiguienteActionPerformed(java.awt.event.ActionEvent evt) {
+        Terminal siguiente = terminalServicio.irSiguiente();
+        if (siguiente != null) {
+            seleccionarTerminalEnTabla(siguiente.getRuc());
+            JOptionPane.showMessageDialog(this, "Puntero de Lista Doble movido al nodo siguiente:\n"
+                    + siguiente.getNombre() + " (RUC: " + siguiente.getRuc() + ")\nPosición: "
+                    + (terminalServicio.getPosicionActual() + 1) + " de " + terminalServicio.getTerminales().size(),
+                    "Navegación Lista Doble (LED)", JOptionPane.INFORMATION_MESSAGE);
+        } else {
+            JOptionPane.showMessageDialog(this, "Ya se encuentra en el último nodo de la lista doble.", "Fin de Lista", JOptionPane.WARNING_MESSAGE);
+        }
+    }
+
+    private void btnEncolarActionPerformed(java.awt.event.ActionEvent evt) {
+        int fila = tblTerminales.getSelectedRow();
+        String ruc = (fila >= 0) ? modeloTabla.getValueAt(fila, 0).toString() : txtRuc.getText().trim();
+        if (ruc.isEmpty()) {
+            JOptionPane.showMessageDialog(this, "Seleccione un terminal de la tabla para gestionar su cola de contenedores.", "Aviso", JOptionPane.WARNING_MESSAGE);
+            return;
+        }
+        Terminal t = terminalServicio.obtenerPorRuc(ruc);
+        if (t == null) {
+            JOptionPane.showMessageDialog(this, "Terminal no encontrado.", "Error", JOptionPane.ERROR_MESSAGE);
+            return;
+        }
+
+        String[] opciones = {"Encolar Contenedor", "Atender Próximo", "Ver Cola de Espera"};
+        int seleccion = JOptionPane.showOptionDialog(this,
+                "Terminal: " + t.getNombre() + "\nContenedores en espera: " + t.getCantidadContenedoresEnEspera(),
+                "Cola de Contenedores (ColaStringLES)",
+                JOptionPane.DEFAULT_OPTION, JOptionPane.QUESTION_MESSAGE, null, opciones, opciones[0]);
+
+        if (seleccion == 0) {
+            String codigo = JOptionPane.showInputDialog(this, "Ingrese el código del contenedor:", "Encolar Contenedor", JOptionPane.QUESTION_MESSAGE);
+            if (codigo != null && !codigo.isBlank()) {
+                t.encolarContenedor(codigo);
+                JOptionPane.showMessageDialog(this, "Contenedor " + codigo.trim().toUpperCase() + " encolado en " + t.getNombre() + ".\nTotal en cola: " + t.getCantidadContenedoresEnEspera(), "Éxito", JOptionPane.INFORMATION_MESSAGE);
+            }
+        } else if (seleccion == 1) {
+            String atendido = t.atenderContenedor();
+            if (atendido != null) {
+                JOptionPane.showMessageDialog(this, "Contenedor atendido de la cola: " + atendido + "\nRestantes: " + t.getCantidadContenedoresEnEspera(), "Atención FIFO", JOptionPane.INFORMATION_MESSAGE);
+            } else {
+                JOptionPane.showMessageDialog(this, "No hay contenedores en la cola de este terminal.", "Cola Vacía", JOptionPane.WARNING_MESSAGE);
+            }
+        } else if (seleccion == 2) {
+            List<String> lista = t.getContenedoresEnEspera();
+            if (lista.isEmpty()) {
+                JOptionPane.showMessageDialog(this, "No hay contenedores en espera.", "Cola Vacía", JOptionPane.INFORMATION_MESSAGE);
+            } else {
+                StringBuilder sb = new StringBuilder("Contenedores en espera en " + t.getNombre() + " (ColaStringLES):\n\n");
+                int idx = 1;
+                for (String c : lista) {
+                    sb.append(idx++).append(". ").append(c).append("\n");
+                }
+                JOptionPane.showMessageDialog(this, sb.toString(), "Cola de Contenedores", JOptionPane.INFORMATION_MESSAGE);
+            }
+        }
+    }
+
+    private void seleccionarTerminalEnTabla(String ruc) {
+        for (int i = 0; i < modeloTabla.getRowCount(); i++) {
+            if (modeloTabla.getValueAt(i, 0).toString().equalsIgnoreCase(ruc)) {
+                tblTerminales.setRowSelectionInterval(i, i);
+                txtRuc.setText(ruc);
+                break;
+            }
+        }
+    }
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
-    private javax.swing.JButton jButton1;
-    private javax.swing.JLabel jLabel1;
-    private javax.swing.JLabel jLabel2;
-    private javax.swing.JLabel jLabel3;
-    private javax.swing.JLabel jLabel4;
-    private javax.swing.JTextField jTextField1;
-    private javax.swing.JTextField jTextField2;
-    private javax.swing.JTextField jTextField3;
+    private javax.swing.JButton btnAgregar;
+    private javax.swing.JButton btnAnterior;
+    private javax.swing.JButton btnCancelar;
+    private javax.swing.JButton btnDeshacer;
+    private javax.swing.JButton btnEditar;
+    private javax.swing.JButton btnEliminar;
+    private javax.swing.JButton btnEncolar;
+    private javax.swing.JButton btnOpcion;
+    private javax.swing.JButton btnSiguiente;
+    private javax.swing.JPanel contenidoPanelFormulario;
+    private javax.swing.JScrollPane jScrollPane;
+    private javax.swing.JSplitPane jSplitPane;
+    private javax.swing.JLabel lblDetalleAccion;
+    private javax.swing.JLabel lblDireccion;
+    private javax.swing.JLabel lblNombre;
+    private javax.swing.JLabel lblRuc;
+    private javax.swing.JLabel lblTitulo;
+    private javax.swing.JPanel panelBarra;
+    private javax.swing.JPanel panelBotones;
+    private javax.swing.JPanel panelFormulario;
+    private javax.swing.JPanel panelTabla;
+    private javax.swing.JTable tblTerminales;
+    private javax.swing.JTextField txtDireccion;
+    private javax.swing.JTextField txtNombre;
+    private javax.swing.JTextField txtRuc;
     // End of variables declaration//GEN-END:variables
 }

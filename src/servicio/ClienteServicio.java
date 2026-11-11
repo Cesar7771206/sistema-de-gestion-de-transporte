@@ -9,72 +9,89 @@ import java.util.List;
 import modelo.Cliente;
 
 /**
+ * Servicio de gestión de Clientes.
+ * Evidencia el uso de:
+ * - ArrayLists para la colección dinámica de clientes y búsquedas secuenciales.
+ * - Cola circular implementada sobre un arreglo estático (Cliente[]) para los turnos de atención al cliente (FIFO).
  *
- * @author NILENY
+ * @author NILENY, cesar
  */
 public class ClienteServicio {
     
-    public static final int CAPACIDAD_COLA=10;
+    public static final int CAPACIDAD_COLA = 10;
     
-    //lista donde se guardan los clientes
-    private final ArrayList<Cliente> clientes = new ArrayList<>();
+    // Lista dinámica donde se guardan los clientes (ArrayList)
+    private final ArrayList<Cliente> clientes;
 
     // Cola circular con arreglo: turnos de atención
     //   frente = posición del que se atiende primero
-    //   fin    = posición del último que llegó (-1 si nunca entró nadie)
-    //   enCola = cuántos clientes están esperando    
-    
+    //   fin    = posición del último que llegó
+    //   enCola = cuántos clientes están esperando actualmente
     private final Cliente[] cola = new Cliente[CAPACIDAD_COLA];
     private int frente = 0;
     private int fin = -1;
     private int enCola = 0;
+
+    public ClienteServicio() {
+        this.clientes = new ArrayList<>();
+    }
+
+    public ClienteServicio(List<Cliente> inicial) {
+        this.clientes = new ArrayList<>();
+        if (inicial != null) {
+            this.clientes.addAll(inicial);
+        }
+    }
     
-    
-    //Devuelve todos los clientes registrados
+    // Devuelve todos los clientes registrados
     public List<Cliente> getCliente() {
-       return clientes;
+        return clientes;
+    }
+
+    public List<Cliente> getClientes() {
+        return clientes;
     }
     
     // Registra un cliente nuevo 
     public void guardarCliente(String ruc, String nombre, String direccion) {
-    Cliente c = new Cliente (ruc, nombre, direccion);
-    if (existeCliente(c.getRuc())) {
-        throw new IllegalArgumentException("Ya existe un Cliente con ese RUC" + c.getRuc());
+        Cliente c = new Cliente(ruc, nombre, direccion);
+        if (existeCliente(c.getRuc())) {
+            throw new IllegalArgumentException("Ya existe un Cliente con ese RUC " + c.getRuc());
+        }
+        clientes.add(c);
     }
-    clientes.add(c);
-}
 
     // Modifica nombre y dirección de un cliente existente
     public void editarCliente(String ruc, String nombre, String direccion) {
-    Cliente cliente = obtenerClientePorRuc(ruc);
-    if (cliente == null) {
-        throw new IllegalArgumentException("El cliente no existe");
-    }
-    new Cliente(cliente.getRuc(), nombre, direccion);
+        Cliente cliente = obtenerClientePorRuc(ruc);
+        if (cliente == null) {
+            throw new IllegalArgumentException("El cliente no existe");
+        }
+        new Cliente(cliente.getRuc(), nombre, direccion);
 
-    cliente.setNombre(nombre);
-    cliente.setDireccion(direccion);
+        cliente.setNombre(nombre);
+        cliente.setDireccion(direccion);
     }
 
-    // Elimina el cliente con el ruc buscado 
+    // Elimina el cliente con el ruc buscado
     public void eliminarCliente(String ruc) {
         Cliente cliente = this.obtenerClientePorRuc(ruc);
         if (cliente == null) {
             throw new IllegalArgumentException("El cliente no existe");
         }
-        if (estaEnCola(cliente)){
-            throw new IllegalArgumentException("No se puede eliminar el cliente esta esperando en la cola de atención");
+        if (estaEnCola(cliente)) {
+            throw new IllegalArgumentException("No se puede eliminar el cliente: está esperando en la cola de atención");
         }
         clientes.remove(cliente);
     }
 
-    //Buscar un cliente por Ruc
+    // Buscar un cliente por Ruc (búsqueda secuencial)
     public Cliente obtenerClientePorRuc(String ruc) {
         if (ruc == null) {
             throw new IllegalArgumentException("El RUC no puede ser nulo");
         }
         String rucBuscado = ruc.trim();
-        for (int i = 0; i < clientes.size();i ++) {
+        for (int i = 0; i < clientes.size(); i++) {
             if (clientes.get(i).getRuc().equals(rucBuscado)) {
                 return clientes.get(i);
             }
@@ -82,104 +99,87 @@ public class ClienteServicio {
         return null;
     }
 
-    //Responde Si/No a ¿Existe un cliente con ese RUC?
-    
     public boolean existeCliente(String ruc) {
-    return obtenerClientePorRuc(ruc) != null;
+        return obtenerClientePorRuc(ruc) != null;
     }
     
-    // Método ordenar los clientes por RUC y Nombre
+    // Método ordenar las plantas por RUC
     public List<Cliente> ordenarClientePorRuc() {
-        return insercion(new ArrayList<>(clientes), "ruc");
+        return clientes.stream().sorted(Cliente.POR_RUC).toList();
+    }
+    
+    // Método ordenar las plantas por Nombre
+    public List<Cliente> ordenarClientePorNombre() {
+        return clientes.stream().sorted(Cliente.POR_NOMBRE).toList();
     }
 
-    public List<Cliente> ordenarClientePorNombre() {
-        return insercion(new ArrayList<>(clientes), "nombre");
-    }
-    
-    private List<Cliente> insercion(ArrayList<Cliente> lista, String criterio) {
-        for (int i = 1; i < lista.size(); i++) {
-            Cliente actual = lista.get(i);
-            int j = i - 1;
-            while (j >= 0 && clave(lista.get(j), criterio).compareTo(clave(actual, criterio)) > 0) {
-                lista.set(j + 1, lista.get(j)); // desplaza a la derecha
-                j--;
-            }
-            lista.set(j + 1, actual);           // coloca en su lugar
-        }
-        return lista;
-    }
-    
-     private String clave(Cliente c, String criterio) {
-        if (criterio.equals("ruc")) {
-            return c.getRuc();
-        }
-        return c.getNombre();
-    }
-     
+    // ==========================================
+    // OPERACIONES DE LA COLA CIRCULAR DE ATENCIÓN
+    // ==========================================
+
     public boolean colaVacia() {
         return enCola == 0;
     }
- 
+
     public boolean colaLlena() {
-        return enCola == cola.length;
+        return enCola == CAPACIDAD_COLA;
     }
- 
+
     public int cantidadEnCola() {
         return enCola;
     }
-    
-    //peek
-    
-     public Cliente siguienteEnCola() {
-        return colaVacia() ? null : cola[frente];
-    }
-    
-    // encolar
+
     public void pedirAtencion(String ruc) {
         Cliente c = obtenerClientePorRuc(ruc);
         if (c == null) {
-            throw new IllegalArgumentException("El cliente no existe");
-        }
-        if (estaEnCola(c)) {
-            throw new IllegalArgumentException(c.getNombre() + " ya está en la cola");
+            throw new IllegalArgumentException("No se encontró un cliente con RUC " + ruc);
         }
         if (colaLlena()) {
-            throw new IllegalArgumentException("La cola está llena (" + CAPACIDAD_COLA + " clientes)");
+            throw new IllegalStateException("La cola de atención está llena (máx " + CAPACIDAD_COLA + ")");
         }
-        fin = (fin + 1) % cola.length;   // avanza en círculo: después de 9 vuelve a 0
+        if (estaEnCola(c)) {
+            throw new IllegalArgumentException("El cliente ya se encuentra en la cola de atención");
+        }
+
+        fin = (fin + 1) % CAPACIDAD_COLA;
         cola[fin] = c;
         enCola++;
     }
-     
-    //Desencolar
+
     public Cliente atenderSiguiente() {
         if (colaVacia()) {
-            throw new IllegalStateException("No hay clientes en la cola");
+            throw new IllegalStateException("No hay clientes en la cola de atención");
         }
         Cliente atendido = cola[frente];
         cola[frente] = null;
-        frente = (frente + 1) % cola.length;  // avanza en círculo
+        frente = (frente + 1) % CAPACIDAD_COLA;
         enCola--;
         return atendido;
     }
-    
-     public Cliente[] getCola() {
-        Cliente[] resultado = new Cliente[enCola];
-        for (int k = 0; k < enCola; k++) {
-            resultado[k] = cola[(frente + k) % cola.length];
-        }
-        return resultado;
+
+    public Cliente proximoEnCola() {
+        return colaVacia() ? null : cola[frente];
     }
-     
-    //¿Clienet está en la cola?
-     
-     public boolean estaEnCola(Cliente c) {
-        for (int k = 0; k < enCola; k++) {
-            if (cola[(frente + k) % cola.length] == c) {
+
+    public boolean estaEnCola(Cliente c) {
+        if (colaVacia() || c == null) {
+            return false;
+        }
+        for (int i = 0; i < enCola; i++) {
+            int indice = (frente + i) % CAPACIDAD_COLA;
+            if (cola[indice].getRuc().equals(c.getRuc())) {
                 return true;
             }
         }
         return false;
+    }
+
+    public List<Cliente> obtenerCola() {
+        List<Cliente> lista = new ArrayList<>();
+        for (int i = 0; i < enCola; i++) {
+            int indice = (frente + i) % CAPACIDAD_COLA;
+            lista.add(cola[indice]);
+        }
+        return lista;
     }
 }

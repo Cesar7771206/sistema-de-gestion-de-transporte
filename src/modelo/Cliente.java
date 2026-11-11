@@ -4,24 +4,27 @@
  */
 package modelo;
 
-
+import java.util.Comparator;
 
 /**
+ * Entidad Cliente comercial.
  *
- * @author cesar
+ * @author cesar, NILENY
  */
 public class Cliente {
 
     private String ruc;
     private String nombre;
     private String direccion;
-    
-    // Constructor 
+
+    // Comparadores para los botones "Ordenar por"
+    public static final Comparator<Cliente> POR_RUC = Comparator.comparing(Cliente::getRuc);
+    public static final Comparator<Cliente> POR_NOMBRE = Comparator.comparing(Cliente::getNombre);
+
     public Cliente(String ruc, String nombre, String direccion) {
         setRuc(ruc);
         setNombre(nombre);
         setDireccion(direccion);
-
     }
 
     public String getRuc() {
@@ -33,7 +36,7 @@ public class Cliente {
             throw new IllegalArgumentException("El Ruc no puede ser nulo");
         }
         String r = ruc.trim();
-        if (ruc.matches("\\d{11}")) {
+        if (r.matches("\\d{11}")) {
             this.ruc = r;
         } else {
             throw new IllegalArgumentException("El ruc debe tener solo 11 digitos");
@@ -53,7 +56,6 @@ public class Cliente {
             throw new IllegalArgumentException("El nombre no puede estar vacio");
         }
         this.nombre = n;
-
     }
 
     public String getDireccion() {
@@ -61,7 +63,6 @@ public class Cliente {
     }
 
     public void setDireccion(String direccion) {
-
         if (direccion == null) {
             throw new IllegalArgumentException("La dirección no puede ser nula");
         }
@@ -70,11 +71,10 @@ public class Cliente {
             throw new IllegalArgumentException("La dirección no puede estar vacía");
         }
         this.direccion = d;
-
     }
 
     @Override
     public String toString() {
-        return nombre;
-    } 
+        return nombre != null ? nombre : ruc;
+    }
 }
