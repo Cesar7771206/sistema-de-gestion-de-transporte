@@ -5,10 +5,12 @@
 package modelo;
 
 import java.time.Year;
+import java.util.Comparator;
 
 /**
+ * Entidad Carreta / Remolque.
  *
- * @author cesar
+ * @author cesar, NILENY
  */
 public class Carreta {
 
@@ -23,7 +25,11 @@ public class Carreta {
     private int anio;
     private String MTC;
 
-   
+    // Comparadores para los botones "Ordenar por"
+    public static final Comparator<Carreta> POR_PLACA = Comparator.comparing(Carreta::getPlaca);
+    public static final Comparator<Carreta> POR_MARCA = Comparator.comparing(Carreta::getMarca);
+
+    // Constructor que usa setters para validacion
     public Carreta(String placa, int ejes, String marca, String modelo, String carroceria, int anio, String MTC) {
         setPlaca(placa);
         setEjes(ejes);
@@ -47,7 +53,6 @@ public class Carreta {
             throw new IllegalArgumentException("La placa debe tener 6 letras o números");
         }
         this.placa = placaFinal;
-
     }
 
     public int getEjes() {
@@ -76,7 +81,6 @@ public class Carreta {
         } else {
             throw new IllegalArgumentException("La marca no puede ser nula.");
         }
-        
     }
 
     public String getModelo() {
@@ -144,8 +148,6 @@ public class Carreta {
 
     @Override
     public String toString() {
-        return  placa ;
+        return placa;
     }
-    
-    
 }

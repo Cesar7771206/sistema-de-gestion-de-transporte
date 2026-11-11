@@ -4,77 +4,166 @@
  */
 package vista;
 
-
+import java.awt.Color;
+import java.awt.Dimension;
+import java.awt.event.MouseAdapter;
+import java.awt.event.MouseEvent;
 import java.util.ArrayList;
+import java.util.List;
 import javax.swing.JOptionPane;
+import javax.swing.SwingUtilities;
 import javax.swing.table.DefaultTableModel;
 import modelo.Carreta;
 import servicio.CarretaServicio;
-
+import servicio.GestorEquipos;
 
 /**
- *
- * @author GIANCARLO REA
+ * Panel de gestión de Carretas.
+ * Permite registrar, editar, listar y eliminar carretas
+ * manteniendo sincronización con GestorEquipos.
  */
 public class PanelCarreta extends javax.swing.JPanel {
 
-    private final CarretaServicio carretaServicio;
-    private final DefaultTableModel modelo;
-    private String orden;
+    private String opcion;
+    private CarretaServicio carretaServicio;
+    private DefaultTableModel modeloTabla;
 
+    /**
+     * Creates new form PanelCarreta
+     */
     public PanelCarreta() {
         initComponents();
-        txtPlacaBuscada.setEditable(false);
-        carretaServicio = new CarretaServicio();
-        modelo = (DefaultTableModel) tblCarretas.getModel();
-        orden = "placa";
-        actualizarTabla();
-        
+
+        carretaServicio = new CarretaServicio(new ArrayList<>());
+        modeloTabla = (DefaultTableModel) tblCarretas.getModel();
+
+        jSplitPane.setResizeWeight(0);
+        panelFormulario.setMinimumSize(new Dimension(0, 0));
+        panelTabla.setMinimumSize(new Dimension(0, 0));
+        ocultarFormulario();
+
+        tblCarretas.addMouseListener(new MouseAdapter() {
+            @Override
+            public void mouseClicked(MouseEvent e) {
+                int fila = tblCarretas.getSelectedRow();
+                if (fila >= 0) {
+                    String placa = modeloTabla.getValueAt(fila, 0).toString();
+                    txtPlaca.setText(placa);
+                }
+            }
+        });
+
+        cargarDatos();
     }
 
-    // Vuelve a llenar la tabla según el orden elegido
-    public void actualizarTabla() {
-        modelo.setRowCount(0);
-
-        Carreta[] lista;
-        switch (orden) {
-            case "marca":
-                lista = carretaServicio.ordenarCarretaPorMarca();
-                break;
-            case "anio":
-                lista = carretaServicio.ordenarCarretaPorAnio();
-                break;
-            default:
-                lista = carretaServicio.ordenarCarretaPorPlaca();
-                break;
+    public void cargarDatos() {
+        for (Carreta c : GestorEquipos.getCarretas()) {
+            if (carretaServicio.obtenerCarretaPorPlaca(c.getPlaca()) == null) {
+                carretaServicio.guardarCarreta(
+                        c.getPlaca(),
+                        c.getEjes(),
+                        c.getMarca(),
+                        c.getModelo(),
+                        c.getCarroceria(),
+                        c.getAnio(),
+                        c.getMTC()
+                );
+            }
         }
+        actualizarTabla(carretaServicio.getCarretas());
+    }
 
-        for (int i=0; i < lista.length; i++) {
-            Carreta c=lista[i];
-            modelo.addRow(new Object[]{
-                i,
+    private void actualizarTabla(List<Carreta> listaCarretas) {
+        modeloTabla.setRowCount(0);
+        for (Carreta c : listaCarretas) {
+            Object[] fila = new Object[]{
                 c.getPlaca(),
+                c.getEjes(),
                 c.getMarca(),
                 c.getModelo(),
-                c.getEjes(),
                 c.getCarroceria(),
                 c.getAnio(),
                 c.getMTC()
-            });
-        
-    }
-    
-    }
-    // Muestra u oculta las cajas y botones de la zona de edición
-    private void mostrarEdicion(boolean visible) {
-        java.awt.Component[] zona = {
-            txtPlacaBuscada, txtMarcaBuscada, txtModeloBuscado, txtEjesBuscado,
-            txtCarroceriaBuscada, txtAnioBuscado, txtMTCBuscado,
-            btnLimpiarCarreta, btnEditarCarreta, btnEliminarCarreta
-        };
-        for (java.awt.Component c : zona) {
-            c.setVisible(visible);
+            };
+            modeloTabla.addRow(fila);
         }
+    }
+
+    private void mostrarFormulario() {
+        jSplitPane.setDividerSize(8);
+        SwingUtilities.invokeLater(() -> {
+            int h = jSplitPane.getHeight();
+            int loc = (h > 0) ? Math.min(220, Math.max(180, h / 3)) : 200;
+            jSplitPane.setDividerLocation(loc);
+        });
+        btnAgregar.setText("Cerrar formulario");
+    }
+
+    private void ocultarFormulario() {
+        jSplitPane.setDividerSize(0);
+        SwingUtilities.invokeLater(() -> jSplitPane.setDividerLocation(0));
+        btnAgregar.setText("Agregar");
+        btnOpcion.setVisible(false);
+    }
+
+    private void mostrarCampos(boolean mostrar) {
+        txtEjes.setVisible(mostrar);
+        txtMarca.setVisible(mostrar);
+        txtModelo.setVisible(mostrar);
+        txtCarroceria.setVisible(mostrar);
+        txtMTC.setVisible(mostrar);
+        txtAnio.setVisible(mostrar);
+
+        lblEjes.setVisible(mostrar);
+        lblMarca.setVisible(mostrar);
+        lblModelo.setVisible(mostrar);
+        lblCarroceria.setVisible(mostrar);
+        lblMTC.setVisible(mostrar);
+        lblAnio.setVisible(mostrar);
+    }
+
+    private void editarCampos(boolean editar) {
+        txtPlaca.setEditable(editar);
+        txtEjes.setEditable(editar);
+        txtMarca.setEditable(editar);
+        txtModelo.setEditable(editar);
+        txtCarroceria.setEditable(editar);
+        txtMTC.setEditable(editar);
+        txtAnio.setEditable(editar);
+    }
+
+    private void limpiarCampos() {
+        txtPlaca.setText("");
+        txtEjes.setText("");
+        txtMarca.setText("");
+        txtModelo.setText("");
+        txtCarroceria.setText("");
+        txtAnio.setText("");
+        txtMTC.setText("");
+        editarCampos(true);
+    }
+
+    private void prepararEdicionDeCarreta(Carreta c) {
+        mostrarFormulario();
+        mostrarCampos(true);
+        txtPlaca.setText(c.getPlaca());
+        txtEjes.setText(String.valueOf(c.getEjes()));
+        txtMarca.setText(c.getMarca());
+        txtModelo.setText(c.getModelo());
+        txtCarroceria.setText(c.getCarroceria());
+        txtAnio.setText(String.valueOf(c.getAnio()));
+        txtMTC.setText(c.getMTC());
+
+        txtPlaca.setEditable(false);
+        lblPlaca.setText("Editar datos de la carreta (Placa protegida):");
+
+        opcion = "guardar";
+        btnOpcion.setText("Guardar");
+        btnOpcion.setBackground(new Color(255, 153, 102));
+        btnOpcion.setForeground(Color.WHITE);
+        btnOpcion.setVisible(true);
+
+        txtEjes.requestFocus();
     }
 
     /**
@@ -86,319 +175,104 @@ public class PanelCarreta extends javax.swing.JPanel {
     // <editor-fold defaultstate="collapsed" desc="Generated Code">//GEN-BEGIN:initComponents
     private void initComponents() {
 
-        jLabel1 = new javax.swing.JLabel();
-        jLabel2 = new javax.swing.JLabel();
-        jLabel3 = new javax.swing.JLabel();
-        jLabel4 = new javax.swing.JLabel();
-        btnGuardar = new javax.swing.JButton();
-        jLabel5 = new javax.swing.JLabel();
-        jLabel6 = new javax.swing.JLabel();
-        jLabel7 = new javax.swing.JLabel();
-        jLabel8 = new javax.swing.JLabel();
-        txtInputPlaca = new javax.swing.JTextField();
-        txtInputMTC = new javax.swing.JTextField();
-        txtInputModelo = new javax.swing.JTextField();
-        txtInputCarroceria = new javax.swing.JTextField();
-        txtInputEjes = new javax.swing.JTextField();
-        txtInputAnio = new javax.swing.JTextField();
-        txtInputMarca = new javax.swing.JTextField();
-        jLabel9 = new javax.swing.JLabel();
-        btnOrPlaca = new javax.swing.JButton();
-        btnOrMarca = new javax.swing.JButton();
-        btnOrAnio = new javax.swing.JButton();
-        jScrollPane1 = new javax.swing.JScrollPane();
-        tblCarretas = new javax.swing.JTable();
-        jLabel10 = new javax.swing.JLabel();
-        txtCarretaBuscada = new javax.swing.JTextField();
-        btnSeleccionarCarreta = new javax.swing.JButton();
-        jLabel11 = new javax.swing.JLabel();
-        txtPlacaBuscada = new javax.swing.JTextField();
-        txtMarcaBuscada = new javax.swing.JTextField();
-        txtModeloBuscado = new javax.swing.JTextField();
-        txtEjesBuscado = new javax.swing.JTextField();
-        txtCarroceriaBuscada = new javax.swing.JTextField();
-        txtMTCBuscado = new javax.swing.JTextField();
-        txtAnioBuscado = new javax.swing.JTextField();
-        jLabel12 = new javax.swing.JLabel();
-        jLabel13 = new javax.swing.JLabel();
-        jLabel14 = new javax.swing.JLabel();
-        jLabel15 = new javax.swing.JLabel();
-        jLabel16 = new javax.swing.JLabel();
-        jLabel17 = new javax.swing.JLabel();
-        btnLimpiarCarreta = new javax.swing.JButton();
-        btnEditarCarreta = new javax.swing.JButton();
-        btnEliminarCarreta = new javax.swing.JButton();
+        panelBarra = new javax.swing.JPanel();
+        lblTitulo = new javax.swing.JLabel();
+        panelBotones = new javax.swing.JPanel();
+        btnAgregar = new javax.swing.JButton();
+        btnEditar = new javax.swing.JButton();
+        btnEliminar = new javax.swing.JButton();
+        btnDeshacer = new javax.swing.JButton();
         btnRespaldo = new javax.swing.JButton();
         btnComparar = new javax.swing.JButton();
-        btnDeshacer = new javax.swing.JButton();
+        jSplitPane = new javax.swing.JSplitPane();
+        panelFormulario = new javax.swing.JPanel();
+        contenidoPanelFormulario = new javax.swing.JPanel();
+        txtPlaca = new javax.swing.JTextField();
+        lblMarca = new javax.swing.JLabel();
+        lblModelo = new javax.swing.JLabel();
+        lblPlaca = new javax.swing.JLabel();
+        txtModelo = new javax.swing.JTextField();
+        txtCarroceria = new javax.swing.JTextField();
+        txtMarca = new javax.swing.JTextField();
+        lblCarroceria = new javax.swing.JLabel();
+        lblAnio = new javax.swing.JLabel();
+        txtAnio = new javax.swing.JTextField();
+        lblMTC = new javax.swing.JLabel();
+        txtMTC = new javax.swing.JTextField();
+        txtEjes = new javax.swing.JTextField();
+        lblEjes = new javax.swing.JLabel();
+        btnOpcion = new javax.swing.JButton();
+        btnCancelar = new javax.swing.JButton();
+        panelTabla = new javax.swing.JPanel();
+        jScrollPane = new javax.swing.JScrollPane();
+        tblCarretas = new javax.swing.JTable();
 
         setBackground(new java.awt.Color(255, 255, 255));
         setMaximumSize(new java.awt.Dimension(810, 540));
         setMinimumSize(new java.awt.Dimension(810, 540));
         setPreferredSize(new java.awt.Dimension(810, 540));
-        setLayout(new org.netbeans.lib.awtextra.AbsoluteLayout());
+        setLayout(new java.awt.BorderLayout());
 
-        jLabel1.setFont(new java.awt.Font("Sans Serif Collection", 1, 14)); // NOI18N
-        jLabel1.setForeground(new java.awt.Color(0, 0, 0));
-        jLabel1.setText("REGISTRAR CARRETA");
-        add(jLabel1, new org.netbeans.lib.awtextra.AbsoluteConstraints(40, 20, -1, -1));
+        panelBarra.setBackground(new java.awt.Color(255, 255, 255));
+        panelBarra.setLayout(new java.awt.BorderLayout());
 
-        jLabel2.setFont(new java.awt.Font("Sans Serif Collection", 1, 14)); // NOI18N
-        jLabel2.setForeground(new java.awt.Color(0, 0, 0));
-        jLabel2.setText("Placa:");
-        add(jLabel2, new org.netbeans.lib.awtextra.AbsoluteConstraints(40, 60, -1, -1));
+        lblTitulo.setFont(new java.awt.Font("sansserif", 1, 13)); // NOI18N
+        lblTitulo.setText("      CARRETAS");
+        panelBarra.add(lblTitulo, java.awt.BorderLayout.CENTER);
 
-        jLabel3.setFont(new java.awt.Font("Sans Serif Collection", 1, 14)); // NOI18N
-        jLabel3.setForeground(new java.awt.Color(0, 0, 0));
-        jLabel3.setText("Marca:");
-        add(jLabel3, new org.netbeans.lib.awtextra.AbsoluteConstraints(180, 60, -1, -1));
+        panelBotones.setBackground(new java.awt.Color(255, 255, 255));
 
-        jLabel4.setFont(new java.awt.Font("Sans Serif Collection", 1, 14)); // NOI18N
-        jLabel4.setForeground(new java.awt.Color(0, 0, 0));
-        jLabel4.setText("MTC:");
-        add(jLabel4, new org.netbeans.lib.awtextra.AbsoluteConstraints(410, 110, -1, -1));
-
-        btnGuardar.setBackground(new java.awt.Color(0, 153, 204));
-        btnGuardar.setForeground(new java.awt.Color(255, 255, 255));
-        btnGuardar.setText("Guardar");
-        btnGuardar.addActionListener(new java.awt.event.ActionListener() {
+        btnAgregar.setBackground(new java.awt.Color(0, 153, 255));
+        btnAgregar.setForeground(new java.awt.Color(255, 255, 255));
+        btnAgregar.setText("Agregar");
+        btnAgregar.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
-                btnGuardarActionPerformed(evt);
+                btnAgregarActionPerformed(evt);
             }
         });
-        add(btnGuardar, new org.netbeans.lib.awtextra.AbsoluteConstraints(630, 100, 130, 30));
+        panelBotones.add(btnAgregar);
 
-        jLabel5.setFont(new java.awt.Font("Sans Serif Collection", 1, 14)); // NOI18N
-        jLabel5.setForeground(new java.awt.Color(0, 0, 0));
-        jLabel5.setText("Modelo:");
-        add(jLabel5, new org.netbeans.lib.awtextra.AbsoluteConstraints(400, 60, -1, -1));
-
-        jLabel6.setFont(new java.awt.Font("Sans Serif Collection", 1, 14)); // NOI18N
-        jLabel6.setForeground(new java.awt.Color(0, 0, 0));
-        jLabel6.setText("Ejes:");
-        add(jLabel6, new org.netbeans.lib.awtextra.AbsoluteConstraints(640, 60, 40, -1));
-
-        jLabel7.setFont(new java.awt.Font("Sans Serif Collection", 1, 14)); // NOI18N
-        jLabel7.setForeground(new java.awt.Color(0, 0, 0));
-        jLabel7.setText("Carroceria:");
-        add(jLabel7, new org.netbeans.lib.awtextra.AbsoluteConstraints(40, 110, -1, -1));
-
-        jLabel8.setFont(new java.awt.Font("Sans Serif Collection", 1, 14)); // NOI18N
-        jLabel8.setForeground(new java.awt.Color(0, 0, 0));
-        jLabel8.setText("Año:");
-        add(jLabel8, new org.netbeans.lib.awtextra.AbsoluteConstraints(290, 110, -1, -1));
-
-        txtInputPlaca.setBackground(new java.awt.Color(255, 255, 255));
-        txtInputPlaca.setHorizontalAlignment(javax.swing.JTextField.CENTER);
-        txtInputPlaca.setBorder(javax.swing.BorderFactory.createLineBorder(new java.awt.Color(0, 0, 0)));
-        add(txtInputPlaca, new org.netbeans.lib.awtextra.AbsoluteConstraints(90, 50, 80, 30));
-
-        txtInputMTC.setBackground(new java.awt.Color(255, 255, 255));
-        txtInputMTC.setHorizontalAlignment(javax.swing.JTextField.CENTER);
-        txtInputMTC.setBorder(javax.swing.BorderFactory.createLineBorder(new java.awt.Color(0, 0, 0)));
-        add(txtInputMTC, new org.netbeans.lib.awtextra.AbsoluteConstraints(460, 100, 150, 30));
-
-        txtInputModelo.setBackground(new java.awt.Color(255, 255, 255));
-        txtInputModelo.setHorizontalAlignment(javax.swing.JTextField.CENTER);
-        txtInputModelo.setBorder(javax.swing.BorderFactory.createLineBorder(new java.awt.Color(0, 0, 0)));
-        add(txtInputModelo, new org.netbeans.lib.awtextra.AbsoluteConstraints(470, 50, 150, 30));
-
-        txtInputCarroceria.setBackground(new java.awt.Color(255, 255, 255));
-        txtInputCarroceria.setHorizontalAlignment(javax.swing.JTextField.CENTER);
-        txtInputCarroceria.setBorder(javax.swing.BorderFactory.createLineBorder(new java.awt.Color(0, 0, 0)));
-        add(txtInputCarroceria, new org.netbeans.lib.awtextra.AbsoluteConstraints(120, 100, 150, 30));
-
-        txtInputEjes.setBackground(new java.awt.Color(255, 255, 255));
-        txtInputEjes.setHorizontalAlignment(javax.swing.JTextField.CENTER);
-        txtInputEjes.setBorder(javax.swing.BorderFactory.createLineBorder(new java.awt.Color(0, 0, 0)));
-        add(txtInputEjes, new org.netbeans.lib.awtextra.AbsoluteConstraints(680, 50, 60, 30));
-
-        txtInputAnio.setBackground(new java.awt.Color(255, 255, 255));
-        txtInputAnio.setHorizontalAlignment(javax.swing.JTextField.CENTER);
-        txtInputAnio.setBorder(javax.swing.BorderFactory.createLineBorder(new java.awt.Color(0, 0, 0)));
-        add(txtInputAnio, new org.netbeans.lib.awtextra.AbsoluteConstraints(330, 100, 60, 30));
-
-        txtInputMarca.setBackground(new java.awt.Color(255, 255, 255));
-        txtInputMarca.setHorizontalAlignment(javax.swing.JTextField.CENTER);
-        txtInputMarca.setBorder(javax.swing.BorderFactory.createLineBorder(new java.awt.Color(0, 0, 0)));
-        add(txtInputMarca, new org.netbeans.lib.awtextra.AbsoluteConstraints(240, 50, 150, 30));
-
-        jLabel9.setForeground(new java.awt.Color(0, 0, 0));
-        jLabel9.setText("Ordenar por:");
-        add(jLabel9, new org.netbeans.lib.awtextra.AbsoluteConstraints(40, 160, 80, -1));
-
-        btnOrPlaca.setBackground(new java.awt.Color(204, 153, 255));
-        btnOrPlaca.setForeground(new java.awt.Color(255, 255, 255));
-        btnOrPlaca.setText("Placa");
-        btnOrPlaca.addActionListener(new java.awt.event.ActionListener() {
+        btnEditar.setBackground(new java.awt.Color(255, 153, 102));
+        btnEditar.setForeground(new java.awt.Color(255, 255, 255));
+        btnEditar.setText("Editar");
+        btnEditar.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
-                btnOrPlacaActionPerformed(evt);
+                btnEditarActionPerformed(evt);
             }
         });
-        add(btnOrPlaca, new org.netbeans.lib.awtextra.AbsoluteConstraints(120, 160, 60, -1));
+        panelBotones.add(btnEditar);
 
-        btnOrMarca.setBackground(new java.awt.Color(255, 153, 153));
-        btnOrMarca.setForeground(new java.awt.Color(255, 255, 255));
-        btnOrMarca.setText("Marca");
-        btnOrMarca.addActionListener(new java.awt.event.ActionListener() {
+        btnEliminar.setBackground(new java.awt.Color(255, 51, 51));
+        btnEliminar.setForeground(new java.awt.Color(255, 255, 255));
+        btnEliminar.setText("Eliminar");
+        btnEliminar.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
-                btnOrMarcaActionPerformed(evt);
+                btnEliminarActionPerformed(evt);
             }
         });
-        add(btnOrMarca, new org.netbeans.lib.awtextra.AbsoluteConstraints(190, 160, 70, -1));
+        panelBotones.add(btnEliminar);
 
-        btnOrAnio.setBackground(new java.awt.Color(153, 153, 255));
-        btnOrAnio.setForeground(new java.awt.Color(255, 255, 255));
-        btnOrAnio.setText("Año");
-        btnOrAnio.addActionListener(new java.awt.event.ActionListener() {
+        btnDeshacer.setBackground(new java.awt.Color(153, 0, 153));
+        btnDeshacer.setForeground(new java.awt.Color(255, 255, 255));
+        btnDeshacer.setText("Deshacer (Pila)");
+        btnDeshacer.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
-                btnOrAnioActionPerformed(evt);
+                btnDeshacerActionPerformed(evt);
             }
         });
-        add(btnOrAnio, new org.netbeans.lib.awtextra.AbsoluteConstraints(270, 160, 60, -1));
+        panelBotones.add(btnDeshacer);
 
-        jScrollPane1.setBackground(new java.awt.Color(255, 255, 255));
-
-        tblCarretas.setBackground(new java.awt.Color(255, 255, 255));
-        tblCarretas.setModel(new javax.swing.table.DefaultTableModel(
-            new Object [][] {
-                {null, null, null, null, null, null, null, null},
-                {null, null, null, null, null, null, null, null},
-                {null, null, null, null, null, null, null, null},
-                {null, null, null, null, null, null, null, null}
-            },
-            new String [] {
-                "Posición", "Placa", "Marca", "Modelo", "Ejes", "Carroceria", "Año", "MTC"
-            }
-        ) {
-            Class[] types = new Class [] {
-                java.lang.Integer.class, java.lang.String.class, java.lang.String.class, java.lang.String.class, java.lang.Integer.class, java.lang.String.class, java.lang.Integer.class, java.lang.String.class
-            };
-
-            public Class getColumnClass(int columnIndex) {
-                return types [columnIndex];
-            }
-        });
-        jScrollPane1.setViewportView(tblCarretas);
-
-        add(jScrollPane1, new org.netbeans.lib.awtextra.AbsoluteConstraints(40, 200, 720, 160));
-
-        jLabel10.setForeground(new java.awt.Color(0, 0, 0));
-        jLabel10.setText("Ingresar la placa de la Carreta:");
-        add(jLabel10, new org.netbeans.lib.awtextra.AbsoluteConstraints(40, 380, 200, 20));
-
-        txtCarretaBuscada.setBackground(new java.awt.Color(255, 255, 255));
-        txtCarretaBuscada.setHorizontalAlignment(javax.swing.JTextField.CENTER);
-        add(txtCarretaBuscada, new org.netbeans.lib.awtextra.AbsoluteConstraints(250, 380, 200, -1));
-
-        btnSeleccionarCarreta.setBackground(new java.awt.Color(0, 153, 204));
-        btnSeleccionarCarreta.setForeground(new java.awt.Color(255, 255, 255));
-        btnSeleccionarCarreta.setText("Buscar");
-        btnSeleccionarCarreta.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                btnSeleccionarCarretaActionPerformed(evt);
-            }
-        });
-        add(btnSeleccionarCarreta, new org.netbeans.lib.awtextra.AbsoluteConstraints(460, 380, 130, -1));
-
-        jLabel11.setForeground(new java.awt.Color(0, 0, 0));
-        jLabel11.setText("MTC");
-        add(jLabel11, new org.netbeans.lib.awtextra.AbsoluteConstraints(360, 470, -1, -1));
-
-        txtPlacaBuscada.setBackground(new java.awt.Color(255, 255, 255));
-        txtPlacaBuscada.setHorizontalAlignment(javax.swing.JTextField.CENTER);
-        add(txtPlacaBuscada, new org.netbeans.lib.awtextra.AbsoluteConstraints(40, 440, 140, -1));
-
-        txtMarcaBuscada.setBackground(new java.awt.Color(255, 255, 255));
-        txtMarcaBuscada.setHorizontalAlignment(javax.swing.JTextField.CENTER);
-        add(txtMarcaBuscada, new org.netbeans.lib.awtextra.AbsoluteConstraints(40, 490, 140, -1));
-
-        txtModeloBuscado.setBackground(new java.awt.Color(255, 255, 255));
-        txtModeloBuscado.setHorizontalAlignment(javax.swing.JTextField.CENTER);
-        add(txtModeloBuscado, new org.netbeans.lib.awtextra.AbsoluteConstraints(200, 440, 120, -1));
-
-        txtEjesBuscado.setBackground(new java.awt.Color(255, 255, 255));
-        txtEjesBuscado.setHorizontalAlignment(javax.swing.JTextField.CENTER);
-        add(txtEjesBuscado, new org.netbeans.lib.awtextra.AbsoluteConstraints(330, 440, 70, -1));
-
-        txtCarroceriaBuscada.setBackground(new java.awt.Color(255, 255, 255));
-        txtCarroceriaBuscada.setHorizontalAlignment(javax.swing.JTextField.CENTER);
-        add(txtCarroceriaBuscada, new org.netbeans.lib.awtextra.AbsoluteConstraints(200, 490, 150, -1));
-
-        txtMTCBuscado.setBackground(new java.awt.Color(255, 255, 255));
-        txtMTCBuscado.setHorizontalAlignment(javax.swing.JTextField.CENTER);
-        add(txtMTCBuscado, new org.netbeans.lib.awtextra.AbsoluteConstraints(360, 490, 140, -1));
-
-        txtAnioBuscado.setBackground(new java.awt.Color(255, 255, 255));
-        txtAnioBuscado.setHorizontalAlignment(javax.swing.JTextField.CENTER);
-        add(txtAnioBuscado, new org.netbeans.lib.awtextra.AbsoluteConstraints(410, 440, 90, -1));
-
-        jLabel12.setForeground(new java.awt.Color(0, 0, 0));
-        jLabel12.setText("Placa");
-        add(jLabel12, new org.netbeans.lib.awtextra.AbsoluteConstraints(40, 420, -1, -1));
-
-        jLabel13.setForeground(new java.awt.Color(0, 0, 0));
-        jLabel13.setText("Marca");
-        add(jLabel13, new org.netbeans.lib.awtextra.AbsoluteConstraints(40, 470, -1, -1));
-
-        jLabel14.setForeground(new java.awt.Color(0, 0, 0));
-        jLabel14.setText("Modelo");
-        add(jLabel14, new org.netbeans.lib.awtextra.AbsoluteConstraints(200, 420, -1, -1));
-
-        jLabel15.setForeground(new java.awt.Color(0, 0, 0));
-        jLabel15.setText("Ejes");
-        add(jLabel15, new org.netbeans.lib.awtextra.AbsoluteConstraints(330, 420, -1, -1));
-
-        jLabel16.setForeground(new java.awt.Color(0, 0, 0));
-        jLabel16.setText("Carroceria");
-        add(jLabel16, new org.netbeans.lib.awtextra.AbsoluteConstraints(200, 470, -1, -1));
-
-        jLabel17.setForeground(new java.awt.Color(0, 0, 0));
-        jLabel17.setText("Año");
-        add(jLabel17, new org.netbeans.lib.awtextra.AbsoluteConstraints(410, 420, -1, -1));
-
-        btnLimpiarCarreta.setBackground(new java.awt.Color(0, 153, 204));
-        btnLimpiarCarreta.setForeground(new java.awt.Color(255, 255, 255));
-        btnLimpiarCarreta.setText("Limpiar");
-        btnLimpiarCarreta.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                btnLimpiarCarretaActionPerformed(evt);
-            }
-        });
-        add(btnLimpiarCarreta, new org.netbeans.lib.awtextra.AbsoluteConstraints(600, 460, -1, -1));
-
-        btnEditarCarreta.setBackground(new java.awt.Color(255, 153, 0));
-        btnEditarCarreta.setForeground(new java.awt.Color(255, 255, 255));
-        btnEditarCarreta.setText("Editar");
-        btnEditarCarreta.setToolTipText("");
-        btnEditarCarreta.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                btnEditarCarretaActionPerformed(evt);
-            }
-        });
-        add(btnEditarCarreta, new org.netbeans.lib.awtextra.AbsoluteConstraints(520, 460, -1, -1));
-
-        btnEliminarCarreta.setBackground(new java.awt.Color(255, 51, 51));
-        btnEliminarCarreta.setForeground(new java.awt.Color(255, 255, 255));
-        btnEliminarCarreta.setText("Eliminar");
-        btnEliminarCarreta.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                btnEliminarCarretaActionPerformed(evt);
-            }
-        });
-        add(btnEliminarCarreta, new org.netbeans.lib.awtextra.AbsoluteConstraints(680, 460, -1, -1));
-
-        btnRespaldo.setBackground(new java.awt.Color(204, 0, 204));
+        btnRespaldo.setBackground(new java.awt.Color(0, 153, 51));
         btnRespaldo.setForeground(new java.awt.Color(255, 255, 255));
-        btnRespaldo.setText("Respaldo");
+        btnRespaldo.setText("Respaldar");
         btnRespaldo.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 btnRespaldoActionPerformed(evt);
             }
         });
-        add(btnRespaldo, new org.netbeans.lib.awtextra.AbsoluteConstraints(550, 160, 90, -1));
+        panelBotones.add(btnRespaldo);
 
-        btnComparar.setBackground(new java.awt.Color(0, 102, 153));
+        btnComparar.setBackground(new java.awt.Color(0, 102, 204));
         btnComparar.setForeground(new java.awt.Color(255, 255, 255));
         btnComparar.setText("Comparar");
         btnComparar.addActionListener(new java.awt.event.ActionListener() {
@@ -406,278 +280,454 @@ public class PanelCarreta extends javax.swing.JPanel {
                 btnCompararActionPerformed(evt);
             }
         });
-        add(btnComparar, new org.netbeans.lib.awtextra.AbsoluteConstraints(650, 160, 110, -1));
+        panelBotones.add(btnComparar);
 
-        btnDeshacer.setBackground(new java.awt.Color(204, 51, 255));
-        btnDeshacer.setForeground(new java.awt.Color(255, 255, 255));
-        btnDeshacer.setText("Deshacer eliminación");
-        btnDeshacer.addActionListener(new java.awt.event.ActionListener() {
+        panelBarra.add(panelBotones, java.awt.BorderLayout.LINE_END);
+
+        add(panelBarra, java.awt.BorderLayout.PAGE_START);
+
+        jSplitPane.setBackground(new java.awt.Color(255, 255, 255));
+        jSplitPane.setDividerLocation(200);
+        jSplitPane.setOrientation(javax.swing.JSplitPane.VERTICAL_SPLIT);
+
+        panelFormulario.setBackground(new java.awt.Color(255, 255, 255));
+        panelFormulario.setMinimumSize(new java.awt.Dimension(100, 100));
+        panelFormulario.setLayout(new org.netbeans.lib.awtextra.AbsoluteLayout());
+
+        contenidoPanelFormulario.setBackground(new java.awt.Color(255, 255, 255));
+        contenidoPanelFormulario.setLayout(new org.netbeans.lib.awtextra.AbsoluteLayout());
+
+        txtPlaca.setHorizontalAlignment(javax.swing.JTextField.CENTER);
+        contenidoPanelFormulario.add(txtPlaca, new org.netbeans.lib.awtextra.AbsoluteConstraints(20, 110, 190, 30));
+
+        lblMarca.setFont(new java.awt.Font("sansserif", 1, 13)); // NOI18N
+        lblMarca.setText("Marca");
+        contenidoPanelFormulario.add(lblMarca, new org.netbeans.lib.awtextra.AbsoluteConstraints(110, 30, -1, -1));
+
+        lblModelo.setFont(new java.awt.Font("sansserif", 1, 13)); // NOI18N
+        lblModelo.setText("Modelo");
+        contenidoPanelFormulario.add(lblModelo, new org.netbeans.lib.awtextra.AbsoluteConstraints(250, 30, -1, -1));
+
+        lblPlaca.setFont(new java.awt.Font("sansserif", 1, 13)); // NOI18N
+        lblPlaca.setText("Placa");
+        contenidoPanelFormulario.add(lblPlaca, new org.netbeans.lib.awtextra.AbsoluteConstraints(20, 90, -1, -1));
+
+        txtModelo.setHorizontalAlignment(javax.swing.JTextField.CENTER);
+        contenidoPanelFormulario.add(txtModelo, new org.netbeans.lib.awtextra.AbsoluteConstraints(250, 50, 130, 30));
+
+        txtCarroceria.setHorizontalAlignment(javax.swing.JTextField.CENTER);
+        contenidoPanelFormulario.add(txtCarroceria, new org.netbeans.lib.awtextra.AbsoluteConstraints(390, 50, 130, 30));
+
+        txtMarca.setHorizontalAlignment(javax.swing.JTextField.CENTER);
+        contenidoPanelFormulario.add(txtMarca, new org.netbeans.lib.awtextra.AbsoluteConstraints(110, 50, 130, 30));
+
+        lblCarroceria.setFont(new java.awt.Font("sansserif", 1, 13)); // NOI18N
+        lblCarroceria.setText("Carrocería");
+        contenidoPanelFormulario.add(lblCarroceria, new org.netbeans.lib.awtextra.AbsoluteConstraints(390, 30, -1, -1));
+
+        lblAnio.setFont(new java.awt.Font("sansserif", 1, 13)); // NOI18N
+        lblAnio.setText("Año");
+        contenidoPanelFormulario.add(lblAnio, new org.netbeans.lib.awtextra.AbsoluteConstraints(670, 30, -1, -1));
+
+        txtAnio.setHorizontalAlignment(javax.swing.JTextField.CENTER);
+        contenidoPanelFormulario.add(txtAnio, new org.netbeans.lib.awtextra.AbsoluteConstraints(670, 50, 80, 30));
+
+        lblMTC.setFont(new java.awt.Font("sansserif", 1, 13)); // NOI18N
+        lblMTC.setText("MTC");
+        contenidoPanelFormulario.add(lblMTC, new org.netbeans.lib.awtextra.AbsoluteConstraints(530, 30, -1, -1));
+
+        txtMTC.setHorizontalAlignment(javax.swing.JTextField.CENTER);
+        contenidoPanelFormulario.add(txtMTC, new org.netbeans.lib.awtextra.AbsoluteConstraints(530, 50, 130, 30));
+
+        txtEjes.setHorizontalAlignment(javax.swing.JTextField.CENTER);
+        contenidoPanelFormulario.add(txtEjes, new org.netbeans.lib.awtextra.AbsoluteConstraints(20, 50, 80, 30));
+
+        lblEjes.setFont(new java.awt.Font("sansserif", 1, 13)); // NOI18N
+        lblEjes.setText("Ejes");
+        contenidoPanelFormulario.add(lblEjes, new org.netbeans.lib.awtextra.AbsoluteConstraints(23, 28, -1, -1));
+
+        btnOpcion.setForeground(new java.awt.Color(255, 255, 255));
+        btnOpcion.setText("Opcion");
+        btnOpcion.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
-                btnDeshacerActionPerformed(evt);
+                btnOpcionActionPerformed(evt);
             }
         });
-        add(btnDeshacer, new org.netbeans.lib.awtextra.AbsoluteConstraints(520, 490, 230, -1));
+        contenidoPanelFormulario.add(btnOpcion, new org.netbeans.lib.awtextra.AbsoluteConstraints(220, 110, 130, -1));
+
+        btnCancelar.setBackground(new java.awt.Color(255, 102, 102));
+        btnCancelar.setForeground(new java.awt.Color(255, 255, 255));
+        btnCancelar.setText("Cancelar");
+        btnCancelar.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                btnCancelarActionPerformed(evt);
+            }
+        });
+        contenidoPanelFormulario.add(btnCancelar, new org.netbeans.lib.awtextra.AbsoluteConstraints(360, 110, 120, -1));
+
+        panelFormulario.add(contenidoPanelFormulario, new org.netbeans.lib.awtextra.AbsoluteConstraints(0, 0, 810, 200));
+
+        jSplitPane.setTopComponent(panelFormulario);
+
+        panelTabla.setBackground(new java.awt.Color(255, 255, 255));
+        panelTabla.setLayout(new java.awt.BorderLayout());
+
+        jScrollPane.setBackground(new java.awt.Color(255, 255, 255));
+
+        tblCarretas.setModel(new javax.swing.table.DefaultTableModel(
+            new Object [][] {
+                {null, null, null, null, null, null, null},
+                {null, null, null, null, null, null, null},
+                {null, null, null, null, null, null, null},
+                {null, null, null, null, null, null, null}
+            },
+            new String [] {
+                "Placa", "Ejes", "Marca", "Modelo", "Carrocería", "Año", "MTC"
+            }
+        ) {
+            Class[] types = new Class [] {
+                java.lang.String.class, java.lang.Integer.class, java.lang.String.class, java.lang.String.class, java.lang.String.class, java.lang.Integer.class, java.lang.String.class
+            };
+
+            public Class getColumnClass(int columnIndex) {
+                return types [columnIndex];
+            }
+        });
+        jScrollPane.setViewportView(tblCarretas);
+
+        panelTabla.add(jScrollPane, java.awt.BorderLayout.CENTER);
+
+        jSplitPane.setRightComponent(panelTabla);
+
+        add(jSplitPane, java.awt.BorderLayout.CENTER);
     }// </editor-fold>//GEN-END:initComponents
 
-    private void btnGuardarActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnGuardarActionPerformed
+    private void btnAgregarActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnAgregarActionPerformed
+        if (btnAgregar.getText().equalsIgnoreCase("Cerrar formulario") && "registrar".equals(opcion)) {
+            ocultarFormulario();
+            limpiarCampos();
+            return;
+        }
+
+        mostrarFormulario();
+        mostrarCampos(true);
+        limpiarCampos();
+
+        lblPlaca.setText("Placa");
+        opcion = "registrar";
+
+        btnOpcion.setText("Registrar");
+        btnOpcion.setBackground(new Color(0, 153, 255));
+        btnOpcion.setForeground(Color.WHITE);
+        btnOpcion.setVisible(true);
+
+        txtEjes.requestFocus();
+    }//GEN-LAST:event_btnAgregarActionPerformed
+
+    private void btnOpcionActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnOpcionActionPerformed
+        switch (opcion) {
+            case "registrar":
+                try {
+                    String placa = txtPlaca.getText().trim();
+                    String marca = txtMarca.getText().trim();
+                    String modelo = txtModelo.getText().trim();
+                    String carroceria = txtCarroceria.getText().trim();
+                    String MTC = txtMTC.getText().trim();
+
+                    if (placa.isEmpty() || marca.isEmpty() || modelo.isEmpty() || carroceria.isEmpty() || MTC.isEmpty()) {
+                        JOptionPane.showMessageDialog(this, "Complete todos los campos de la carreta.", "Aviso", JOptionPane.WARNING_MESSAGE);
+                        return;
+                    }
+
+                    int ejes = Integer.parseInt(txtEjes.getText().trim());
+                    int anio = Integer.parseInt(txtAnio.getText().trim());
+
+                    carretaServicio.guardarCarreta(placa, ejes, marca, modelo, carroceria, anio, MTC);
+                    Carreta carretaRegistrada = carretaServicio.obtenerCarretaPorPlaca(placa);
+                    GestorEquipos.agregarCarreta(carretaRegistrada);
+
+                    JOptionPane.showMessageDialog(this, "Carreta " + placa + " registrada exitosamente.");
+                    limpiarCampos();
+                    btnOpcion.setVisible(false);
+                    actualizarTabla(carretaServicio.getCarretas());
+                    ocultarFormulario();
+                } catch (NumberFormatException e) {
+                    JOptionPane.showMessageDialog(this, "Ejes y Año deben ser valores numéricos enteros.", "Error de Formato", JOptionPane.ERROR_MESSAGE);
+                } catch (IllegalArgumentException | IllegalStateException e) {
+                    JOptionPane.showMessageDialog(this, e.getMessage(), "Error al Registrar", JOptionPane.ERROR_MESSAGE);
+                }
+                break;
+
+            case "seleccionarGuardar":
+                try {
+                    String placa = txtPlaca.getText().trim();
+                    Carreta c = carretaServicio.obtenerCarretaPorPlaca(placa);
+                    if (c == null) {
+                        c = GestorEquipos.buscarCarretaPorPlaca(placa);
+                    }
+
+                    if (c == null) {
+                        JOptionPane.showMessageDialog(this, "La carreta con placa " + placa + " no está registrada.", "No Encontrada", JOptionPane.WARNING_MESSAGE);
+                        txtPlaca.setText("");
+                        txtPlaca.requestFocus();
+                    } else {
+                        prepararEdicionDeCarreta(c);
+                    }
+                } catch (IllegalArgumentException e) {
+                    JOptionPane.showMessageDialog(this, e.getMessage(), "Aviso", JOptionPane.WARNING_MESSAGE);
+                }
+                break;
+
+            case "guardar":
+                try {
+                    String placa = txtPlaca.getText().trim();
+                    String marca = txtMarca.getText().trim();
+                    String modelo = txtModelo.getText().trim();
+                    String carroceria = txtCarroceria.getText().trim();
+                    String MTC = txtMTC.getText().trim();
+
+                    if (marca.isEmpty() || modelo.isEmpty() || carroceria.isEmpty() || MTC.isEmpty()) {
+                        JOptionPane.showMessageDialog(this, "Complete todos los campos a actualizar.", "Aviso", JOptionPane.WARNING_MESSAGE);
+                        return;
+                    }
+
+                    int ejes = Integer.parseInt(txtEjes.getText().trim());
+                    int anio = Integer.parseInt(txtAnio.getText().trim());
+
+                    carretaServicio.editarCarreta(placa, ejes, marca, modelo, carroceria, anio, MTC);
+
+                    Carreta cGestor = GestorEquipos.buscarCarretaPorPlaca(placa);
+                    if (cGestor != null) {
+                        cGestor.setEjes(ejes);
+                        cGestor.setMarca(marca);
+                        cGestor.setModelo(modelo);
+                        cGestor.setCarroceria(carroceria);
+                        cGestor.setAnio(anio);
+                        cGestor.setMTC(MTC);
+                    }
+
+                    JOptionPane.showMessageDialog(this, "Carreta " + placa + " actualizada correctamente.");
+                    actualizarTabla(carretaServicio.getCarretas());
+                    limpiarCampos();
+                    ocultarFormulario();
+                } catch (NumberFormatException e) {
+                    JOptionPane.showMessageDialog(this, "Ejes y Año deben ser valores numéricos enteros.", "Error de Formato", JOptionPane.ERROR_MESSAGE);
+                } catch (IllegalArgumentException | IllegalStateException e) {
+                    JOptionPane.showMessageDialog(this, e.getMessage(), "Error al Actualizar", JOptionPane.ERROR_MESSAGE);
+                }
+                break;
+
+            case "seleccionarEliminar":
+                try {
+                    String placa = txtPlaca.getText().trim();
+                    Carreta c = carretaServicio.obtenerCarretaPorPlaca(placa);
+                    if (c == null) {
+                        c = GestorEquipos.buscarCarretaPorPlaca(placa);
+                    }
+
+                    if (c == null) {
+                        JOptionPane.showMessageDialog(this, "La carreta con placa " + placa + " no está registrada.", "No Encontrada", JOptionPane.WARNING_MESSAGE);
+                        txtPlaca.setText("");
+                    } else {
+                        mostrarCampos(true);
+                        txtEjes.setText(String.valueOf(c.getEjes()));
+                        txtMarca.setText(c.getMarca());
+                        txtModelo.setText(c.getModelo());
+                        txtCarroceria.setText(c.getCarroceria());
+                        txtAnio.setText(String.valueOf(c.getAnio()));
+                        txtMTC.setText(c.getMTC());
+
+                        editarCampos(false);
+                        lblPlaca.setText("¿Desea confirmar la eliminación de la carreta " + placa + "?");
+
+                        opcion = "eliminar";
+                        btnOpcion.setText("Confirmar");
+                        btnOpcion.setBackground(new Color(220, 53, 69));
+                        btnOpcion.setForeground(Color.WHITE);
+                        btnOpcion.setVisible(true);
+                    }
+                } catch (IllegalArgumentException e) {
+                    JOptionPane.showMessageDialog(this, e.getMessage(), "Aviso", JOptionPane.WARNING_MESSAGE);
+                }
+                break;
+
+            case "eliminar":
+                try {
+                    String placa = txtPlaca.getText().trim();
+
+                    if (GestorEquipos.buscarUnidadPorCarreta(placa) != null) {
+                        JOptionPane.showMessageDialog(
+                                this,
+                                "No se puede eliminar la carreta " + placa + " porque está vinculada a una Unidad Operativa activa.\n"
+                                        + "Desvincule primero la unidad en el módulo Data -> Unidad.",
+                                "Carreta en Uso",
+                                JOptionPane.WARNING_MESSAGE
+                        );
+                        return;
+                    }
+
+                    carretaServicio.eliminarCarreta(placa);
+                    GestorEquipos.getCarretas().removeIf(c -> c.getPlaca().equalsIgnoreCase(placa));
+
+                    JOptionPane.showMessageDialog(this, "Carreta " + placa + " eliminada correctamente.");
+                    actualizarTabla(carretaServicio.getCarretas());
+                    limpiarCampos();
+                    ocultarFormulario();
+                } catch (IllegalArgumentException | IllegalStateException e) {
+                    JOptionPane.showMessageDialog(this, e.getMessage(), "Error al Eliminar", JOptionPane.ERROR_MESSAGE);
+                }
+                break;
+
+            default:
+                break;
+        }
+    }//GEN-LAST:event_btnOpcionActionPerformed
+
+    private void btnEditarActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnEditarActionPerformed
+        int fila = tblCarretas.getSelectedRow();
+        String placa = (fila >= 0) ? modeloTabla.getValueAt(fila, 0).toString() : txtPlaca.getText().trim();
+
+        if (!placa.isEmpty()) {
+            Carreta c = carretaServicio.obtenerCarretaPorPlaca(placa);
+            if (c == null) {
+                c = GestorEquipos.buscarCarretaPorPlaca(placa);
+            }
+            if (c != null) {
+                prepararEdicionDeCarreta(c);
+                return;
+            }
+        }
+
+        mostrarFormulario();
+        mostrarCampos(false);
+        limpiarCampos();
+
+        opcion = "seleccionarGuardar";
+        lblPlaca.setText("Ingrese la placa de la carreta a editar:");
+        btnOpcion.setText("Seleccionar");
+        btnOpcion.setBackground(new Color(255, 193, 7));
+        btnOpcion.setForeground(Color.BLACK);
+        btnOpcion.setVisible(true);
+
+        txtPlaca.requestFocus();
+    }//GEN-LAST:event_btnEditarActionPerformed
+
+    private void btnEliminarActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnEliminarActionPerformed
+        int fila = tblCarretas.getSelectedRow();
+        String placa = (fila >= 0) ? modeloTabla.getValueAt(fila, 0).toString() : txtPlaca.getText().trim();
+
+        if (!placa.isEmpty()) {
+            Carreta c = carretaServicio.obtenerCarretaPorPlaca(placa);
+            if (c == null) {
+                c = GestorEquipos.buscarCarretaPorPlaca(placa);
+            }
+            if (c != null) {
+                int r = JOptionPane.showConfirmDialog(
+                        this,
+                        "¿Está seguro de eliminar la carreta con placa " + placa + "?",
+                        "Confirmar Eliminación",
+                        JOptionPane.YES_NO_OPTION
+                );
+                if (r == JOptionPane.YES_OPTION) {
+                    if (GestorEquipos.buscarUnidadPorCarreta(placa) != null) {
+                        JOptionPane.showMessageDialog(
+                                this,
+                                "No se puede eliminar la carreta " + placa + " porque está vinculada a una Unidad Operativa activa.",
+                                "Carreta en Uso",
+                                JOptionPane.WARNING_MESSAGE
+                        );
+                        return;
+                    }
+                    carretaServicio.eliminarCarreta(placa);
+                    GestorEquipos.getCarretas().removeIf(x -> x.getPlaca().equalsIgnoreCase(placa));
+                    actualizarTabla(carretaServicio.getCarretas());
+                    limpiarCampos();
+                    ocultarFormulario();
+                }
+                return;
+            }
+        }
+
+        mostrarFormulario();
+        mostrarCampos(false);
+        limpiarCampos();
+
+        opcion = "seleccionarEliminar";
+        lblPlaca.setText("Ingrese la placa de la carreta a eliminar:");
+        btnOpcion.setText("Seleccionar");
+        btnOpcion.setBackground(new Color(255, 193, 7));
+        btnOpcion.setForeground(Color.BLACK);
+        btnOpcion.setVisible(true);
+
+        txtPlaca.requestFocus();
+    }//GEN-LAST:event_btnEliminarActionPerformed
+
+    private void btnCancelarActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnCancelarActionPerformed
+        limpiarCampos();
+        ocultarFormulario();
+    }//GEN-LAST:event_btnCancelarActionPerformed
+
+    private void btnDeshacerActionPerformed(java.awt.event.ActionEvent evt) {
         try {
-
-            int ejes = Integer.parseInt(txtInputEjes.getText().trim());
-            int anio = Integer.parseInt(txtInputAnio.getText().trim());
-
-            carretaServicio.guardarCarreta(
-                    txtInputPlaca.getText(),
-                    ejes,
-                    txtInputMarca.getText(),
-                    txtInputModelo.getText(),
-                    txtInputCarroceria.getText(),
-                    anio,
-                    txtInputMTC.getText());
-            
-            actualizarTabla();
-
-            txtInputPlaca.setText("");
-            txtInputEjes.setText("");
-            txtInputMarca.setText("");
-            txtInputModelo.setText("");
-            txtInputCarroceria.setText("");
-            txtInputAnio.setText("");
-            txtInputMTC.setText("");
-            txtInputPlaca.requestFocus();
-
-        } catch (NumberFormatException ex) {
-            JOptionPane.showMessageDialog(this, "Ejes y año deben ser números enteros",
-                    "Error", JOptionPane.ERROR_MESSAGE);
-
-        } catch (IllegalArgumentException ex) {
-            JOptionPane.showMessageDialog(this, ex.getMessage(),
-                    "Error", JOptionPane.ERROR_MESSAGE);
+            Carreta recuperada = carretaServicio.deshacerEliminacion();
+            if (GestorEquipos.buscarCarretaPorPlaca(recuperada.getPlaca()) == null) {
+                GestorEquipos.agregarCarreta(recuperada);
+            }
+            actualizarTabla(carretaServicio.getCarretas());
+            JOptionPane.showMessageDialog(this, "Se recuperó de la papelera (Pila LIFO) la carreta: " + recuperada.getPlaca(), "Deshacer Eliminación", JOptionPane.INFORMATION_MESSAGE);
+        } catch (IllegalStateException | IllegalArgumentException ex) {
+            JOptionPane.showMessageDialog(this, ex.getMessage(), "Aviso", JOptionPane.WARNING_MESSAGE);
         }
-    }//GEN-LAST:event_btnGuardarActionPerformed
+    }
 
-    private void btnSeleccionarCarretaActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnSeleccionarCarretaActionPerformed
+    private void btnRespaldoActionPerformed(java.awt.event.ActionEvent evt) {
+        carretaServicio.crearRespaldo();
+        JOptionPane.showMessageDialog(this, "Respaldo clonado con éxito (" + carretaServicio.cantidad() + " carretas en arreglo estático).", "Respaldo Creado", JOptionPane.INFORMATION_MESSAGE);
+    }
 
-        String placa = txtCarretaBuscada.getText().trim();
-
-        if (placa.isEmpty()) {
-            JOptionPane.showMessageDialog(this, "Ingresa la placa de la carreta",
-                    "Error", JOptionPane.ERROR_MESSAGE);
-            return;
-        }
-
-        Carreta c = carretaServicio.obtenerCarretaPorPlaca(placa);
-
-        if (c == null) {
-
-            JOptionPane.showMessageDialog(this, "No existe una carreta con esa placa",
-                    "Error", JOptionPane.ERROR_MESSAGE);
-            return;
-        }
-
-        txtPlacaBuscada.setText(c.getPlaca());
-        txtMarcaBuscada.setText(c.getMarca());
-        txtModeloBuscado.setText(c.getModelo());
-        txtEjesBuscado.setText(String.valueOf(c.getEjes()));
-        txtCarroceriaBuscada.setText(c.getCarroceria());
-        txtAnioBuscado.setText(String.valueOf(c.getAnio()));
-        txtMTCBuscado.setText(c.getMTC());
-
-        txtPlacaBuscada.setEditable(false);
-
-    }//GEN-LAST:event_btnSeleccionarCarretaActionPerformed
-
-    private void btnLimpiarCarretaActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnLimpiarCarretaActionPerformed
-
-        txtCarretaBuscada.setText("");
-
-        txtPlacaBuscada.setText("");
-        txtMarcaBuscada.setText("");
-        txtModeloBuscado.setText("");
-        txtEjesBuscado.setText("");
-        txtCarroceriaBuscada.setText("");
-        txtAnioBuscado.setText("");
-        txtMTCBuscado.setText("");
-
-        txtCarretaBuscada.requestFocus();
-    }//GEN-LAST:event_btnLimpiarCarretaActionPerformed
-
-    private void btnEditarCarretaActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnEditarCarretaActionPerformed
-
-        if (txtPlacaBuscada.getText().isEmpty()) {
-            JOptionPane.showMessageDialog(this, "Primero selecciona una carreta",
-                    "Error", JOptionPane.ERROR_MESSAGE);
-            return;
-        }
-
+    private void btnCompararActionPerformed(java.awt.event.ActionEvent evt) {
         try {
-            int ejes = Integer.parseInt(txtEjesBuscado.getText().trim());
-            int anio = Integer.parseInt(txtAnioBuscado.getText().trim());
-
-            carretaServicio.editarCarreta(
-                    txtPlacaBuscada.getText(),
-                    ejes,
-                    txtMarcaBuscada.getText(),
-                    txtModeloBuscado.getText(),
-                    txtCarroceriaBuscada.getText(),
-                    anio,
-                    txtMTCBuscado.getText());
-
-            actualizarTabla();
-
-            JOptionPane.showMessageDialog(this, "Carreta actualizada correctamente");
-
-            txtCarretaBuscada.setText("");
-            txtPlacaBuscada.setText("");
-            txtMarcaBuscada.setText("");
-            txtModeloBuscado.setText("");
-            txtEjesBuscado.setText("");
-            txtCarroceriaBuscada.setText("");
-            txtAnioBuscado.setText("");
-            txtMTCBuscado.setText("");
-            txtCarretaBuscada.requestFocus();
-
-        } catch (NumberFormatException ex) {
-            JOptionPane.showMessageDialog(this, "Ejes y año deben ser números enteros",
-                    "Error", JOptionPane.ERROR_MESSAGE);
-        } catch (IllegalArgumentException ex) {
-            JOptionPane.showMessageDialog(this, ex.getMessage(),
-                    "Error", JOptionPane.ERROR_MESSAGE);
-        }
-    }//GEN-LAST:event_btnEditarCarretaActionPerformed
-
-    private void btnEliminarCarretaActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnEliminarCarretaActionPerformed
-
-        if (txtPlacaBuscada.getText().isEmpty()) {
-            JOptionPane.showMessageDialog(this, "Primero selecciona una carreta",
-                    "Error", JOptionPane.ERROR_MESSAGE);
-            return;
-        }
-
-        String placa = txtPlacaBuscada.getText();
-
-        int respuesta = JOptionPane.showConfirmDialog(this,
-                "¿Seguro que quieres eliminar la carreta " + placa + "?",
-                "Confirmar eliminación", JOptionPane.YES_NO_OPTION);
-
-        if (respuesta != JOptionPane.YES_OPTION) {
-            return;
-        }
-
-        try {
-
-            carretaServicio.eliminarCarreta(placa);
-
-            actualizarTabla();
-
-            JOptionPane.showMessageDialog(this, "Carreta eliminada correctamente");
-
-            txtCarretaBuscada.setText("");
-            txtPlacaBuscada.setText("");
-            txtMarcaBuscada.setText("");
-            txtModeloBuscado.setText("");
-            txtEjesBuscado.setText("");
-            txtCarroceriaBuscada.setText("");
-            txtAnioBuscado.setText("");
-            txtMTCBuscado.setText("");
-            txtCarretaBuscada.requestFocus();
-
-        } catch (IllegalArgumentException ex) {
-            JOptionPane.showMessageDialog(this, ex.getMessage(),
-                    "Error", JOptionPane.ERROR_MESSAGE);
-        }
-    }//GEN-LAST:event_btnEliminarCarretaActionPerformed
-
-    private void btnOrPlacaActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnOrPlacaActionPerformed
-        orden = "placa";
-        actualizarTabla();
-    }//GEN-LAST:event_btnOrPlacaActionPerformed
-
-    private void btnOrMarcaActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnOrMarcaActionPerformed
-        orden = "marca";
-        actualizarTabla();
-    }//GEN-LAST:event_btnOrMarcaActionPerformed
-
-    private void btnOrAnioActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnOrAnioActionPerformed
-        orden = "anio";
-        actualizarTabla();
-    }//GEN-LAST:event_btnOrAnioActionPerformed
-
-    private void btnRespaldoActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnRespaldoActionPerformed
-        carretaServicio.crearRespaldo(); 
-        JOptionPane.showMessageDialog(this, "Respaldo creado con " + carretaServicio.cantidad() + " carretas");
-    
-    }//GEN-LAST:event_btnRespaldoActionPerformed
-
-    private void btnCompararActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnCompararActionPerformed
-       
-        try {
-            if (carretaServicio.flotaIgualAlRespaldo()) { 
-                JOptionPane.showMessageDialog(this, "IGUALES: la flota no cambió desde el respaldo");
+            if (carretaServicio.flotaIgualAlRespaldo()) {
+                JOptionPane.showMessageDialog(this, "IGUALES: la flota no ha cambiado respecto al arreglo respaldado.", "Comparación de Arreglos", JOptionPane.INFORMATION_MESSAGE);
             } else {
-                JOptionPane.showMessageDialog(this, "DIFERENTES: hubo registros o eliminaciones después del respaldo");
+                JOptionPane.showMessageDialog(this, "DIFERENTES: hubo cambios (registros o eliminaciones) respecto al respaldo.", "Comparación de Arreglos", JOptionPane.INFORMATION_MESSAGE);
             }
         } catch (IllegalStateException ex) {
-            JOptionPane.showMessageDialog(this, ex.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
+            JOptionPane.showMessageDialog(this, ex.getMessage(), "Aviso", JOptionPane.WARNING_MESSAGE);
         }
-    }//GEN-LAST:event_btnCompararActionPerformed
-
-    private void btnDeshacerActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnDeshacerActionPerformed
-         
-        try {
-            Carreta recuperada = carretaServicio.deshacerEliminacion(); // pop de la pila
-            actualizarTabla();
-            JOptionPane.showMessageDialog(this, "Se recuperó la carreta " + recuperada.getPlaca());
-        } catch (IllegalStateException | IllegalArgumentException ex) {
-            JOptionPane.showMessageDialog(this, ex.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
-        }
-    }//GEN-LAST:event_btnDeshacerActionPerformed
-
+    }
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
+    private javax.swing.JButton btnAgregar;
+    private javax.swing.JButton btnCancelar;
     private javax.swing.JButton btnComparar;
     private javax.swing.JButton btnDeshacer;
-    private javax.swing.JButton btnEditarCarreta;
-    private javax.swing.JButton btnEliminarCarreta;
-    private javax.swing.JButton btnGuardar;
-    private javax.swing.JButton btnLimpiarCarreta;
-    private javax.swing.JButton btnOrAnio;
-    private javax.swing.JButton btnOrMarca;
-    private javax.swing.JButton btnOrPlaca;
+    private javax.swing.JButton btnEditar;
+    private javax.swing.JButton btnEliminar;
+    private javax.swing.JButton btnOpcion;
     private javax.swing.JButton btnRespaldo;
-    private javax.swing.JButton btnSeleccionarCarreta;
-    private javax.swing.JLabel jLabel1;
-    private javax.swing.JLabel jLabel10;
-    private javax.swing.JLabel jLabel11;
-    private javax.swing.JLabel jLabel12;
-    private javax.swing.JLabel jLabel13;
-    private javax.swing.JLabel jLabel14;
-    private javax.swing.JLabel jLabel15;
-    private javax.swing.JLabel jLabel16;
-    private javax.swing.JLabel jLabel17;
-    private javax.swing.JLabel jLabel2;
-    private javax.swing.JLabel jLabel3;
-    private javax.swing.JLabel jLabel4;
-    private javax.swing.JLabel jLabel5;
-    private javax.swing.JLabel jLabel6;
-    private javax.swing.JLabel jLabel7;
-    private javax.swing.JLabel jLabel8;
-    private javax.swing.JLabel jLabel9;
-    private javax.swing.JScrollPane jScrollPane1;
+    private javax.swing.JPanel contenidoPanelFormulario;
+    private javax.swing.JScrollPane jScrollPane;
+    private javax.swing.JSplitPane jSplitPane;
+    private javax.swing.JLabel lblAnio;
+    private javax.swing.JLabel lblCarroceria;
+    private javax.swing.JLabel lblEjes;
+    private javax.swing.JLabel lblMTC;
+    private javax.swing.JLabel lblMarca;
+    private javax.swing.JLabel lblModelo;
+    private javax.swing.JLabel lblPlaca;
+    private javax.swing.JLabel lblTitulo;
+    private javax.swing.JPanel panelBarra;
+    private javax.swing.JPanel panelBotones;
+    private javax.swing.JPanel panelFormulario;
+    private javax.swing.JPanel panelTabla;
     private javax.swing.JTable tblCarretas;
-    private javax.swing.JTextField txtAnioBuscado;
-    private javax.swing.JTextField txtCarretaBuscada;
-    private javax.swing.JTextField txtCarroceriaBuscada;
-    private javax.swing.JTextField txtEjesBuscado;
-    private javax.swing.JTextField txtInputAnio;
-    private javax.swing.JTextField txtInputCarroceria;
-    private javax.swing.JTextField txtInputEjes;
-    private javax.swing.JTextField txtInputMTC;
-    private javax.swing.JTextField txtInputMarca;
-    private javax.swing.JTextField txtInputModelo;
-    private javax.swing.JTextField txtInputPlaca;
-    private javax.swing.JTextField txtMTCBuscado;
-    private javax.swing.JTextField txtMarcaBuscada;
-    private javax.swing.JTextField txtModeloBuscado;
-    private javax.swing.JTextField txtPlacaBuscada;
+    private javax.swing.JTextField txtAnio;
+    private javax.swing.JTextField txtCarroceria;
+    private javax.swing.JTextField txtEjes;
+    private javax.swing.JTextField txtMTC;
+    private javax.swing.JTextField txtMarca;
+    private javax.swing.JTextField txtModelo;
+    private javax.swing.JTextField txtPlaca;
     // End of variables declaration//GEN-END:variables
 }

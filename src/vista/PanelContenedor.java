@@ -5,96 +5,133 @@
 package vista;
 
 import java.awt.Color;
-import javax.swing.BorderFactory;
-import servicio.ContenedorServicio;
+import java.awt.Dimension;
+import java.awt.event.MouseAdapter;
+import java.awt.event.MouseEvent;
+import java.util.List;
+import javax.swing.JOptionPane;
+import javax.swing.SwingUtilities;
 import javax.swing.table.DefaultTableModel;
 import modelo.Contenedor;
+import servicio.ContenedorServicio;
+import servicio.GestorEquipos;
+
 /**
- *
- * @author GIANCARLO REA
+ * Panel de gestión de Contenedores.
+ * Permite registrar, editar, listar y eliminar contenedores
+ * manteniendo sincronización con GestorEquipos.
  */
 public class PanelContenedor extends javax.swing.JPanel {
-    
-    ContenedorServicio contenedorServicio;
-    DefaultTableModel modelo; 
-    private String orden;
 
+    private String opcion;
+    private ContenedorServicio contenedorServicio;
+    private DefaultTableModel modeloTabla;
+
+    /**
+     * Creates new form PanelContenedor
+     */
     public PanelContenedor() {
         initComponents();
+
         contenedorServicio = new ContenedorServicio();
-        modelo = (DefaultTableModel) tblContenedores.getModel(); 
-        this.orden = "default";
-        
-        actualizarTabla();
-        
-        txtCodigoBuscado.setVisible(false);
-        txtPayloadBuscado_noEncontrado.setVisible(false);
-        txtTaraBuscado.setVisible(false);
-        
-        btnEliminarContenedor.setVisible(false);
-        btnLimpiar.setVisible(false);
-        btnEditarContenedor.setVisible(false);
-        btnGuardarEdicion.setVisible(false);
-        
-        tblContenedores.setEnabled(false);
+        modeloTabla = (DefaultTableModel) tblContenedores.getModel();
+
+        jSplitPane.setResizeWeight(0);
+        panelFormulario.setMinimumSize(new Dimension(0, 0));
+        panelTabla.setMinimumSize(new Dimension(0, 0));
+        ocultarFormulario();
+
+        tblContenedores.addMouseListener(new MouseAdapter() {
+            @Override
+            public void mouseClicked(MouseEvent e) {
+                int fila = tblContenedores.getSelectedRow();
+                if (fila >= 0) {
+                    String codigo = modeloTabla.getValueAt(fila, 0).toString();
+                    txtCodigo.setText(codigo);
+                }
+            }
+        });
+
+        cargarDatos();
     }
-    
-    public void actualizarTabla() {        
-        modelo.setRowCount(0);
-        
-        switch (this.orden) {
-            case "default":
-                for (Contenedor c : contenedorServicio.getContenedores()) {
-                    Object[] fila = new Object[]{
-                        c.getCodigo(),
-                        c.getPayload(),
-                        c.getTara()
-                    };
-                    modelo.addRow(fila);
-                }
-                break;
-            case "codigo":
-                for (Contenedor c : contenedorServicio.ordenarContenedorPorCodigo()) {
-                    Object[] fila = new Object[]{
-                        c.getCodigo(),
-                        c.getPayload(),
-                        c.getTara()
-                    };
-                    modelo.addRow(fila);
-                }
-                break;
-            case "payload":
-                for (Contenedor c : contenedorServicio.ordenarContenedorPorPayload()) {
-                    Object[] fila = new Object[]{
-                        c.getCodigo(),
-                        c.getPayload(),
-                        c.getTara()
-                    };
-                    modelo.addRow(fila);
-                }
-                break;
-            case "tara":
-                for (Contenedor c : contenedorServicio.ordenarContenedorPorTara()) {
-                    Object[] fila = new Object[]{
-                        c.getCodigo(),
-                        c.getPayload(),
-                        c.getTara()
-                    };
-                    modelo.addRow(fila);
-                }
-                break;
-            default:
-                for (Contenedor c : contenedorServicio.getContenedores()) {
-                    Object[] fila = new Object[]{
-                        c.getCodigo(),
-                        c.getPayload(),
-                        c.getTara()
-                    };
-                    modelo.addRow(fila);
-                }
-                break;
+
+    public void cargarDatos() {
+        for (Contenedor c : GestorEquipos.getContenedores()) {
+            if (contenedorServicio.obtenerContenedorPörCodigo(c.getCodigo()) == null) {
+                contenedorServicio.guardarContenedor(c.getCodigo(), c.getPayload(), c.getTara());
+            }
+        }
+        actualizarTabla(contenedorServicio.getContenedores());
+    }
+
+    private void actualizarTabla(List<Contenedor> lista) {
+        modeloTabla.setRowCount(0);
+        for (Contenedor c : lista) {
+            Object[] fila = new Object[]{
+                c.getCodigo(),
+                c.getPayload(),
+                c.getTara()
+            };
+            modeloTabla.addRow(fila);
         }
     }
+
+    private void mostrarFormulario() {
+        jSplitPane.setDividerSize(8);
+        SwingUtilities.invokeLater(() -> {
+            int h = jSplitPane.getHeight();
+            int loc = (h > 0) ? Math.min(220, Math.max(180, h / 3)) : 200;
+            jSplitPane.setDividerLocation(loc);
+        });
+        btnAgregar.setText("Cerrar formulario");
+    }
+
+    private void ocultarFormulario() {
+        jSplitPane.setDividerSize(0);
+        SwingUtilities.invokeLater(() -> jSplitPane.setDividerLocation(0));
+        btnAgregar.setText("Agregar");
+        btnOpcion.setVisible(false);
+    }
+
+    private void mostrarCampos(boolean mostrar) {
+        txtPayload.setVisible(mostrar);
+        txtTara.setVisible(mostrar);
+        lblPayload.setVisible(mostrar);
+        lblTara.setVisible(mostrar);
+    }
+
+    private void editarCampos(boolean editar) {
+        txtCodigo.setEditable(editar);
+        txtPayload.setEditable(editar);
+        txtTara.setEditable(editar);
+    }
+
+    private void limpiarCampos() {
+        txtCodigo.setText("");
+        txtPayload.setText("");
+        txtTara.setText("");
+        editarCampos(true);
+    }
+
+    private void prepararEdicion(Contenedor c) {
+        mostrarFormulario();
+        mostrarCampos(true);
+        txtCodigo.setText(c.getCodigo());
+        txtPayload.setText(String.valueOf(c.getPayload()));
+        txtTara.setText(String.valueOf(c.getTara()));
+
+        txtCodigo.setEditable(false);
+        lblDetalleAccion.setText("Editar datos del contenedor (Código protegido):");
+
+        opcion = "guardar";
+        btnOpcion.setText("Guardar");
+        btnOpcion.setBackground(new Color(255, 153, 102));
+        btnOpcion.setForeground(Color.WHITE);
+        btnOpcion.setVisible(true);
+
+        txtPayload.requestFocus();
+    }
+
     /**
      * This method is called from within the constructor to initialize the form.
      * WARNING: Do NOT modify this code. The content of this method is always
@@ -104,86 +141,152 @@ public class PanelContenedor extends javax.swing.JPanel {
     // <editor-fold defaultstate="collapsed" desc="Generated Code">//GEN-BEGIN:initComponents
     private void initComponents() {
 
-        jLabel1 = new javax.swing.JLabel();
-        txtContenedorBuscado = new javax.swing.JTextField();
-        jLabel2 = new javax.swing.JLabel();
-        txtTara = new javax.swing.JTextField();
-        jLabel3 = new javax.swing.JLabel();
-        txtPayload = new javax.swing.JTextField();
-        btnGuardarContenedor = new javax.swing.JButton();
-        jLabel4 = new javax.swing.JLabel();
-        jScrollPane1 = new javax.swing.JScrollPane();
-        tblContenedores = new javax.swing.JTable();
-        btnSeleccionarContenedor = new javax.swing.JButton();
-        txtTaraBuscado = new javax.swing.JTextField();
-        jLabel5 = new javax.swing.JLabel();
-        btnEliminarContenedor = new javax.swing.JButton();
-        btnEditarContenedor = new javax.swing.JButton();
-        btnLimpiar = new javax.swing.JButton();
-        btnOrdenarPorCodigo = new javax.swing.JButton();
-        btnOrdenarPorTara = new javax.swing.JButton();
-        btnOrdenatPorPayload = new javax.swing.JButton();
-        jLabel9 = new javax.swing.JLabel();
-        btnOrdenarDefault = new javax.swing.JButton();
+        panelBarra = new javax.swing.JPanel();
+        lblTitulo = new javax.swing.JLabel();
+        panelBotones = new javax.swing.JPanel();
+        btnAgregar = new javax.swing.JButton();
+        btnEditar = new javax.swing.JButton();
+        btnEliminar = new javax.swing.JButton();
+        btnRecorrerLES = new javax.swing.JButton();
+        jSplitPane = new javax.swing.JSplitPane();
+        panelFormulario = new javax.swing.JPanel();
+        contenidoPanelFormulario = new javax.swing.JPanel();
+        lblCodigo = new javax.swing.JLabel();
         txtCodigo = new javax.swing.JTextField();
-        txtCodigoBuscado = new javax.swing.JTextField();
-        txtPayloadBuscado_noEncontrado = new javax.swing.JTextField();
-        btnGuardarEdicion = new javax.swing.JButton();
+        lblPayload = new javax.swing.JLabel();
+        txtPayload = new javax.swing.JTextField();
+        lblTara = new javax.swing.JLabel();
+        txtTara = new javax.swing.JTextField();
+        lblDetalleAccion = new javax.swing.JLabel();
+        btnOpcion = new javax.swing.JButton();
+        btnCancelar = new javax.swing.JButton();
+        panelTabla = new javax.swing.JPanel();
+        jScrollPane = new javax.swing.JScrollPane();
+        tblContenedores = new javax.swing.JTable();
 
         setBackground(new java.awt.Color(255, 255, 255));
         setMaximumSize(new java.awt.Dimension(810, 540));
         setMinimumSize(new java.awt.Dimension(810, 540));
         setPreferredSize(new java.awt.Dimension(810, 540));
-        setLayout(new org.netbeans.lib.awtextra.AbsoluteLayout());
+        setLayout(new java.awt.BorderLayout());
 
-        jLabel1.setFont(new java.awt.Font("Sans Serif Collection", 1, 14)); // NOI18N
-        jLabel1.setForeground(new java.awt.Color(0, 0, 0));
-        jLabel1.setText("Código:");
-        add(jLabel1, new org.netbeans.lib.awtextra.AbsoluteConstraints(50, 70, 61, -1));
+        panelBarra.setBackground(new java.awt.Color(255, 255, 255));
+        panelBarra.setLayout(new java.awt.BorderLayout());
 
-        txtContenedorBuscado.setBackground(new java.awt.Color(255, 255, 255));
-        txtContenedorBuscado.setHorizontalAlignment(javax.swing.JTextField.CENTER);
-        txtContenedorBuscado.setToolTipText("");
-        txtContenedorBuscado.setBorder(javax.swing.BorderFactory.createLineBorder(new java.awt.Color(0, 0, 0)));
-        add(txtContenedorBuscado, new org.netbeans.lib.awtextra.AbsoluteConstraints(100, 450, 200, 30));
+        lblTitulo.setFont(new java.awt.Font("sansserif", 1, 13)); // NOI18N
+        lblTitulo.setText("      CONTENEDORES");
+        panelBarra.add(lblTitulo, java.awt.BorderLayout.CENTER);
 
-        jLabel2.setFont(new java.awt.Font("Sans Serif Collection", 1, 14)); // NOI18N
-        jLabel2.setForeground(new java.awt.Color(0, 0, 0));
-        jLabel2.setText("Tara:");
-        add(jLabel2, new org.netbeans.lib.awtextra.AbsoluteConstraints(460, 70, -1, -1));
+        panelBotones.setBackground(new java.awt.Color(255, 255, 255));
 
-        txtTara.setBackground(new java.awt.Color(255, 255, 255));
-        txtTara.setHorizontalAlignment(javax.swing.JTextField.CENTER);
-        txtTara.setBorder(javax.swing.BorderFactory.createLineBorder(new java.awt.Color(0, 0, 0)));
-        add(txtTara, new org.netbeans.lib.awtextra.AbsoluteConstraints(510, 60, 80, 30));
-
-        jLabel3.setFont(new java.awt.Font("Sans Serif Collection", 1, 14)); // NOI18N
-        jLabel3.setForeground(new java.awt.Color(0, 0, 0));
-        jLabel3.setText("Payload:");
-        add(jLabel3, new org.netbeans.lib.awtextra.AbsoluteConstraints(290, 70, -1, -1));
-
-        txtPayload.setBackground(new java.awt.Color(255, 255, 255));
-        txtPayload.setHorizontalAlignment(javax.swing.JTextField.CENTER);
-        txtPayload.setBorder(javax.swing.BorderFactory.createLineBorder(new java.awt.Color(0, 0, 0)));
-        add(txtPayload, new org.netbeans.lib.awtextra.AbsoluteConstraints(360, 60, 80, 30));
-
-        btnGuardarContenedor.setBackground(new java.awt.Color(51, 153, 255));
-        btnGuardarContenedor.setForeground(new java.awt.Color(255, 255, 255));
-        btnGuardarContenedor.setText("Guardar");
-        btnGuardarContenedor.addActionListener(new java.awt.event.ActionListener() {
+        btnAgregar.setBackground(new java.awt.Color(0, 153, 255));
+        btnAgregar.setForeground(new java.awt.Color(255, 255, 255));
+        btnAgregar.setText("Agregar");
+        btnAgregar.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
-                btnGuardarContenedorActionPerformed(evt);
+                btnAgregarActionPerformed(evt);
             }
         });
-        add(btnGuardarContenedor, new org.netbeans.lib.awtextra.AbsoluteConstraints(610, 60, 140, -1));
+        panelBotones.add(btnAgregar);
 
-        jLabel4.setFont(new java.awt.Font("Sans Serif Collection", 1, 14)); // NOI18N
-        jLabel4.setForeground(new java.awt.Color(0, 0, 0));
-        jLabel4.setText("REGISTRAR CONTENEDOR");
-        add(jLabel4, new org.netbeans.lib.awtextra.AbsoluteConstraints(50, 30, -1, -1));
+        btnEditar.setBackground(new java.awt.Color(255, 153, 102));
+        btnEditar.setForeground(new java.awt.Color(255, 255, 255));
+        btnEditar.setText("Editar");
+        btnEditar.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                btnEditarActionPerformed(evt);
+            }
+        });
+        panelBotones.add(btnEditar);
 
-        tblContenedores.setBackground(new java.awt.Color(255, 255, 255));
-        tblContenedores.setForeground(new java.awt.Color(0, 0, 0));
+        btnEliminar.setBackground(new java.awt.Color(255, 51, 51));
+        btnEliminar.setForeground(new java.awt.Color(255, 255, 255));
+        btnEliminar.setText("Eliminar");
+        btnEliminar.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                btnEliminarActionPerformed(evt);
+            }
+        });
+        panelBotones.add(btnEliminar);
+
+        btnRecorrerLES.setBackground(new java.awt.Color(0, 153, 51));
+        btnRecorrerLES.setForeground(new java.awt.Color(255, 255, 255));
+        btnRecorrerLES.setText("Lista Simple (LES)");
+        btnRecorrerLES.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                btnRecorrerLESActionPerformed(evt);
+            }
+        });
+        panelBotones.add(btnRecorrerLES);
+
+        panelBarra.add(panelBotones, java.awt.BorderLayout.LINE_END);
+
+        add(panelBarra, java.awt.BorderLayout.PAGE_START);
+
+        jSplitPane.setBackground(new java.awt.Color(255, 255, 255));
+        jSplitPane.setDividerLocation(200);
+        jSplitPane.setOrientation(javax.swing.JSplitPane.VERTICAL_SPLIT);
+
+        panelFormulario.setBackground(new java.awt.Color(255, 255, 255));
+        panelFormulario.setMinimumSize(new java.awt.Dimension(100, 100));
+        panelFormulario.setLayout(new org.netbeans.lib.awtextra.AbsoluteLayout());
+
+        contenidoPanelFormulario.setBackground(new java.awt.Color(255, 255, 255));
+        contenidoPanelFormulario.setLayout(new org.netbeans.lib.awtextra.AbsoluteLayout());
+
+        lblCodigo.setFont(new java.awt.Font("sansserif", 1, 13)); // NOI18N
+        lblCodigo.setText("Código");
+        contenidoPanelFormulario.add(lblCodigo, new org.netbeans.lib.awtextra.AbsoluteConstraints(20, 30, -1, -1));
+
+        txtCodigo.setHorizontalAlignment(javax.swing.JTextField.CENTER);
+        contenidoPanelFormulario.add(txtCodigo, new org.netbeans.lib.awtextra.AbsoluteConstraints(20, 50, 160, 30));
+
+        lblPayload.setFont(new java.awt.Font("sansserif", 1, 13)); // NOI18N
+        lblPayload.setText("Payload (kg)");
+        contenidoPanelFormulario.add(lblPayload, new org.netbeans.lib.awtextra.AbsoluteConstraints(200, 30, -1, -1));
+
+        txtPayload.setHorizontalAlignment(javax.swing.JTextField.CENTER);
+        contenidoPanelFormulario.add(txtPayload, new org.netbeans.lib.awtextra.AbsoluteConstraints(200, 50, 130, 30));
+
+        lblTara.setFont(new java.awt.Font("sansserif", 1, 13)); // NOI18N
+        lblTara.setText("Tara (kg)");
+        contenidoPanelFormulario.add(lblTara, new org.netbeans.lib.awtextra.AbsoluteConstraints(350, 30, -1, -1));
+
+        txtTara.setHorizontalAlignment(javax.swing.JTextField.CENTER);
+        contenidoPanelFormulario.add(txtTara, new org.netbeans.lib.awtextra.AbsoluteConstraints(350, 50, 130, 30));
+
+        lblDetalleAccion.setFont(new java.awt.Font("sansserif", 1, 13)); // NOI18N
+        lblDetalleAccion.setText("Ingrese los datos del contenedor:");
+        contenidoPanelFormulario.add(lblDetalleAccion, new org.netbeans.lib.awtextra.AbsoluteConstraints(20, 90, 460, -1));
+
+        btnOpcion.setForeground(new java.awt.Color(255, 255, 255));
+        btnOpcion.setText("Opcion");
+        btnOpcion.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                btnOpcionActionPerformed(evt);
+            }
+        });
+        contenidoPanelFormulario.add(btnOpcion, new org.netbeans.lib.awtextra.AbsoluteConstraints(200, 120, 130, -1));
+
+        btnCancelar.setBackground(new java.awt.Color(255, 102, 102));
+        btnCancelar.setForeground(new java.awt.Color(255, 255, 255));
+        btnCancelar.setText("Cancelar");
+        btnCancelar.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                btnCancelarActionPerformed(evt);
+            }
+        });
+        contenidoPanelFormulario.add(btnCancelar, new org.netbeans.lib.awtextra.AbsoluteConstraints(350, 120, 120, -1));
+
+        panelFormulario.add(contenidoPanelFormulario, new org.netbeans.lib.awtextra.AbsoluteConstraints(0, 0, 810, 200));
+
+        jSplitPane.setTopComponent(panelFormulario);
+
+        panelTabla.setBackground(new java.awt.Color(255, 255, 255));
+        panelTabla.setLayout(new java.awt.BorderLayout());
+
+        jScrollPane.setBackground(new java.awt.Color(255, 255, 255));
+
         tblContenedores.setModel(new javax.swing.table.DefaultTableModel(
             new Object [][] {
                 {null, null, null},
@@ -192,7 +295,7 @@ public class PanelContenedor extends javax.swing.JPanel {
                 {null, null, null}
             },
             new String [] {
-                "Codigo", "Payload", "Tara"
+                "Código", "Payload (kg)", "Tara (kg)"
             }
         ) {
             Class[] types = new Class [] {
@@ -203,279 +306,265 @@ public class PanelContenedor extends javax.swing.JPanel {
                 return types [columnIndex];
             }
         });
-        jScrollPane1.setViewportView(tblContenedores);
+        jScrollPane.setViewportView(tblContenedores);
 
-        add(jScrollPane1, new org.netbeans.lib.awtextra.AbsoluteConstraints(70, 170, 694, 220));
+        panelTabla.add(jScrollPane, java.awt.BorderLayout.CENTER);
 
-        btnSeleccionarContenedor.setBackground(new java.awt.Color(0, 153, 255));
-        btnSeleccionarContenedor.setForeground(new java.awt.Color(255, 255, 255));
-        btnSeleccionarContenedor.setText("Seleccionar");
-        btnSeleccionarContenedor.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                btnSeleccionarContenedorActionPerformed(evt);
-            }
-        });
-        add(btnSeleccionarContenedor, new org.netbeans.lib.awtextra.AbsoluteConstraints(320, 450, -1, -1));
+        jSplitPane.setRightComponent(panelTabla);
 
-        txtTaraBuscado.setBackground(new java.awt.Color(255, 255, 255));
-        txtTaraBuscado.setHorizontalAlignment(javax.swing.JTextField.CENTER);
-        txtTaraBuscado.setBorder(javax.swing.BorderFactory.createLineBorder(new java.awt.Color(0, 0, 0)));
-        add(txtTaraBuscado, new org.netbeans.lib.awtextra.AbsoluteConstraints(440, 490, 190, 30));
-
-        jLabel5.setForeground(new java.awt.Color(102, 102, 102));
-        jLabel5.setText("Ordenar por: ");
-        add(jLabel5, new org.netbeans.lib.awtextra.AbsoluteConstraints(70, 140, -1, -1));
-
-        btnEliminarContenedor.setBackground(new java.awt.Color(255, 102, 102));
-        btnEliminarContenedor.setForeground(new java.awt.Color(255, 255, 255));
-        btnEliminarContenedor.setText("Eliminar");
-        btnEliminarContenedor.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                btnEliminarContenedorActionPerformed(evt);
-            }
-        });
-        add(btnEliminarContenedor, new org.netbeans.lib.awtextra.AbsoluteConstraints(650, 410, -1, -1));
-
-        btnEditarContenedor.setBackground(new java.awt.Color(255, 153, 0));
-        btnEditarContenedor.setForeground(new java.awt.Color(255, 255, 255));
-        btnEditarContenedor.setText("Editar");
-        btnEditarContenedor.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                btnEditarContenedorActionPerformed(evt);
-            }
-        });
-        add(btnEditarContenedor, new org.netbeans.lib.awtextra.AbsoluteConstraints(650, 490, 80, -1));
-
-        btnLimpiar.setBackground(new java.awt.Color(0, 153, 255));
-        btnLimpiar.setForeground(new java.awt.Color(255, 255, 255));
-        btnLimpiar.setText("Limpiar");
-        btnLimpiar.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                btnLimpiarActionPerformed(evt);
-            }
-        });
-        add(btnLimpiar, new org.netbeans.lib.awtextra.AbsoluteConstraints(650, 450, -1, -1));
-
-        btnOrdenarPorCodigo.setBackground(new java.awt.Color(153, 153, 255));
-        btnOrdenarPorCodigo.setForeground(new java.awt.Color(255, 255, 255));
-        btnOrdenarPorCodigo.setText("Código");
-        btnOrdenarPorCodigo.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                btnOrdenarPorCodigoActionPerformed(evt);
-            }
-        });
-        add(btnOrdenarPorCodigo, new org.netbeans.lib.awtextra.AbsoluteConstraints(160, 130, -1, -1));
-
-        btnOrdenarPorTara.setBackground(new java.awt.Color(153, 204, 255));
-        btnOrdenarPorTara.setForeground(new java.awt.Color(255, 255, 255));
-        btnOrdenarPorTara.setText("Tara");
-        btnOrdenarPorTara.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                btnOrdenarPorTaraActionPerformed(evt);
-            }
-        });
-        add(btnOrdenarPorTara, new org.netbeans.lib.awtextra.AbsoluteConstraints(330, 130, -1, -1));
-
-        btnOrdenatPorPayload.setBackground(new java.awt.Color(255, 153, 153));
-        btnOrdenatPorPayload.setForeground(new java.awt.Color(255, 255, 255));
-        btnOrdenatPorPayload.setText("Payload");
-        btnOrdenatPorPayload.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                btnOrdenatPorPayloadActionPerformed(evt);
-            }
-        });
-        add(btnOrdenatPorPayload, new org.netbeans.lib.awtextra.AbsoluteConstraints(240, 130, -1, -1));
-
-        jLabel9.setForeground(new java.awt.Color(102, 102, 102));
-        jLabel9.setText("Ingresar el código del contenedor");
-        add(jLabel9, new org.netbeans.lib.awtextra.AbsoluteConstraints(100, 420, -1, -1));
-
-        btnOrdenarDefault.setBackground(new java.awt.Color(0, 153, 255));
-        btnOrdenarDefault.setForeground(new java.awt.Color(255, 255, 255));
-        btnOrdenarDefault.setText("Default");
-        btnOrdenarDefault.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                btnOrdenarDefaultActionPerformed(evt);
-            }
-        });
-        add(btnOrdenarDefault, new org.netbeans.lib.awtextra.AbsoluteConstraints(680, 130, -1, -1));
-
-        txtCodigo.setBackground(new java.awt.Color(255, 255, 255));
-        txtCodigo.setHorizontalAlignment(javax.swing.JTextField.CENTER);
-        txtCodigo.setBorder(javax.swing.BorderFactory.createLineBorder(new java.awt.Color(0, 0, 0)));
-        add(txtCodigo, new org.netbeans.lib.awtextra.AbsoluteConstraints(110, 60, 160, 30));
-
-        txtCodigoBuscado.setBackground(new java.awt.Color(255, 255, 255));
-        txtCodigoBuscado.setHorizontalAlignment(javax.swing.JTextField.CENTER);
-        txtCodigoBuscado.setBorder(javax.swing.BorderFactory.createLineBorder(new java.awt.Color(0, 0, 0)));
-        add(txtCodigoBuscado, new org.netbeans.lib.awtextra.AbsoluteConstraints(440, 410, 190, 30));
-
-        txtPayloadBuscado_noEncontrado.setBackground(new java.awt.Color(255, 255, 255));
-        txtPayloadBuscado_noEncontrado.setHorizontalAlignment(javax.swing.JTextField.CENTER);
-        txtPayloadBuscado_noEncontrado.setBorder(javax.swing.BorderFactory.createLineBorder(new java.awt.Color(0, 0, 0)));
-        add(txtPayloadBuscado_noEncontrado, new org.netbeans.lib.awtextra.AbsoluteConstraints(440, 450, 190, 30));
-
-        btnGuardarEdicion.setBackground(new java.awt.Color(51, 255, 51));
-        btnGuardarEdicion.setForeground(new java.awt.Color(0, 0, 0));
-        btnGuardarEdicion.setText("Guardar");
-        btnGuardarEdicion.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                btnGuardarEdicionActionPerformed(evt);
-            }
-        });
-        add(btnGuardarEdicion, new org.netbeans.lib.awtextra.AbsoluteConstraints(650, 490, 100, -1));
+        add(jSplitPane, java.awt.BorderLayout.CENTER);
     }// </editor-fold>//GEN-END:initComponents
 
-    private void btnGuardarContenedorActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnGuardarContenedorActionPerformed
-        contenedorServicio.guardarContenedor(txtCodigo.getText(), Double.parseDouble(txtPayload.getText()), Double.parseDouble(txtTara.getText()));
-        
-        actualizarTabla();
-        
-        txtCodigo.setText("");
-        txtPayload.setText("");
-        txtTara.setText("");
-        txtCodigo.requestFocus();
-    }//GEN-LAST:event_btnGuardarContenedorActionPerformed
-
-    private void btnSeleccionarContenedorActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnSeleccionarContenedorActionPerformed
-        String codigo = txtContenedorBuscado.getText(); 
-        Contenedor c = contenedorServicio.obtenerContenedorPörCodigo(codigo);
-        if (c != null){
-            txtPayloadBuscado_noEncontrado.setForeground(Color.BLACK);
-            txtPayloadBuscado_noEncontrado.setBorder(BorderFactory.createLineBorder(Color.BLACK));
-            
-            
-            txtCodigoBuscado.setVisible(true);
-            txtPayloadBuscado_noEncontrado.setVisible(true);
-            txtTaraBuscado.setVisible(true);
-            
-            btnEliminarContenedor.setVisible(true);
-            btnLimpiar.setVisible(true);
-            btnEditarContenedor.setVisible(true);
-            
-            txtContenedorBuscado.setEditable(false);
-            txtCodigoBuscado.setEditable(false);
-            txtPayloadBuscado_noEncontrado.setEditable(false);
-            txtTaraBuscado.setEditable(false);
-            
-            btnSeleccionarContenedor.setEnabled(false);
-            
-            txtCodigoBuscado.setText(c.getCodigo());
-            txtPayloadBuscado_noEncontrado.setText(String.valueOf(c.getPayload()));
-            txtTaraBuscado.setText(String.valueOf(c.getTara()));
-            
-        } else {
-            btnSeleccionarContenedor.setEnabled(false);
-            txtContenedorBuscado.setEditable(false);
-            
-            txtPayloadBuscado_noEncontrado.setVisible(true);
-            txtPayloadBuscado_noEncontrado.setEditable(false);
-            btnLimpiar.setVisible(true);
-            
-            txtPayloadBuscado_noEncontrado.setForeground(Color.RED);
-            txtPayloadBuscado_noEncontrado.setBorder(BorderFactory.createLineBorder(Color.RED));
-            txtPayloadBuscado_noEncontrado.setText("Contenedor No Encontrado");
+    private void btnAgregarActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnAgregarActionPerformed
+        if (btnAgregar.getText().equalsIgnoreCase("Cerrar formulario") && "registrar".equals(opcion)) {
+            ocultarFormulario();
+            limpiarCampos();
+            return;
         }
-    }//GEN-LAST:event_btnSeleccionarContenedorActionPerformed
 
-    private void btnEliminarContenedorActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnEliminarContenedorActionPerformed
-        contenedorServicio.eliminarContenedor(txtCodigoBuscado.getText());
-        
-        actualizarTabla();
-        
-        btnLimpiarActionPerformed(evt);
-    }//GEN-LAST:event_btnEliminarContenedorActionPerformed
+        mostrarFormulario();
+        mostrarCampos(true);
+        limpiarCampos();
 
-    private void btnEditarContenedorActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnEditarContenedorActionPerformed
-        txtCodigoBuscado.setEditable(true);
-        txtPayloadBuscado_noEncontrado.setEditable(true);
-        txtTaraBuscado.setEditable(true);
-        
-        btnLimpiar.setVisible(false);
-        btnEliminarContenedor.setVisible(false);
-        
-        btnEditarContenedor.setVisible(false);
-        btnGuardarEdicion.setVisible(true);
-    }//GEN-LAST:event_btnEditarContenedorActionPerformed
+        lblDetalleAccion.setText("Ingrese los datos del nuevo contenedor:");
+        opcion = "registrar";
 
-    private void btnGuardarEdicionActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnGuardarEdicionActionPerformed
-        String codigo = txtCodigoBuscado.getText();
-        double payload = Double.parseDouble(txtPayloadBuscado_noEncontrado.getText());
-        double tara = Double.parseDouble(txtTaraBuscado.getText());
-        
-        contenedorServicio.editarContenedor(codigo, payload, tara);
-        
-        actualizarTabla();
-        
-        btnLimpiarActionPerformed(evt);
-        btnGuardarEdicion.setVisible(false);
-    }//GEN-LAST:event_btnGuardarEdicionActionPerformed
+        btnOpcion.setText("Registrar");
+        btnOpcion.setBackground(new Color(0, 153, 255));
+        btnOpcion.setForeground(Color.WHITE);
+        btnOpcion.setVisible(true);
 
-    private void btnLimpiarActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnLimpiarActionPerformed
-        txtCodigoBuscado.setText("");
-        txtPayloadBuscado_noEncontrado.setText("");
-        txtTaraBuscado.setText("");
-        
-        txtCodigoBuscado.setVisible(false);
-        txtPayloadBuscado_noEncontrado.setVisible(false);
-        txtTaraBuscado.setVisible(false);
-        
-        txtContenedorBuscado.setText("");
-        txtContenedorBuscado.setEditable(true);
-        txtContenedorBuscado.requestFocus();
-        btnSeleccionarContenedor.setEnabled(true);
+        txtCodigo.requestFocus();
+    }//GEN-LAST:event_btnAgregarActionPerformed
 
-        btnLimpiar.setVisible(false);
-        btnEditarContenedor.setVisible(false);
-        btnEliminarContenedor.setVisible(false);
-    }//GEN-LAST:event_btnLimpiarActionPerformed
+    private void btnOpcionActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnOpcionActionPerformed
+        switch (opcion) {
+            case "registrar":
+                try {
+                    String codigo = txtCodigo.getText().trim();
+                    if (codigo.isEmpty() || txtPayload.getText().trim().isEmpty() || txtTara.getText().trim().isEmpty()) {
+                        JOptionPane.showMessageDialog(this, "Complete todos los campos del contenedor.", "Aviso", JOptionPane.WARNING_MESSAGE);
+                        return;
+                    }
 
-    private void btnOrdenarPorCodigoActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnOrdenarPorCodigoActionPerformed
-        this.orden = "codigo";
-        actualizarTabla();
-    }//GEN-LAST:event_btnOrdenarPorCodigoActionPerformed
+                    double payload = Double.parseDouble(txtPayload.getText().trim());
+                    double tara = Double.parseDouble(txtTara.getText().trim());
 
-    private void btnOrdenatPorPayloadActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnOrdenatPorPayloadActionPerformed
-        this.orden = "payload";
-        actualizarTabla();
-    }//GEN-LAST:event_btnOrdenatPorPayloadActionPerformed
+                    if (contenedorServicio.obtenerContenedorPörCodigo(codigo) != null) {
+                        JOptionPane.showMessageDialog(this, "Ya existe un contenedor con el código " + codigo, "Código Duplicado", JOptionPane.WARNING_MESSAGE);
+                        return;
+                    }
 
-    private void btnOrdenarPorTaraActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnOrdenarPorTaraActionPerformed
-        this.orden = "tara";
-        actualizarTabla();
-    }//GEN-LAST:event_btnOrdenarPorTaraActionPerformed
+                    contenedorServicio.guardarContenedor(codigo, payload, tara);
+                    Contenedor c = contenedorServicio.obtenerContenedorPörCodigo(codigo);
+                    GestorEquipos.agregarContenedor(c);
 
-    private void btnOrdenarDefaultActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnOrdenarDefaultActionPerformed
-        this.orden = "default";
-        actualizarTabla();
-    }//GEN-LAST:event_btnOrdenarDefaultActionPerformed
+                    JOptionPane.showMessageDialog(this, "Contenedor " + codigo + " registrado exitosamente.");
+                    actualizarTabla(contenedorServicio.getContenedores());
+                    limpiarCampos();
+                    ocultarFormulario();
+                } catch (NumberFormatException e) {
+                    JOptionPane.showMessageDialog(this, "Payload y Tara deben ser valores numéricos.", "Error de Formato", JOptionPane.ERROR_MESSAGE);
+                } catch (IllegalArgumentException e) {
+                    JOptionPane.showMessageDialog(this, e.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
+                }
+                break;
 
+            case "seleccionarGuardar":
+                try {
+                    String codigo = txtCodigo.getText().trim();
+                    Contenedor c = contenedorServicio.obtenerContenedorPörCodigo(codigo);
+                    if (c == null) {
+                        JOptionPane.showMessageDialog(this, "El contenedor " + codigo + " no está registrado.", "No Encontrado", JOptionPane.WARNING_MESSAGE);
+                        txtCodigo.setText("");
+                        txtCodigo.requestFocus();
+                    } else {
+                        prepararEdicion(c);
+                    }
+                } catch (IllegalArgumentException e) {
+                    JOptionPane.showMessageDialog(this, e.getMessage(), "Aviso", JOptionPane.WARNING_MESSAGE);
+                }
+                break;
+
+            case "guardar":
+                try {
+                    String codigo = txtCodigo.getText().trim();
+                    double payload = Double.parseDouble(txtPayload.getText().trim());
+                    double tara = Double.parseDouble(txtTara.getText().trim());
+
+                    contenedorServicio.editarContenedor(codigo, payload, tara);
+
+                    for (Contenedor cG : GestorEquipos.getContenedores()) {
+                        if (cG.getCodigo().equalsIgnoreCase(codigo)) {
+                            cG.setPayload(payload);
+                            cG.setTara(tara);
+                            break;
+                        }
+                    }
+
+                    JOptionPane.showMessageDialog(this, "Contenedor " + codigo + " actualizado correctamente.");
+                    actualizarTabla(contenedorServicio.getContenedores());
+                    limpiarCampos();
+                    ocultarFormulario();
+                } catch (NumberFormatException e) {
+                    JOptionPane.showMessageDialog(this, "Payload y Tara deben ser numéricos.", "Error de Formato", JOptionPane.ERROR_MESSAGE);
+                } catch (IllegalArgumentException e) {
+                    JOptionPane.showMessageDialog(this, e.getMessage(), "Error al Actualizar", JOptionPane.ERROR_MESSAGE);
+                }
+                break;
+
+            case "seleccionarEliminar":
+                try {
+                    String codigo = txtCodigo.getText().trim();
+                    Contenedor c = contenedorServicio.obtenerContenedorPörCodigo(codigo);
+                    if (c == null) {
+                        JOptionPane.showMessageDialog(this, "El contenedor " + codigo + " no está registrado.", "No Encontrado", JOptionPane.WARNING_MESSAGE);
+                        txtCodigo.setText("");
+                    } else {
+                        mostrarCampos(true);
+                        txtPayload.setText(String.valueOf(c.getPayload()));
+                        txtTara.setText(String.valueOf(c.getTara()));
+                        editarCampos(false);
+
+                        lblDetalleAccion.setText("¿Desea confirmar la eliminación del contenedor " + codigo + "?");
+                        opcion = "eliminar";
+                        btnOpcion.setText("Confirmar");
+                        btnOpcion.setBackground(new Color(220, 53, 69));
+                        btnOpcion.setForeground(Color.WHITE);
+                        btnOpcion.setVisible(true);
+                    }
+                } catch (IllegalArgumentException e) {
+                    JOptionPane.showMessageDialog(this, e.getMessage(), "Aviso", JOptionPane.WARNING_MESSAGE);
+                }
+                break;
+
+            case "eliminar":
+                try {
+                    String codigo = txtCodigo.getText().trim();
+                    contenedorServicio.eliminarContenedor(codigo);
+                    GestorEquipos.getContenedores().removeIf(c -> c.getCodigo().equalsIgnoreCase(codigo));
+
+                    JOptionPane.showMessageDialog(this, "Contenedor " + codigo + " eliminado correctamente.");
+                    actualizarTabla(contenedorServicio.getContenedores());
+                    limpiarCampos();
+                    ocultarFormulario();
+                } catch (IllegalArgumentException e) {
+                    JOptionPane.showMessageDialog(this, e.getMessage(), "Error al Eliminar", JOptionPane.ERROR_MESSAGE);
+                }
+                break;
+
+            default:
+                break;
+        }
+    }//GEN-LAST:event_btnOpcionActionPerformed
+
+    private void btnEditarActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnEditarActionPerformed
+        int fila = tblContenedores.getSelectedRow();
+        String codigo = (fila >= 0) ? modeloTabla.getValueAt(fila, 0).toString() : txtCodigo.getText().trim();
+
+        if (!codigo.isEmpty()) {
+            Contenedor c = contenedorServicio.obtenerContenedorPörCodigo(codigo);
+            if (c != null) {
+                prepararEdicion(c);
+                return;
+            }
+        }
+
+        mostrarFormulario();
+        mostrarCampos(false);
+        limpiarCampos();
+
+        opcion = "seleccionarGuardar";
+        lblDetalleAccion.setText("Ingrese el código del contenedor a editar:");
+        btnOpcion.setText("Seleccionar");
+        btnOpcion.setBackground(new Color(255, 193, 7));
+        btnOpcion.setForeground(Color.BLACK);
+        btnOpcion.setVisible(true);
+
+        txtCodigo.requestFocus();
+    }//GEN-LAST:event_btnEditarActionPerformed
+
+    private void btnEliminarActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnEliminarActionPerformed
+        int fila = tblContenedores.getSelectedRow();
+        String codigo = (fila >= 0) ? modeloTabla.getValueAt(fila, 0).toString() : txtCodigo.getText().trim();
+
+        if (!codigo.isEmpty()) {
+            Contenedor c = contenedorServicio.obtenerContenedorPörCodigo(codigo);
+            if (c != null) {
+                int r = JOptionPane.showConfirmDialog(
+                        this,
+                        "¿Está seguro de eliminar el contenedor " + codigo + "?",
+                        "Confirmar Eliminación",
+                        JOptionPane.YES_NO_OPTION
+                );
+                if (r == JOptionPane.YES_OPTION) {
+                    contenedorServicio.eliminarContenedor(codigo);
+                    GestorEquipos.getContenedores().removeIf(x -> x.getCodigo().equalsIgnoreCase(codigo));
+                    actualizarTabla(contenedorServicio.getContenedores());
+                    limpiarCampos();
+                    ocultarFormulario();
+                }
+                return;
+            }
+        }
+
+        mostrarFormulario();
+        mostrarCampos(false);
+        limpiarCampos();
+
+        opcion = "seleccionarEliminar";
+        lblDetalleAccion.setText("Ingrese el código del contenedor a eliminar:");
+        btnOpcion.setText("Seleccionar");
+        btnOpcion.setBackground(new Color(255, 193, 7));
+        btnOpcion.setForeground(Color.BLACK);
+        btnOpcion.setVisible(true);
+
+        txtCodigo.requestFocus();
+    }//GEN-LAST:event_btnEliminarActionPerformed
+
+    private void btnCancelarActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnCancelarActionPerformed
+        limpiarCampos();
+        ocultarFormulario();
+    }//GEN-LAST:event_btnCancelarActionPerformed
+
+    private void btnRecorrerLESActionPerformed(java.awt.event.ActionEvent evt) {
+        int total = contenedorServicio.getTamanio();
+        if (total == 0) {
+            JOptionPane.showMessageDialog(this, "La Lista Enlazada Simple (LES) de contenedores está vacía.", "Lista Enlazada Simple", JOptionPane.INFORMATION_MESSAGE);
+            return;
+        }
+
+        StringBuilder sb = new StringBuilder("Estructura: Lista Enlazada Simple (LES) de Contenedores:\n\n");
+        sb.append("cabeza -> ");
+        for (Contenedor c : contenedorServicio.getContenedores()) {
+            sb.append("[").append(c.getCodigo()).append("] -> ");
+        }
+        sb.append("null\n\nTotal de nodos enlazados: ").append(total);
+        JOptionPane.showMessageDialog(this, sb.toString(), "Recorrido de Lista Enlazada Simple (LES)", JOptionPane.INFORMATION_MESSAGE);
+    }
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
-    private javax.swing.JButton btnEditarContenedor;
-    private javax.swing.JButton btnEliminarContenedor;
-    private javax.swing.JButton btnGuardarContenedor;
-    private javax.swing.JButton btnGuardarEdicion;
-    private javax.swing.JButton btnLimpiar;
-    private javax.swing.JButton btnOrdenarDefault;
-    private javax.swing.JButton btnOrdenarPorCodigo;
-    private javax.swing.JButton btnOrdenarPorTara;
-    private javax.swing.JButton btnOrdenatPorPayload;
-    private javax.swing.JButton btnSeleccionarContenedor;
-    private javax.swing.JLabel jLabel1;
-    private javax.swing.JLabel jLabel2;
-    private javax.swing.JLabel jLabel3;
-    private javax.swing.JLabel jLabel4;
-    private javax.swing.JLabel jLabel5;
-    private javax.swing.JLabel jLabel9;
-    private javax.swing.JScrollPane jScrollPane1;
+    private javax.swing.JButton btnAgregar;
+    private javax.swing.JButton btnCancelar;
+    private javax.swing.JButton btnEditar;
+    private javax.swing.JButton btnEliminar;
+    private javax.swing.JButton btnOpcion;
+    private javax.swing.JButton btnRecorrerLES;
+    private javax.swing.JPanel contenidoPanelFormulario;
+    private javax.swing.JScrollPane jScrollPane;
+    private javax.swing.JSplitPane jSplitPane;
+    private javax.swing.JLabel lblCodigo;
+    private javax.swing.JLabel lblDetalleAccion;
+    private javax.swing.JLabel lblPayload;
+    private javax.swing.JLabel lblTara;
+    private javax.swing.JLabel lblTitulo;
+    private javax.swing.JPanel panelBarra;
+    private javax.swing.JPanel panelBotones;
+    private javax.swing.JPanel panelFormulario;
+    private javax.swing.JPanel panelTabla;
     private javax.swing.JTable tblContenedores;
     private javax.swing.JTextField txtCodigo;
-    private javax.swing.JTextField txtCodigoBuscado;
-    private javax.swing.JTextField txtContenedorBuscado;
     private javax.swing.JTextField txtPayload;
-    private javax.swing.JTextField txtPayloadBuscado_noEncontrado;
     private javax.swing.JTextField txtTara;
-    private javax.swing.JTextField txtTaraBuscado;
     // End of variables declaration//GEN-END:variables
 }

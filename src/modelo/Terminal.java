@@ -3,22 +3,27 @@
  * Click nbfs://nbhost/SystemFileSystem/Templates/Classes/Class.java to edit this template
  */
 package modelo;
-import java.util.ArrayList;
+
+import estructuras.ColaStringLES;
+import java.util.List;
 
 /**
+ * Entidad Terminal Portuaria / Extraportuaria.
+ * Incluye cola enlazada simple (ColaStringLES) para los contenedores en espera de despacho.
  *
- * @author cesar
+ * @author cesar, yimmy
  */
 public class Terminal {
-  
-    private String ruc;
+    private String ruc; 
     private String nombre;
-    private ArrayList<Ubicacion> ubicaciones;
+    private String direccion;
 
-    public Terminal(String ruc, String nombre) {
-        this.ruc = ruc;
+    private final ColaStringLES contenedoresEnEspera = new ColaStringLES();
+
+    public Terminal(String ruc, String nombre, String direccion) {
+        setRuc(ruc);
         this.nombre = nombre;
-        this.ubicaciones = new ArrayList<>();
+        this.direccion = direccion;
     }
 
     public String getRuc() {
@@ -26,7 +31,15 @@ public class Terminal {
     }
 
     public void setRuc(String ruc) {
-        this.ruc = ruc;
+        if (ruc == null) {
+            throw new IllegalArgumentException("El Ruc no puede ser nulo");
+        }
+        String r = ruc.trim();
+        if (r.matches("\\d{11}")) {
+            this.ruc = r;
+        } else {
+            throw new IllegalArgumentException("El ruc debe tener solo 11 digitos");
+        }
     }
 
     public String getNombre() {
@@ -37,20 +50,42 @@ public class Terminal {
         this.nombre = nombre;
     }
 
-    public ArrayList<Ubicacion> getUbicaciones() {
-        return ubicaciones;
+    public String getDireccion() {
+        return direccion;
     }
 
-    public void setUbicaciones(ArrayList<Ubicacion> ubicaciones) {
-        this.ubicaciones = ubicaciones;
+    public void setDireccion(String direccion) {
+        this.direccion = direccion;
     }
 
-    public void agregarUbicacion(Ubicacion ubicacion) {
-        ubicaciones.add(ubicacion);
+    public void encolarContenedor(String codigo) {
+        if (codigo == null || codigo.isBlank()) {
+            throw new IllegalArgumentException("El código del contenedor no puede estar vacío");
+        }
+        contenedoresEnEspera.enqueue(codigo.trim());
+    }
+
+    public String atenderContenedor() {
+        if (contenedoresEnEspera.isEmpty()) {
+            return null;
+        }
+        return contenedoresEnEspera.dequeue();
+    }
+
+    public String getProximoContenedor() {
+        return contenedoresEnEspera.peek();
+    }
+
+    public int getCantidadContenedoresEnEspera() {
+        return contenedoresEnEspera.size();
+    }
+
+    public List<String> getContenedoresEnEspera() {
+        return contenedoresEnEspera.getElementos();
     }
 
     @Override
     public String toString() {
-        return nombre;
+        return nombre != null ? nombre : ruc;
     }
 }

@@ -4,12 +4,20 @@
  */
 package servicio;
 
-
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
 import modelo.Carreta;
 
 /**
+ * Servicio de gestión de Carretas.
+ * Evidencia el uso de:
+ * - Arreglo estático ordenado (Carreta[]) con búsqueda binaria e inserción ordenada.
+ * - Pila estática (papelera con arreglo y puntero tope) para deshacer eliminaciones (LIFO).
+ * - Ordenamiento por algoritmo de la burbuja (sobre copias de arreglos estáticos).
+ * - Respaldo, clonación de arreglos y comparación de estados de flota.
  *
- * @author NILENY
+ * @author NILENY, cesar
  */
 public class CarretaServicio {
     
@@ -25,17 +33,45 @@ public class CarretaServicio {
     private Carreta[] respaldo;      
     private int cantidadRespaldo;
 
+    public CarretaServicio() {
+    }
+
+    public CarretaServicio(List<Carreta> listaInicial) {
+        if (listaInicial != null) {
+            for (Carreta c : listaInicial) {
+                if (c != null && !existeCarreta(c.getPlaca())) {
+                    guardarCarreta(c.getPlaca(), c.getEjes(), c.getMarca(),
+                            c.getModelo(), c.getCarroceria(), c.getAnio(), c.getMTC());
+                }
+            }
+        }
+    }
     
-    //Consultar
-    public int cantidad(){
+    // Consultar
+    public int cantidad() {
+        return cantidad;
+    }
+
+    public int getCantidad() {
         return cantidad;
     }
     
-    public Carreta[] getCarretas(){
+    public Carreta[] getCarretasArreglo() {
         return copiar(carretas, cantidad);
     }
+
+    public List<Carreta> getCarretas() {
+        List<Carreta> lista = new ArrayList<>();
+        for (int i = 0; i < cantidad; i++) {
+            lista.add(carretas[i]);
+        }
+        return lista;
+    }
     
-    // pila en papelera
+    // ==========================================
+    // OPERACIONES DE LA PILA ESTÁTICA (PAPELERA)
+    // ==========================================
+
     public boolean papeleraVacia() {
         return tope == -1;
     }
@@ -48,12 +84,10 @@ public class CarretaServicio {
         return tope + 1;
     }
     
-    //peek
-     public Carreta cimaPapelera() {
+    public Carreta cimaPapelera() {
         return papeleraVacia() ? null : papelera[tope];
     }
      
-    //Push
     private void apilar(Carreta c) {
         if (papeleraLlena()) {
             for (int i = 0; i < tope; i++) {
@@ -66,7 +100,6 @@ public class CarretaServicio {
         papelera[tope] = c;
     } 
     
-    //Pop
     private Carreta desapilar() {
         if (papeleraVacia()) {
             throw new IllegalStateException("La papelera está vacía");
@@ -76,10 +109,24 @@ public class CarretaServicio {
         tope--;
         return c;
     }
-    
-    
-    //Buscar 
-   
+
+    public Carreta deshacerEliminacion() {
+        if (papeleraVacia()) {
+            throw new IllegalStateException("No hay eliminaciones para deshacer");
+        }
+        Carreta ultima = cimaPapelera(); 
+        if (existeCarreta(ultima.getPlaca())) {
+            throw new IllegalStateException("Ya se registró otra carreta con la placa " + ultima.getPlaca());
+        }
+        insertarOrdenado(ultima);
+        desapilar(); 
+        return ultima;
+    }
+
+    // ==========================================
+    // BÚSQUEDA BINARIA EN ARREGLO ORDENADO
+    // ==========================================
+
     private int busquedaBinaria(String placa) {
         int izquierda = 0;
         int derecha = cantidad - 1;
@@ -97,7 +144,7 @@ public class CarretaServicio {
         return -1;
     } 
      
-     public Carreta obtenerCarretaPorPlaca(String placa) {
+    public Carreta obtenerCarretaPorPlaca(String placa) {
         if (placa == null) {
             return null;
         }
@@ -105,23 +152,20 @@ public class CarretaServicio {
         return pos == -1 ? null : carretas[pos];
     }
      
-     public boolean existeCarreta(String placa) {
+    public boolean existeCarreta(String placa) {
         return obtenerCarretaPorPlaca(placa) != null;
     } 
-     
     
     // Registra una carreta nueva
     public void guardarCarreta(String placa, int ejes, String marca, String modelo, String carroceria, int anio, String MTC) {
         Carreta nuevaCarreta = new Carreta(placa, ejes, marca, modelo, carroceria, anio, MTC);
         if (existeCarreta(nuevaCarreta.getPlaca())) {
-            throw new IllegalArgumentException("Ya existe una carreta con esa placa" + nuevaCarreta.getPlaca());
+            throw new IllegalArgumentException("Ya existe una carreta con esa placa " + nuevaCarreta.getPlaca());
         }
-    
         insertarOrdenado(nuevaCarreta);
-              
     }
 
-     private void insertarOrdenado(Carreta nueva) {
+    private void insertarOrdenado(Carreta nueva) {
         if (cantidad == carretas.length) {
             throw new IllegalArgumentException("La flota está completa (" + CAPACIDAD_FLOTA + " carretas)");
         }
@@ -135,15 +179,13 @@ public class CarretaServicio {
         carretas[pos] = nueva;
         cantidad++;
     }
-    
-      
+
     // Modifica los atributos de una carreta existente, menos la placa
     public void editarCarreta(String placa, int ejes, String marca, String modelo, String carroceria, int anio, String MTC) {
         Carreta carreta = obtenerCarretaPorPlaca(placa);
         if (carreta == null) {
             throw new IllegalArgumentException("La carreta no existe");
         }
-        
         new Carreta(carreta.getPlaca(), ejes, marca, modelo, carroceria, anio, MTC);
 
         carreta.setEjes(ejes);
@@ -154,9 +196,9 @@ public class CarretaServicio {
         carreta.setMTC(MTC);
     }
 
-    // Elimina la carreta de la placa ingresada; falla si no existe
+    // Elimina la carreta de la placa ingresada y la apila en la papelera
     public void eliminarCarreta(String placa) {
-       int pos = busquedaBinaria(placa == null ? "" : placa.trim().toUpperCase());
+        int pos = busquedaBinaria(placa == null ? "" : placa.trim().toUpperCase());
         if (pos == -1) {
             throw new IllegalArgumentException("La carreta no existe");
         }
@@ -170,32 +212,22 @@ public class CarretaServicio {
         apilar(eliminada); 
     }
     
-    public Carreta deshacerEliminacion() {
-        if (papeleraVacia()) {
-            throw new IllegalStateException("No hay eliminaciones para deshacer");
-        }
-        Carreta ultima = cimaPapelera(); 
-        if (existeCarreta(ultima.getPlaca())) {
-            throw new IllegalStateException("Ya se registró otra carreta con la placa " + ultima.getPlaca());
-        }
-        insertarOrdenado(ultima);
-        desapilar(); 
-        return ultima;
-    }
-    
-    //ordenar por 
-    
-     public Carreta[] ordenarCarretaPorPlaca() {
-        return copiar(carretas, cantidad);
+    // ==========================================
+    // ORDENAMIENTO POR BURBUJA (ARREGLO ESTÁTICO)
+    // ==========================================
+
+    public List<Carreta> ordenarCarretaPorPlaca() {
+        return Arrays.asList(copiar(carretas, cantidad));
     }
 
-    // Se ordena una COPIA para que el original siga ordenado por placa
-    public Carreta[] ordenarCarretaPorMarca() {
-        return burbuja(copiar(carretas, cantidad), "marca");
+    public List<Carreta> ordenarCarretaPorMarca() {
+        Carreta[] ordenado = burbuja(copiar(carretas, cantidad), "marca");
+        return Arrays.asList(ordenado);
     }
 
-    public Carreta[] ordenarCarretaPorAnio() {
-        return burbuja(copiar(carretas, cantidad), "anio");
+    public List<Carreta> ordenarCarretaPorAnio() {
+        Carreta[] ordenado = burbuja(copiar(carretas, cantidad), "anio");
+        return Arrays.asList(ordenado);
     }
     
     private Carreta[] burbuja(Carreta[] a, String criterio) {
@@ -223,9 +255,10 @@ public class CarretaServicio {
         return x.getAnio() < y.getAnio();
     }
     
-    
-    //copiar
-    
+    // ==========================================
+    // COPIA, CLONACIÓN Y COMPARACIÓN DE ARREGLOS
+    // ==========================================
+
     private static Carreta[] copiar(Carreta[] origen, int n) {
         Carreta[] destino = new Carreta[n];
         for (int i = 0; i < n; i++) {
@@ -234,7 +267,6 @@ public class CarretaServicio {
         return destino;
     }
     
-    //clonacion
     private static Carreta[] clonar(Carreta[] origen) {
         return origen.clone();
     }
@@ -252,7 +284,6 @@ public class CarretaServicio {
         return respaldo == null ? new Carreta[0] : copiar(respaldo, cantidadRespaldo);
     }
     
-    //comparación
     public boolean flotaIgualAlRespaldo() {
         if (respaldo == null) {
             throw new IllegalStateException("Primero cree un respaldo");
@@ -267,8 +298,4 @@ public class CarretaServicio {
         }
         return true;
     }
-    
-    
 }
-
-   
