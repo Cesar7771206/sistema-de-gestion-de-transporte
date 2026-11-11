@@ -45,6 +45,7 @@ public class PanelModuloViajes extends javax.swing.JPanel {
     public void cargarDatos() {
         cargarCombos();
         cargarTablaViajes();
+        actualizarContadorPendientes();
     }
 
     public void cargarCombos() {
@@ -187,6 +188,10 @@ public class PanelModuloViajes extends javax.swing.JPanel {
         btnEliminar = new javax.swing.JButton();
         btnActualizar = new javax.swing.JButton();
         btnEditar = new javax.swing.JButton();
+        btnRecuperar = new javax.swing.JButton();
+        btnAtender = new javax.swing.JButton();
+        btnPendientes = new javax.swing.JButton();
+        lblContadorPendientes = new javax.swing.JLabel();
 
         setBackground(new java.awt.Color(255, 255, 255));
         setPreferredSize(new java.awt.Dimension(880, 680));
@@ -382,6 +387,44 @@ public class PanelModuloViajes extends javax.swing.JPanel {
             }
         });
         add(btnEditar, new org.netbeans.lib.awtextra.AbsoluteConstraints(735, 470, 115, 34));
+
+        btnRecuperar.setBackground(new java.awt.Color(153, 0, 153));
+        btnRecuperar.setFont(new java.awt.Font("sansserif", 1, 11)); // NOI18N
+        btnRecuperar.setForeground(new java.awt.Color(255, 255, 255));
+        btnRecuperar.setText("RECUPERAR");
+        btnRecuperar.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                btnRecuperarActionPerformed(evt);
+            }
+        });
+        add(btnRecuperar, new org.netbeans.lib.awtextra.AbsoluteConstraints(735, 520, 115, 34));
+
+        btnAtender.setBackground(new java.awt.Color(0, 153, 51));
+        btnAtender.setFont(new java.awt.Font("sansserif", 1, 11)); // NOI18N
+        btnAtender.setForeground(new java.awt.Color(255, 255, 255));
+        btnAtender.setText("ATENDER");
+        btnAtender.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                btnAtenderActionPerformed(evt);
+            }
+        });
+        add(btnAtender, new org.netbeans.lib.awtextra.AbsoluteConstraints(735, 570, 115, 34));
+
+        btnPendientes.setBackground(new java.awt.Color(0, 102, 204));
+        btnPendientes.setFont(new java.awt.Font("sansserif", 1, 11)); // NOI18N
+        btnPendientes.setForeground(new java.awt.Color(255, 255, 255));
+        btnPendientes.setText("PENDIENTES");
+        btnPendientes.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                btnPendientesActionPerformed(evt);
+            }
+        });
+        add(btnPendientes, new org.netbeans.lib.awtextra.AbsoluteConstraints(735, 620, 115, 34));
+
+        lblContadorPendientes.setFont(new java.awt.Font("sansserif", 1, 13)); // NOI18N
+        lblContadorPendientes.setForeground(new java.awt.Color(0, 102, 255));
+        lblContadorPendientes.setText("VIAJES PENDIENTES: 0");
+        add(lblContadorPendientes, new org.netbeans.lib.awtextra.AbsoluteConstraints(550, 35, 300, 30));
     }// </editor-fold>//GEN-END:initComponents
 
     private void jButton1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton1ActionPerformed
@@ -440,6 +483,7 @@ public class PanelModuloViajes extends javax.swing.JPanel {
 
         GestorViajes.agregarViaje(nuevoViaje);
         cargarTablaViajes();
+        actualizarContadorPendientes();
 
         JOptionPane.showMessageDialog(
                 this,
@@ -505,6 +549,7 @@ public class PanelModuloViajes extends javax.swing.JPanel {
 
         GestorViajes.agregarViajeUrgente(nuevoViaje);
         cargarTablaViajes();
+        actualizarContadorPendientes();
 
         JOptionPane.showMessageDialog(
                 this,
@@ -668,25 +713,103 @@ public class PanelModuloViajes extends javax.swing.JPanel {
             return;
         }
 
-        GestorViajes.getViajes().remove(viajeEliminar);
+        GestorViajes.eliminarViaje(viajeEliminar);
 
         cargarTablaViajes();
+        actualizarContadorPendientes();
 
         idViajeEditando = -1;
 
         JOptionPane.showMessageDialog(
                 this,
-                "Viaje eliminado correctamente.",
+                "Viaje eliminado correctamente y guardado en la pila de recuperación.",
                 "Éxito",
                 JOptionPane.INFORMATION_MESSAGE
         );
     }//GEN-LAST:event_btnEliminarActionPerformed
 
+    private void btnRecuperarActionPerformed(java.awt.event.ActionEvent evt) {
+        Viaje viaje = GestorViajes.recuperarViaje();
+        actualizarContadorPendientes();
+
+        if (viaje != null) {
+            cargarTablaViajes();
+            JOptionPane.showMessageDialog(
+                    this,
+                    "Se recuperó de la pila el viaje ID: " + viaje.getId(),
+                    "Recuperación Exitosa",
+                    JOptionPane.INFORMATION_MESSAGE
+            );
+        } else {
+            JOptionPane.showMessageDialog(
+                    this,
+                    "No hay viajes eliminados para recuperar en la pila.",
+                    "Aviso",
+                    JOptionPane.WARNING_MESSAGE
+            );
+        }
+    }
+
+    private void btnAtenderActionPerformed(java.awt.event.ActionEvent evt) {
+        Viaje viaje = GestorViajes.atenderSiguienteViaje();
+        actualizarContadorPendientes();
+
+        if (viaje != null) {
+            JOptionPane.showMessageDialog(
+                    this,
+                    "Se atendió y despachó de la cola el viaje ID: " + viaje.getId()
+                    + "\nContenedor: " + (viaje.getContenedor() != null ? viaje.getContenedor().getCodigo() : "-")
+                    + "\nUnidad: " + (viaje.getUnidad() != null ? viaje.getUnidad().getPlaca() : "-"),
+                    "Viaje Atendido (Cola FIFO)",
+                    JOptionPane.INFORMATION_MESSAGE
+            );
+        } else {
+            JOptionPane.showMessageDialog(
+                    this,
+                    "No hay viajes pendientes en la cola de atención.",
+                    "Cola Vacía",
+                    JOptionPane.WARNING_MESSAGE
+            );
+        }
+    }
+
+    private void btnPendientesActionPerformed(java.awt.event.ActionEvent evt) {
+        actualizarContadorPendientes();
+        StringBuilder mensaje = new StringBuilder();
+
+        for (Viaje viaje : GestorViajes.getColaPendientes()) {
+            mensaje.append("Viaje ID: ").append(viaje.getId())
+                    .append(" | Contenedor: ").append(viaje.getContenedor() != null ? viaje.getContenedor().getCodigo() : "-")
+                    .append(" | Unidad: ").append(viaje.getUnidad() != null ? viaje.getUnidad().getPlaca() : "-")
+                    .append("\n");
+        }
+
+        if (mensaje.length() == 0) {
+            mensaje.append("No hay viajes pendientes en la cola.");
+        }
+
+        JOptionPane.showMessageDialog(
+                this,
+                mensaje.toString(),
+                "VIAJES PENDIENTES EN COLA",
+                JOptionPane.INFORMATION_MESSAGE
+        );
+    }
+
+    private void actualizarContadorPendientes() {
+        int cantidad = GestorViajes.getCantidadPendientes();
+        if (lblContadorPendientes != null) {
+            lblContadorPendientes.setText("VIAJES PENDIENTES: " + cantidad);
+        }
+    }
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JButton btnActualizar;
+    private javax.swing.JButton btnAtender;
     private javax.swing.JButton btnEditar;
     private javax.swing.JButton btnEliminar;
+    private javax.swing.JButton btnPendientes;
+    private javax.swing.JButton btnRecuperar;
     private javax.swing.JButton btnRegistrarUrgencia;
     private javax.swing.JComboBox<String> cboCliente;
     private javax.swing.JComboBox<String> cboContenedor;
@@ -704,6 +827,7 @@ public class PanelModuloViajes extends javax.swing.JPanel {
     private javax.swing.JLabel jLabel8;
     private javax.swing.JLabel jLabel9;
     private javax.swing.JScrollPane jScrollPane1;
+    private javax.swing.JLabel lblContadorPendientes;
     private javax.swing.JPanel pnlContenido;
     private javax.swing.JTable tblViajes;
     // End of variables declaration//GEN-END:variables

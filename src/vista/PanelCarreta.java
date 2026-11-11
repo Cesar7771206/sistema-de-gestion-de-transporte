@@ -181,6 +181,9 @@ public class PanelCarreta extends javax.swing.JPanel {
         btnAgregar = new javax.swing.JButton();
         btnEditar = new javax.swing.JButton();
         btnEliminar = new javax.swing.JButton();
+        btnDeshacer = new javax.swing.JButton();
+        btnRespaldo = new javax.swing.JButton();
+        btnComparar = new javax.swing.JButton();
         jSplitPane = new javax.swing.JSplitPane();
         panelFormulario = new javax.swing.JPanel();
         contenidoPanelFormulario = new javax.swing.JPanel();
@@ -248,6 +251,36 @@ public class PanelCarreta extends javax.swing.JPanel {
             }
         });
         panelBotones.add(btnEliminar);
+
+        btnDeshacer.setBackground(new java.awt.Color(153, 0, 153));
+        btnDeshacer.setForeground(new java.awt.Color(255, 255, 255));
+        btnDeshacer.setText("Deshacer (Pila)");
+        btnDeshacer.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                btnDeshacerActionPerformed(evt);
+            }
+        });
+        panelBotones.add(btnDeshacer);
+
+        btnRespaldo.setBackground(new java.awt.Color(0, 153, 51));
+        btnRespaldo.setForeground(new java.awt.Color(255, 255, 255));
+        btnRespaldo.setText("Respaldar");
+        btnRespaldo.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                btnRespaldoActionPerformed(evt);
+            }
+        });
+        panelBotones.add(btnRespaldo);
+
+        btnComparar.setBackground(new java.awt.Color(0, 102, 204));
+        btnComparar.setForeground(new java.awt.Color(255, 255, 255));
+        btnComparar.setText("Comparar");
+        btnComparar.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                btnCompararActionPerformed(evt);
+            }
+        });
+        panelBotones.add(btnComparar);
 
         panelBarra.add(panelBotones, java.awt.BorderLayout.LINE_END);
 
@@ -634,13 +667,45 @@ public class PanelCarreta extends javax.swing.JPanel {
         ocultarFormulario();
     }//GEN-LAST:event_btnCancelarActionPerformed
 
+    private void btnDeshacerActionPerformed(java.awt.event.ActionEvent evt) {
+        try {
+            Carreta recuperada = carretaServicio.deshacerEliminacion();
+            if (GestorEquipos.buscarCarretaPorPlaca(recuperada.getPlaca()) == null) {
+                GestorEquipos.agregarCarreta(recuperada);
+            }
+            actualizarTabla(carretaServicio.getCarretas());
+            JOptionPane.showMessageDialog(this, "Se recuperó de la papelera (Pila LIFO) la carreta: " + recuperada.getPlaca(), "Deshacer Eliminación", JOptionPane.INFORMATION_MESSAGE);
+        } catch (IllegalStateException | IllegalArgumentException ex) {
+            JOptionPane.showMessageDialog(this, ex.getMessage(), "Aviso", JOptionPane.WARNING_MESSAGE);
+        }
+    }
+
+    private void btnRespaldoActionPerformed(java.awt.event.ActionEvent evt) {
+        carretaServicio.crearRespaldo();
+        JOptionPane.showMessageDialog(this, "Respaldo clonado con éxito (" + carretaServicio.cantidad() + " carretas en arreglo estático).", "Respaldo Creado", JOptionPane.INFORMATION_MESSAGE);
+    }
+
+    private void btnCompararActionPerformed(java.awt.event.ActionEvent evt) {
+        try {
+            if (carretaServicio.flotaIgualAlRespaldo()) {
+                JOptionPane.showMessageDialog(this, "IGUALES: la flota no ha cambiado respecto al arreglo respaldado.", "Comparación de Arreglos", JOptionPane.INFORMATION_MESSAGE);
+            } else {
+                JOptionPane.showMessageDialog(this, "DIFERENTES: hubo cambios (registros o eliminaciones) respecto al respaldo.", "Comparación de Arreglos", JOptionPane.INFORMATION_MESSAGE);
+            }
+        } catch (IllegalStateException ex) {
+            JOptionPane.showMessageDialog(this, ex.getMessage(), "Aviso", JOptionPane.WARNING_MESSAGE);
+        }
+    }
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JButton btnAgregar;
     private javax.swing.JButton btnCancelar;
+    private javax.swing.JButton btnComparar;
+    private javax.swing.JButton btnDeshacer;
     private javax.swing.JButton btnEditar;
     private javax.swing.JButton btnEliminar;
     private javax.swing.JButton btnOpcion;
+    private javax.swing.JButton btnRespaldo;
     private javax.swing.JPanel contenidoPanelFormulario;
     private javax.swing.JScrollPane jScrollPane;
     private javax.swing.JSplitPane jSplitPane;

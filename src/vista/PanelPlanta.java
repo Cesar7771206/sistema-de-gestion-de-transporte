@@ -148,6 +148,9 @@ public class PanelPlanta extends javax.swing.JPanel {
         btnAgregar = new javax.swing.JButton();
         btnEditar = new javax.swing.JButton();
         btnEliminar = new javax.swing.JButton();
+        btnPrioridad = new javax.swing.JButton();
+        btnDeshacer = new javax.swing.JButton();
+        btnReporte = new javax.swing.JButton();
         jSplitPane = new javax.swing.JSplitPane();
         panelFormulario = new javax.swing.JPanel();
         contenidoPanelFormulario = new javax.swing.JPanel();
@@ -208,6 +211,36 @@ public class PanelPlanta extends javax.swing.JPanel {
             }
         });
         panelBotones.add(btnEliminar);
+
+        btnPrioridad.setBackground(new java.awt.Color(0, 153, 51));
+        btnPrioridad.setForeground(new java.awt.Color(255, 255, 255));
+        btnPrioridad.setText("Cola Prioridad");
+        btnPrioridad.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                btnPrioridadActionPerformed(evt);
+            }
+        });
+        panelBotones.add(btnPrioridad);
+
+        btnDeshacer.setBackground(new java.awt.Color(153, 0, 153));
+        btnDeshacer.setForeground(new java.awt.Color(255, 255, 255));
+        btnDeshacer.setText("Deshacer (Pila)");
+        btnDeshacer.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                btnDeshacerActionPerformed(evt);
+            }
+        });
+        panelBotones.add(btnDeshacer);
+
+        btnReporte.setBackground(new java.awt.Color(0, 102, 204));
+        btnReporte.setForeground(new java.awt.Color(255, 255, 255));
+        btnReporte.setText("Matriz 2D");
+        btnReporte.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                btnReporteActionPerformed(evt);
+            }
+        });
+        panelBotones.add(btnReporte);
 
         panelBarra.add(panelBotones, java.awt.BorderLayout.LINE_END);
 
@@ -536,13 +569,53 @@ public class PanelPlanta extends javax.swing.JPanel {
         ocultarFormulario();
     }//GEN-LAST:event_btnCancelarActionPerformed
 
+    private void btnPrioridadActionPerformed(java.awt.event.ActionEvent evt) {
+        List<Planta> ordenadas = plantaServicio.plantasPorCarga();
+        if (ordenadas.isEmpty()) {
+            JOptionPane.showMessageDialog(this, "No hay plantas registradas.", "Aviso", JOptionPane.WARNING_MESSAGE);
+            return;
+        }
+        actualizarTabla(ordenadas);
+        JOptionPane.showMessageDialog(this, "Plantas ordenadas por prioridad de carga semanal (PriorityQueue con Comparator POR_CARGA).", "Cola con Prioridad", JOptionPane.INFORMATION_MESSAGE);
+    }
+
+    private void btnDeshacerActionPerformed(java.awt.event.ActionEvent evt) {
+        Planta recuperada = plantaServicio.deshacerEliminacion();
+        if (recuperada != null) {
+            if (GestorLogistica.buscarPlantaPorRuc(recuperada.getRuc()) == null) {
+                GestorLogistica.agregarPlanta(recuperada);
+            }
+            actualizarTabla(plantaServicio.getPlantas());
+            JOptionPane.showMessageDialog(this, "Se recuperó de la pila (PilaArreglo LIFO) la planta:\n" + recuperada.getNombre() + " (RUC: " + recuperada.getRuc() + ")", "Deshacer Eliminación", JOptionPane.INFORMATION_MESSAGE);
+        } else {
+            JOptionPane.showMessageDialog(this, "No hay plantas en la pila de eliminadas para deshacer.", "Pila Vacía", JOptionPane.WARNING_MESSAGE);
+        }
+    }
+
+    private void btnReporteActionPerformed(java.awt.event.ActionEvent evt) {
+        int fila = tblPlantas.getSelectedRow();
+        String ruc = (fila >= 0) ? modeloTabla.getValueAt(fila, 0).toString() : txtRuc.getText().trim();
+        if (ruc.isEmpty()) {
+            JOptionPane.showMessageDialog(this, "Seleccione una planta de la tabla para ver su matriz 2D de carga.", "Aviso", JOptionPane.WARNING_MESSAGE);
+            return;
+        }
+        Planta p = plantaServicio.obtenerPlantaPorRuc(ruc);
+        if (p != null) {
+            JOptionPane.showMessageDialog(this, p.generarReporte(), "Matriz 2D - Programación Semanal", JOptionPane.INFORMATION_MESSAGE);
+        } else {
+            JOptionPane.showMessageDialog(this, "Planta no encontrada.", "Error", JOptionPane.ERROR_MESSAGE);
+        }
+    }
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JButton btnAgregar;
     private javax.swing.JButton btnCancelar;
+    private javax.swing.JButton btnDeshacer;
     private javax.swing.JButton btnEditar;
     private javax.swing.JButton btnEliminar;
     private javax.swing.JButton btnOpcion;
+    private javax.swing.JButton btnPrioridad;
+    private javax.swing.JButton btnReporte;
     private javax.swing.JPanel contenidoPanelFormulario;
     private javax.swing.JScrollPane jScrollPane;
     private javax.swing.JSplitPane jSplitPane;

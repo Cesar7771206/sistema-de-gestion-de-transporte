@@ -148,6 +148,9 @@ public class PanelCliente extends javax.swing.JPanel {
         btnAgregar = new javax.swing.JButton();
         btnEditar = new javax.swing.JButton();
         btnEliminar = new javax.swing.JButton();
+        btnPedirAtencion = new javax.swing.JButton();
+        btnAtender = new javax.swing.JButton();
+        btnVerCola = new javax.swing.JButton();
         jSplitPane = new javax.swing.JSplitPane();
         panelFormulario = new javax.swing.JPanel();
         contenidoPanelFormulario = new javax.swing.JPanel();
@@ -208,6 +211,36 @@ public class PanelCliente extends javax.swing.JPanel {
             }
         });
         panelBotones.add(btnEliminar);
+
+        btnPedirAtencion.setBackground(new java.awt.Color(0, 153, 51));
+        btnPedirAtencion.setForeground(new java.awt.Color(255, 255, 255));
+        btnPedirAtencion.setText("Pedir Atención (Cola)");
+        btnPedirAtencion.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                btnPedirAtencionActionPerformed(evt);
+            }
+        });
+        panelBotones.add(btnPedirAtencion);
+
+        btnAtender.setBackground(new java.awt.Color(153, 0, 153));
+        btnAtender.setForeground(new java.awt.Color(255, 255, 255));
+        btnAtender.setText("Atender");
+        btnAtender.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                btnAtenderActionPerformed(evt);
+            }
+        });
+        panelBotones.add(btnAtender);
+
+        btnVerCola.setBackground(new java.awt.Color(0, 102, 204));
+        btnVerCola.setForeground(new java.awt.Color(255, 255, 255));
+        btnVerCola.setText("Ver Cola");
+        btnVerCola.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                btnVerColaActionPerformed(evt);
+            }
+        });
+        panelBotones.add(btnVerCola);
 
         panelBarra.add(panelBotones, java.awt.BorderLayout.LINE_END);
 
@@ -536,13 +569,62 @@ public class PanelCliente extends javax.swing.JPanel {
         ocultarFormulario();
     }//GEN-LAST:event_btnCancelarActionPerformed
 
+    private void btnPedirAtencionActionPerformed(java.awt.event.ActionEvent evt) {
+        int fila = tblClientes.getSelectedRow();
+        String ruc = (fila >= 0) ? modeloTabla.getValueAt(fila, 0).toString() : txtRuc.getText().trim();
+
+        if (ruc.isEmpty()) {
+            JOptionPane.showMessageDialog(this, "Seleccione un cliente de la tabla o ingrese el RUC para pedir atención.", "Aviso", JOptionPane.WARNING_MESSAGE);
+            return;
+        }
+
+        try {
+            clienteServicio.pedirAtencion(ruc);
+            Cliente c = clienteServicio.obtenerClientePorRuc(ruc);
+            JOptionPane.showMessageDialog(this, "Cliente ingresado a la cola de atención:\n"
+                    + (c != null ? c.getNombre() : ruc) + "\nPosición en cola: " + clienteServicio.cantidadEnCola(),
+                    "Cola de Atención (Circular)", JOptionPane.INFORMATION_MESSAGE);
+        } catch (IllegalArgumentException | IllegalStateException ex) {
+            JOptionPane.showMessageDialog(this, ex.getMessage(), "Aviso", JOptionPane.WARNING_MESSAGE);
+        }
+    }
+
+    private void btnAtenderActionPerformed(java.awt.event.ActionEvent evt) {
+        try {
+            Cliente atendido = clienteServicio.atenderSiguiente();
+            JOptionPane.showMessageDialog(this, "Atendiendo cliente:\n"
+                    + "Nombre: " + atendido.getNombre() + "\n"
+                    + "RUC: " + atendido.getRuc() + "\n"
+                    + "Clientes restantes en cola: " + clienteServicio.cantidadEnCola(),
+                    "Cliente Atendido (FIFO)", JOptionPane.INFORMATION_MESSAGE);
+        } catch (IllegalStateException ex) {
+            JOptionPane.showMessageDialog(this, ex.getMessage(), "Cola Vacía", JOptionPane.WARNING_MESSAGE);
+        }
+    }
+
+    private void btnVerColaActionPerformed(java.awt.event.ActionEvent evt) {
+        List<Cliente> enEspera = clienteServicio.obtenerCola();
+        if (enEspera.isEmpty()) {
+            JOptionPane.showMessageDialog(this, "No hay clientes en la cola de atención.", "Cola de Atención", JOptionPane.INFORMATION_MESSAGE);
+            return;
+        }
+        StringBuilder sb = new StringBuilder("Clientes en Cola de Atención (Arreglo Circular):\n\n");
+        int turno = 1;
+        for (Cliente c : enEspera) {
+            sb.append(turno++).append(". ").append(c.getNombre()).append(" (RUC: ").append(c.getRuc()).append(")\n");
+        }
+        JOptionPane.showMessageDialog(this, sb.toString(), "Cola de Atención", JOptionPane.INFORMATION_MESSAGE);
+    }
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JButton btnAgregar;
+    private javax.swing.JButton btnAtender;
     private javax.swing.JButton btnCancelar;
     private javax.swing.JButton btnEditar;
     private javax.swing.JButton btnEliminar;
     private javax.swing.JButton btnOpcion;
+    private javax.swing.JButton btnPedirAtencion;
+    private javax.swing.JButton btnVerCola;
     private javax.swing.JPanel contenidoPanelFormulario;
     private javax.swing.JScrollPane jScrollPane;
     private javax.swing.JSplitPane jSplitPane;

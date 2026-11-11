@@ -181,6 +181,7 @@ public class PanelRuta extends javax.swing.JPanel {
         btnAgregar = new javax.swing.JButton();
         btnEditar = new javax.swing.JButton();
         btnEliminar = new javax.swing.JButton();
+        btnCircuito = new javax.swing.JButton();
         jSplitPane = new javax.swing.JSplitPane();
         panelFormulario = new javax.swing.JPanel();
         contenidoPanelFormulario = new javax.swing.JPanel();
@@ -248,6 +249,16 @@ public class PanelRuta extends javax.swing.JPanel {
             }
         });
         panelBotones.add(btnEliminar);
+
+        btnCircuito.setBackground(new java.awt.Color(0, 153, 51));
+        btnCircuito.setForeground(new java.awt.Color(255, 255, 255));
+        btnCircuito.setText("Circuito (LECS)");
+        btnCircuito.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                btnCircuitoActionPerformed(evt);
+            }
+        });
+        panelBotones.add(btnCircuito);
 
         panelBarra.add(panelBotones, java.awt.BorderLayout.LINE_END);
 
@@ -602,10 +613,44 @@ public class PanelRuta extends javax.swing.JPanel {
         ocultarFormulario();
     }//GEN-LAST:event_btnCancelarActionPerformed
 
+    private void btnCircuitoActionPerformed(java.awt.event.ActionEvent evt) {
+        int fila = tblRutas.getSelectedRow();
+        int id = -1;
+        if (fila >= 0) {
+            id = Integer.parseInt(modeloTabla.getValueAt(fila, 0).toString());
+        } else if (!txtId.getText().trim().isEmpty()) {
+            try {
+                id = Integer.parseInt(txtId.getText().trim());
+            } catch (NumberFormatException e) {
+            }
+        }
+
+        if (id == -1) {
+            JOptionPane.showMessageDialog(this, "Seleccione una ruta de la tabla para recorrer su circuito cerrado (LECS).", "Aviso", JOptionPane.WARNING_MESSAGE);
+            return;
+        }
+
+        Ruta r = GestorLogistica.buscarRutaPorId(id);
+        if (r == null) {
+            JOptionPane.showMessageDialog(this, "Ruta no encontrada.", "Error", JOptionPane.ERROR_MESSAGE);
+            return;
+        }
+
+        r.avanzarParada();
+        StringBuilder sb = new StringBuilder("Circuito de la Ruta " + r.getId() + " (Lista Enlazada Circular Simple - LECS):\n\n");
+        for (Ruta.ParadaCircuito p : r.getItinerarioCircular()) {
+            boolean esActual = (p == r.getParadaActual());
+            sb.append(esActual ? " ▶ [HITO ACTUAL] " : "   - ")
+              .append(p.getTipo()).append(": ").append(p.getNombre()).append("\n");
+        }
+        sb.append("\n(Al avanzar en el circuito, el último nodo enlaza cíclicamente con el primer nodo)");
+        JOptionPane.showMessageDialog(this, sb.toString(), "Circuito Circular (LECS)", JOptionPane.INFORMATION_MESSAGE);
+    }
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JButton btnAgregar;
     private javax.swing.JButton btnCancelar;
+    private javax.swing.JButton btnCircuito;
     private javax.swing.JButton btnEditar;
     private javax.swing.JButton btnEliminar;
     private javax.swing.JButton btnOpcion;

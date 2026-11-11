@@ -147,6 +147,10 @@ public class PanelTerminal extends javax.swing.JPanel {
         btnAgregar = new javax.swing.JButton();
         btnEditar = new javax.swing.JButton();
         btnEliminar = new javax.swing.JButton();
+        btnDeshacer = new javax.swing.JButton();
+        btnAnterior = new javax.swing.JButton();
+        btnSiguiente = new javax.swing.JButton();
+        btnEncolar = new javax.swing.JButton();
         jSplitPane = new javax.swing.JSplitPane();
         panelFormulario = new javax.swing.JPanel();
         contenidoPanelFormulario = new javax.swing.JPanel();
@@ -207,6 +211,46 @@ public class PanelTerminal extends javax.swing.JPanel {
             }
         });
         panelBotones.add(btnEliminar);
+
+        btnDeshacer.setBackground(new java.awt.Color(153, 0, 153));
+        btnDeshacer.setForeground(new java.awt.Color(255, 255, 255));
+        btnDeshacer.setText("Deshacer (Pila)");
+        btnDeshacer.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                btnDeshacerActionPerformed(evt);
+            }
+        });
+        panelBotones.add(btnDeshacer);
+
+        btnAnterior.setBackground(new java.awt.Color(0, 102, 204));
+        btnAnterior.setForeground(new java.awt.Color(255, 255, 255));
+        btnAnterior.setText("◀ Anterior (LED)");
+        btnAnterior.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                btnAnteriorActionPerformed(evt);
+            }
+        });
+        panelBotones.add(btnAnterior);
+
+        btnSiguiente.setBackground(new java.awt.Color(0, 102, 204));
+        btnSiguiente.setForeground(new java.awt.Color(255, 255, 255));
+        btnSiguiente.setText("Siguiente ▶ (LED)");
+        btnSiguiente.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                btnSiguienteActionPerformed(evt);
+            }
+        });
+        panelBotones.add(btnSiguiente);
+
+        btnEncolar.setBackground(new java.awt.Color(0, 153, 51));
+        btnEncolar.setForeground(new java.awt.Color(255, 255, 255));
+        btnEncolar.setText("Cola Espera");
+        btnEncolar.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                btnEncolarActionPerformed(evt);
+            }
+        });
+        panelBotones.add(btnEncolar);
 
         panelBarra.add(panelBotones, java.awt.BorderLayout.LINE_END);
 
@@ -536,13 +580,113 @@ public class PanelTerminal extends javax.swing.JPanel {
         ocultarFormulario();
     }//GEN-LAST:event_btnCancelarActionPerformed
 
+    private void btnDeshacerActionPerformed(java.awt.event.ActionEvent evt) {
+        Terminal recuperada = terminalServicio.deshacerEliminacion();
+        if (recuperada != null) {
+            if (GestorLogistica.buscarTerminalPorRuc(recuperada.getRuc()) == null) {
+                GestorLogistica.agregarTerminal(recuperada);
+            }
+            actualizarTabla(terminalServicio.getTerminales());
+            JOptionPane.showMessageDialog(this, "Se recuperó de la pila (PilaTerminalLES LIFO) el terminal:\n"
+                    + recuperada.getNombre() + " (RUC: " + recuperada.getRuc() + ")", "Deshacer Eliminación", JOptionPane.INFORMATION_MESSAGE);
+        } else {
+            JOptionPane.showMessageDialog(this, "No hay terminales en la pila de eliminadas para deshacer.", "Pila Vacía", JOptionPane.WARNING_MESSAGE);
+        }
+    }
+
+    private void btnAnteriorActionPerformed(java.awt.event.ActionEvent evt) {
+        Terminal anterior = terminalServicio.irAnterior();
+        if (anterior != null) {
+            seleccionarTerminalEnTabla(anterior.getRuc());
+            JOptionPane.showMessageDialog(this, "Puntero de Lista Doble movido al nodo anterior:\n"
+                    + anterior.getNombre() + " (RUC: " + anterior.getRuc() + ")\nPosición: "
+                    + (terminalServicio.getPosicionActual() + 1) + " de " + terminalServicio.getTerminales().size(),
+                    "Navegación Lista Doble (LED)", JOptionPane.INFORMATION_MESSAGE);
+        } else {
+            JOptionPane.showMessageDialog(this, "Ya se encuentra en el primer nodo de la lista doble.", "Inicio de Lista", JOptionPane.WARNING_MESSAGE);
+        }
+    }
+
+    private void btnSiguienteActionPerformed(java.awt.event.ActionEvent evt) {
+        Terminal siguiente = terminalServicio.irSiguiente();
+        if (siguiente != null) {
+            seleccionarTerminalEnTabla(siguiente.getRuc());
+            JOptionPane.showMessageDialog(this, "Puntero de Lista Doble movido al nodo siguiente:\n"
+                    + siguiente.getNombre() + " (RUC: " + siguiente.getRuc() + ")\nPosición: "
+                    + (terminalServicio.getPosicionActual() + 1) + " de " + terminalServicio.getTerminales().size(),
+                    "Navegación Lista Doble (LED)", JOptionPane.INFORMATION_MESSAGE);
+        } else {
+            JOptionPane.showMessageDialog(this, "Ya se encuentra en el último nodo de la lista doble.", "Fin de Lista", JOptionPane.WARNING_MESSAGE);
+        }
+    }
+
+    private void btnEncolarActionPerformed(java.awt.event.ActionEvent evt) {
+        int fila = tblTerminales.getSelectedRow();
+        String ruc = (fila >= 0) ? modeloTabla.getValueAt(fila, 0).toString() : txtRuc.getText().trim();
+        if (ruc.isEmpty()) {
+            JOptionPane.showMessageDialog(this, "Seleccione un terminal de la tabla para gestionar su cola de contenedores.", "Aviso", JOptionPane.WARNING_MESSAGE);
+            return;
+        }
+        Terminal t = terminalServicio.obtenerPorRuc(ruc);
+        if (t == null) {
+            JOptionPane.showMessageDialog(this, "Terminal no encontrado.", "Error", JOptionPane.ERROR_MESSAGE);
+            return;
+        }
+
+        String[] opciones = {"Encolar Contenedor", "Atender Próximo", "Ver Cola de Espera"};
+        int seleccion = JOptionPane.showOptionDialog(this,
+                "Terminal: " + t.getNombre() + "\nContenedores en espera: " + t.getCantidadContenedoresEnEspera(),
+                "Cola de Contenedores (ColaStringLES)",
+                JOptionPane.DEFAULT_OPTION, JOptionPane.QUESTION_MESSAGE, null, opciones, opciones[0]);
+
+        if (seleccion == 0) {
+            String codigo = JOptionPane.showInputDialog(this, "Ingrese el código del contenedor:", "Encolar Contenedor", JOptionPane.QUESTION_MESSAGE);
+            if (codigo != null && !codigo.isBlank()) {
+                t.encolarContenedor(codigo);
+                JOptionPane.showMessageDialog(this, "Contenedor " + codigo.trim().toUpperCase() + " encolado en " + t.getNombre() + ".\nTotal en cola: " + t.getCantidadContenedoresEnEspera(), "Éxito", JOptionPane.INFORMATION_MESSAGE);
+            }
+        } else if (seleccion == 1) {
+            String atendido = t.atenderContenedor();
+            if (atendido != null) {
+                JOptionPane.showMessageDialog(this, "Contenedor atendido de la cola: " + atendido + "\nRestantes: " + t.getCantidadContenedoresEnEspera(), "Atención FIFO", JOptionPane.INFORMATION_MESSAGE);
+            } else {
+                JOptionPane.showMessageDialog(this, "No hay contenedores en la cola de este terminal.", "Cola Vacía", JOptionPane.WARNING_MESSAGE);
+            }
+        } else if (seleccion == 2) {
+            List<String> lista = t.getContenedoresEnEspera();
+            if (lista.isEmpty()) {
+                JOptionPane.showMessageDialog(this, "No hay contenedores en espera.", "Cola Vacía", JOptionPane.INFORMATION_MESSAGE);
+            } else {
+                StringBuilder sb = new StringBuilder("Contenedores en espera en " + t.getNombre() + " (ColaStringLES):\n\n");
+                int idx = 1;
+                for (String c : lista) {
+                    sb.append(idx++).append(". ").append(c).append("\n");
+                }
+                JOptionPane.showMessageDialog(this, sb.toString(), "Cola de Contenedores", JOptionPane.INFORMATION_MESSAGE);
+            }
+        }
+    }
+
+    private void seleccionarTerminalEnTabla(String ruc) {
+        for (int i = 0; i < modeloTabla.getRowCount(); i++) {
+            if (modeloTabla.getValueAt(i, 0).toString().equalsIgnoreCase(ruc)) {
+                tblTerminales.setRowSelectionInterval(i, i);
+                txtRuc.setText(ruc);
+                break;
+            }
+        }
+    }
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JButton btnAgregar;
+    private javax.swing.JButton btnAnterior;
     private javax.swing.JButton btnCancelar;
+    private javax.swing.JButton btnDeshacer;
     private javax.swing.JButton btnEditar;
     private javax.swing.JButton btnEliminar;
+    private javax.swing.JButton btnEncolar;
     private javax.swing.JButton btnOpcion;
+    private javax.swing.JButton btnSiguiente;
     private javax.swing.JPanel contenidoPanelFormulario;
     private javax.swing.JScrollPane jScrollPane;
     private javax.swing.JSplitPane jSplitPane;

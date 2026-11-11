@@ -147,6 +147,7 @@ public class PanelContenedor extends javax.swing.JPanel {
         btnAgregar = new javax.swing.JButton();
         btnEditar = new javax.swing.JButton();
         btnEliminar = new javax.swing.JButton();
+        btnRecorrerLES = new javax.swing.JButton();
         jSplitPane = new javax.swing.JSplitPane();
         panelFormulario = new javax.swing.JPanel();
         contenidoPanelFormulario = new javax.swing.JPanel();
@@ -207,6 +208,16 @@ public class PanelContenedor extends javax.swing.JPanel {
             }
         });
         panelBotones.add(btnEliminar);
+
+        btnRecorrerLES.setBackground(new java.awt.Color(0, 153, 51));
+        btnRecorrerLES.setForeground(new java.awt.Color(255, 255, 255));
+        btnRecorrerLES.setText("Lista Simple (LES)");
+        btnRecorrerLES.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                btnRecorrerLESActionPerformed(evt);
+            }
+        });
+        panelBotones.add(btnRecorrerLES);
 
         panelBarra.add(panelBotones, java.awt.BorderLayout.LINE_END);
 
@@ -516,6 +527,21 @@ public class PanelContenedor extends javax.swing.JPanel {
         ocultarFormulario();
     }//GEN-LAST:event_btnCancelarActionPerformed
 
+    private void btnRecorrerLESActionPerformed(java.awt.event.ActionEvent evt) {
+        int total = contenedorServicio.getTamanio();
+        if (total == 0) {
+            JOptionPane.showMessageDialog(this, "La Lista Enlazada Simple (LES) de contenedores está vacía.", "Lista Enlazada Simple", JOptionPane.INFORMATION_MESSAGE);
+            return;
+        }
+
+        StringBuilder sb = new StringBuilder("Estructura: Lista Enlazada Simple (LES) de Contenedores:\n\n");
+        sb.append("cabeza -> ");
+        for (Contenedor c : contenedorServicio.getContenedores()) {
+            sb.append("[").append(c.getCodigo()).append("] -> ");
+        }
+        sb.append("null\n\nTotal de nodos enlazados: ").append(total);
+        JOptionPane.showMessageDialog(this, sb.toString(), "Recorrido de Lista Enlazada Simple (LES)", JOptionPane.INFORMATION_MESSAGE);
+    }
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JButton btnAgregar;
@@ -523,6 +549,7 @@ public class PanelContenedor extends javax.swing.JPanel {
     private javax.swing.JButton btnEditar;
     private javax.swing.JButton btnEliminar;
     private javax.swing.JButton btnOpcion;
+    private javax.swing.JButton btnRecorrerLES;
     private javax.swing.JPanel contenidoPanelFormulario;
     private javax.swing.JScrollPane jScrollPane;
     private javax.swing.JSplitPane jSplitPane;

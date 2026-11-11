@@ -21,6 +21,20 @@ public class GestorLogistica {
         return clientes;
     }
 
+    public static Cliente buscarClientePorRuc(String ruc) {
+        if (ruc == null) return null;
+        for (Cliente c : clientes) {
+            if (c.getRuc().equalsIgnoreCase(ruc.trim())) {
+                return c;
+            }
+        }
+        return null;
+    }
+
+    public static boolean eliminarCliente(String ruc) {
+        if (ruc == null) return false;
+        return clientes.removeIf(c -> c.getRuc().equalsIgnoreCase(ruc.trim()));
+    }
     
     public static void agregarPlanta(Planta planta) {
         plantas.add(planta);
@@ -30,6 +44,20 @@ public class GestorLogistica {
         return plantas;
     }
 
+    public static Planta buscarPlantaPorRuc(String ruc) {
+        if (ruc == null) return null;
+        for (Planta p : plantas) {
+            if (p.getRuc().equalsIgnoreCase(ruc.trim())) {
+                return p;
+            }
+        }
+        return null;
+    }
+
+    public static boolean eliminarPlanta(String ruc) {
+        if (ruc == null) return false;
+        return plantas.removeIf(p -> p.getRuc().equalsIgnoreCase(ruc.trim()));
+    }
     
     public static void agregarTerminal(Terminal terminal) {
         terminales.add(terminal);
@@ -37,6 +65,21 @@ public class GestorLogistica {
 
     public static ArrayList<Terminal> getTerminales() {
         return terminales;
+    }
+
+    public static Terminal buscarTerminalPorRuc(String ruc) {
+        if (ruc == null) return null;
+        for (Terminal t : terminales) {
+            if (t.getRuc().equalsIgnoreCase(ruc.trim())) {
+                return t;
+            }
+        }
+        return null;
+    }
+
+    public static boolean eliminarTerminal(String ruc) {
+        if (ruc == null) return false;
+        return terminales.removeIf(t -> t.getRuc().equalsIgnoreCase(ruc.trim()));
     }
 
     
